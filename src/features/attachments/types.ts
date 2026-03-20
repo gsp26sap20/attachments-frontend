@@ -24,3 +24,27 @@ export type AttachmentListParams = {
   $top: number;
   $filter?: string;
 };
+
+export type AttachmentDetailParams = {
+  "sap-client": number;
+  $select: string;
+  $expand?: string;
+};
+
+export type AttachmentDetailResponse = {
+  FileId: string;
+  Title: string;
+  CurrentVersion: string;
+  IsActive: boolean;
+  Erdat: string;
+  Ernam: string;
+  __EntityControl: {
+    Deletable: boolean;
+    Updatable: boolean;
+  };
+  _CurrentVersion?: {
+    FileName: string;
+    MimeType: string;
+    FileContent: string;
+  };
+};
