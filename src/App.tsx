@@ -1,4 +1,3 @@
-import "./App.css";
 import { useState } from "react";
 import heroImg from "./assets/hero.png";
 
@@ -49,7 +48,7 @@ function App() {
           </ul>
         </div>
         <div id="social">
-          <h2>Connect with us</h2>
+          <h2 className="text-red-500">Connect with us</h2>
           <p>Join the Vite community</p>
           <ul>
             <li>
