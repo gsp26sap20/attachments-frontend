@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useParams } from "react-router";
 import { ObjectPage } from "@ui5/webcomponents-react/ObjectPage";
 import { ObjectPageHeader } from "@ui5/webcomponents-react/ObjectPageHeader";
@@ -11,9 +12,6 @@ import { Title } from "@ui5/webcomponents-react/Title";
 import { FlexBox } from "@ui5/webcomponents-react/FlexBox";
 import { Label } from "@ui5/webcomponents-react/Label";
 import { Text } from "@ui5/webcomponents-react/Text";
-// import { Form } from "@ui5/webcomponents-react/Form";
-// import { FormGroup } from "@ui5/webcomponents-react/FormGroup";
-// import { FormItem } from "@ui5/webcomponents-react/FormItem";
 import { Button } from "@ui5/webcomponents-react/Button";
 import "@ui5/webcomponents-icons/decline.js";
 import "@ui5/webcomponents-icons/share.js";
@@ -24,10 +22,14 @@ import { BusyIndicator } from "@ui5/webcomponents-react/BusyIndicator";
 import { FilePreview } from "./file-preview";
 import { AttachmentAudit } from "./attachment-audit";
 import { AttachmentVersion } from "./attachment-version";
+import "@ui5/webcomponents-icons/arrow-bottom.js";
+import { downloadFile } from "../helpers";
+import { Toast } from "@ui5/webcomponents-react/Toast";
 
 export function AttachmentsDetailView() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [toastVisible, setToastVisible] = React.useState(false);
   const { data: attachment, isLoading } = useQuery(
     getAttachmentDetailQueryOptions(id!, {
       "sap-client": 324,
@@ -94,6 +96,25 @@ export function AttachmentsDetailView() {
         <ObjectPageTitle
           actionsBar={
             <Toolbar design="Transparent" style={{ height: "auto" }}>
+              <ToolbarButton
+                icon="arrow-bottom"
+                tooltip="Download current version"
+                onClick={() => {
+                  if (!attachment?._CurrentVersion) return;
+                  const success = downloadFile(
+                    attachment._CurrentVersion.FileContent,
+                    attachment._CurrentVersion.FileName,
+                    attachment._CurrentVersion.MimeType,
+                  );
+                  if (!success) {
+                    setToastVisible(true);
+                  }
+                }}
+                disabled={
+                  !attachment?._CurrentVersion?.FileContent ||
+                  !attachment?._CurrentVersion?.MimeType
+                }
+              />
               <ToolbarButton
                 design="Emphasized"
                 text="Edit"
@@ -175,6 +196,13 @@ export function AttachmentsDetailView() {
           />
         </div>
       </ObjectPageSection>
+      <Toast
+        open={toastVisible}
+        onClose={() => setToastVisible(false)}
+        duration={2000}
+      >
+        Failed to download file.
+      </Toast>
     </ObjectPage>
   );
 }

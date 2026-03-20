@@ -1,4 +1,6 @@
+import * as React from "react";
 import { Controller, useForm } from "react-hook-form";
+import { Toast } from "@ui5/webcomponents-react/Toast";
 
 type LoginFormValues = {
   username: string;
@@ -14,6 +16,8 @@ const LANGUAGE_OPTIONS = [
 ];
 
 export function App() {
+  const [showToast, setShowToast] = React.useState(false);
+
   const {
     control,
     handleSubmit,
@@ -28,6 +32,7 @@ export function App() {
   });
 
   const onSubmit = (_values: LoginFormValues) => {
+    setShowToast(true);
     return;
   };
 
@@ -36,9 +41,9 @@ export function App() {
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.16),transparent_35%),linear-gradient(320deg,rgba(255,255,255,0.14),transparent_42%)] opacity-95" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.08)_0_14%,transparent_14%_100%)]" />
-        <div className="absolute -left-32 -top-8 h-[44rem] w-[44rem] rotate-[24deg] rounded-[42%_58%_51%_49%/46%_39%_61%_54%] bg-white/20" />
-        <div className="absolute left-1/2 top-[-22rem] h-[52rem] w-[52rem] -translate-x-1/2 rounded-[54%_46%_39%_61%/40%_55%_45%_60%] bg-white/20" />
-        <div className="absolute -bottom-8 -right-32 h-[34rem] w-[48rem] rotate-[28deg] rounded-[60%_40%_47%_53%/38%_48%_52%_62%] bg-white/20" />
+        <div className="absolute -left-32 -top-8 h-176 w-176 rotate-24 rounded-[42%_58%_51%_49%/46%_39%_61%_54%] bg-white/20" />
+        <div className="absolute left-1/2 -top-88 h-208 w-208 -translate-x-1/2 rounded-[54%_46%_39%_61%/40%_55%_45%_60%] bg-white/20" />
+        <div className="absolute -bottom-8 -right-32 h-136 w-3xl rotate-28 rounded-[60%_40%_47%_53%/38%_48%_52%_62%] bg-white/20" />
       </div>
 
       <header
@@ -52,7 +57,7 @@ export function App() {
       </header>
 
       <section className="relative z-10 grid min-h-screen place-items-center px-6 pb-16 pt-20">
-        <div className="w-full max-w-[22rem] rounded-[0.9rem] border border-white/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.48),rgba(255,255,255,0.22))] px-4 pb-4 pt-[1.15rem] shadow-[0_18px_48px_rgba(113,144,176,0.2),inset_0_1px_0_rgba(255,255,255,0.45)] backdrop-blur-[12px] sm:px-[1.35rem] sm:pb-[1.1rem] sm:pt-[1.4rem]">
+        <div className="w-full max-w-88 rounded-[0.9rem] border border-white/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.48),rgba(255,255,255,0.22))] px-4 pb-4 pt-[1.15rem] shadow-[0_18px_48px_rgba(113,144,176,0.2),inset_0_1px_0_rgba(255,255,255,0.45)] backdrop-blur-md sm:px-[1.35rem] sm:pb-[1.1rem] sm:pt-[1.4rem]">
           <form
             className="flex flex-col gap-3"
             onSubmit={handleSubmit(onSubmit)}
@@ -184,10 +189,7 @@ export function App() {
               Log On
             </button>
 
-            <a
-              className="self-center text-[0.76rem] text-[#235b90]"
-              href="#"
-            >
+            <a className="self-center text-[0.76rem] text-[#235b90]" href="#">
               Change Password
             </a>
           </form>
@@ -197,6 +199,16 @@ export function App() {
       <footer className="absolute bottom-[0.95rem] left-4 right-4 z-10 text-center text-[0.7rem] text-[rgba(52,76,98,0.88)] sm:left-auto sm:right-5 sm:text-left">
         Copyright (c) 2026 SAP SE All Rights Reserved.
       </footer>
+
+      <Toast
+        className="px-2 py-1"
+        open={showToast}
+        onClose={() => {
+          setShowToast(false);
+        }}
+      >
+        This function is not implemented yet.
+      </Toast>
     </main>
   );
 }

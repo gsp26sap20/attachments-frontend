@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useParams } from "react-router";
 import { ObjectPage } from "@ui5/webcomponents-react/ObjectPage";
 import { ObjectPageHeader } from "@ui5/webcomponents-react/ObjectPageHeader";
@@ -12,6 +13,7 @@ import { FlexBox } from "@ui5/webcomponents-react/FlexBox";
 import { Label } from "@ui5/webcomponents-react/Label";
 import { Text } from "@ui5/webcomponents-react/Text";
 import { Button } from "@ui5/webcomponents-react/Button";
+import { Toast } from "@ui5/webcomponents-react/Toast";
 import "@ui5/webcomponents-icons/decline.js";
 import "@ui5/webcomponents-icons/share.js";
 import { useNavigate } from "react-router";
@@ -23,9 +25,11 @@ import {
   getAttachmentVersionDetailQueryOptions,
   getAttachmentTitleQueryOptions,
 } from "../options/query";
+import { downloadFile } from "../helpers";
 
 export function VersionDetailView() {
   const { id, versionNo } = useParams();
+  const [toastVisible, setToastVisible] = React.useState(false);
   const navigate = useNavigate();
   const { data: version, isLoading } = useQuery(
     getAttachmentVersionDetailQueryOptions(id!, versionNo!, {
@@ -98,7 +102,18 @@ export function VersionDetailView() {
                 design="Default"
                 icon="arrow-bottom"
                 tooltip="Download"
-                // disabled={!attachment?.__EntityControl?.Deletable}
+                onClick={() => {
+                  if (!version) return;
+                  const success = downloadFile(
+                    version.FileContent,
+                    version.FileName,
+                    version.MimeType,
+                  );
+                  if (!success) {
+                    setToastVisible(true);
+                  }
+                }}
+                disabled={!version?.FileContent || !version?.MimeType}
               />
             </Toolbar>
           }
@@ -164,6 +179,13 @@ export function VersionDetailView() {
           />
         </div>
       </ObjectPageSection>
+      <Toast
+        open={toastVisible}
+        onClose={() => setToastVisible(false)}
+        duration={2000}
+      >
+        Failed to download file.
+      </Toast>
     </ObjectPage>
   );
 }

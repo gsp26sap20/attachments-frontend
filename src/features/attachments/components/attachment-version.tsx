@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Title } from "@ui5/webcomponents-react/Title";
 import { Toolbar } from "@ui5/webcomponents-react/Toolbar";
