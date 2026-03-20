@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
+
+specVersion: "4.0"
+metadata:
+  name: app.dev221.reactfiori
+type: application
+builder:
+  resources:
+    excludes:
+      - /test/**
+      - /localService/**
+  customTasks:
+    - name: deploy-to-abap
+      afterTask: generateCachebusterInfo
+      configuration:
+        target:
+          url: https://s40lp1.ucc.cit.tum.de
+          client: "324"
+        app:
+          name: ZTRONGDEV221_RF
+          description: React Fiori App
+          package: YTRONG_QE180172_221
+          transport: S40K908842
+        exclude:
+          - /test/
