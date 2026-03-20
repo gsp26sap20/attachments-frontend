@@ -1,0 +1,68 @@
+import * as React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Title } from "@ui5/webcomponents-react/Title";
+import { Toolbar } from "@ui5/webcomponents-react/Toolbar";
+import { ToolbarSpacer } from "@ui5/webcomponents-react/ToolbarSpacer";
+import { getAttachmentVersionsQueryOptions } from "../options/query";
+import { AnalyticalTable } from "@ui5/webcomponents-react/AnalyticalTable";
+
+const versionColumns = [
+  {
+    Header: "Version",
+    accessor: "VersionNo",
+  },
+  {
+    Header: "File Name",
+    accessor: "FileName",
+  },
+  {
+    Header: "Created On",
+    accessor: "Erdat",
+  },
+  {
+    Header: "Created By",
+    accessor: "Ernam",
+  },
+];
+
+export function AttachmentVersion({ fileId }: { fileId: string }) {
+  const { data: versionsData, isFetching: isVersionsFetching } = useQuery(
+    getAttachmentVersionsQueryOptions(fileId, {
+      "sap-client": 324,
+      $count: true,
+      $select:
+        "Erdat,Ernam,FileId,FileName,VersionNo,__EntityControl/Deletable,__EntityControl/Updatable",
+      $skip: 0,
+      $top: 10,
+    }),
+  );
+
+  const versions = versionsData?.value ?? [];
+
+  const memoizedVersionColumns = React.useMemo(() => versionColumns, []);
+
+  return (
+    <AnalyticalTable
+      header={
+        <Toolbar className="py-2 px-4 rounded-t-xl">
+          <Title level="H4">
+            Versions{" "}
+            {versionsData?.["@odata.count"]
+              ? `(${versionsData["@odata.count"]})`
+              : ""}
+          </Title>
+          <ToolbarSpacer />
+        </Toolbar>
+      }
+      data={versions}
+      columns={memoizedVersionColumns}
+      loading={isVersionsFetching}
+      rowHeight={36}
+      selectionMode="None"
+      visibleRows={10}
+      sortable
+      groupable
+      scaleWidthMode="Smart"
+    />
+  );
+}

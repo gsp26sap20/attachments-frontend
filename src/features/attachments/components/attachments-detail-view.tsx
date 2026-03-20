@@ -22,6 +22,8 @@ import { useQuery } from "@tanstack/react-query";
 import { getAttachmentDetailQueryOptions } from "../options/query";
 import { BusyIndicator } from "@ui5/webcomponents-react/BusyIndicator";
 import { FilePreview } from "./file-preview";
+import { AttachmentAudit } from "./attachment-audit";
+import { AttachmentVersion } from "./attachment-version";
 
 export function AttachmentsDetailView() {
   const { id } = useParams();
@@ -143,6 +145,22 @@ export function AttachmentsDetailView() {
           <BusyIndicator delay={0} active size="L" />
         </FlexBox>
       )}
+      <ObjectPageSection
+        aria-label="Versions"
+        id="versions"
+        titleText="Versions"
+        style={{ display: isLoading ? "none" : "block" }}
+      >
+        <AttachmentVersion fileId={id!} />
+      </ObjectPageSection>
+      <ObjectPageSection
+        aria-label="Audit"
+        id="audit"
+        titleText="Audit"
+        style={{ display: isLoading ? "none" : "block" }}
+      >
+        <AttachmentAudit fileId={id!} />
+      </ObjectPageSection>
       {/* <ObjectPageSection
         aria-label="Goals"
         id="goals"

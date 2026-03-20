@@ -48,3 +48,51 @@ export type AttachmentDetailResponse = {
     FileContent: string;
   };
 };
+
+export type AttachmentVersionItem = {
+  FileId: string;
+  VersionNo: string;
+  FileName: string;
+  Erdat: string;
+  Ernam: string;
+  __EntityControl: {
+    Deletable: boolean;
+    Updatable: boolean;
+  };
+};
+
+export type AttachmentVersionsResponse = {
+  value: AttachmentVersionItem[];
+  "@odata.count": string;
+};
+
+export type AttachmentVersionsParams = {
+  "sap-client": number;
+  $count: boolean;
+  $select: string;
+  $skip: number;
+  $top: number;
+};
+
+export type AttachmentAuditItem = {
+  FileId: string;
+  Erdat: string;
+  Erzet: string;
+  Uname: string;
+  Action: string;
+  Note: string;
+  Ernam: string;
+};
+
+export type AttachmentAuditsResponse = {
+  "@odata.count": string;
+  value: AttachmentAuditItem[];
+};
+
+export type AttachmentAuditsParams = {
+  "sap-client": number;
+  $count: boolean;
+  $select: string;
+  $skip: number;
+  $top: number;
+};
