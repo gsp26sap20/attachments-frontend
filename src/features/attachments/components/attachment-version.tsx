@@ -6,7 +6,9 @@ import { getAttachmentVersionsQueryOptions } from "../options/query";
 import { AnalyticalTable } from "@ui5/webcomponents-react/AnalyticalTable";
 import { useNavigate } from "react-router";
 import { Icon } from "@ui5/webcomponents-react/Icon";
+import { Button } from "@ui5/webcomponents-react/Button";
 import "@ui5/webcomponents-icons/navigation-right-arrow.js";
+import "@ui5/webcomponents-icons/add.js";
 
 const versionColumns = [
   {
@@ -61,6 +63,13 @@ export function AttachmentVersion({ fileId }: { fileId: string }) {
               : ""}
           </Title>
           <ToolbarSpacer />
+          <Button
+            design="Emphasized"
+            icon="add"
+            onClick={() => navigate(`/Attachments/${fileId}/Upload`)}
+          >
+            Upload
+          </Button>
         </Toolbar>
       }
       data={versions}

@@ -128,3 +128,27 @@ export type AttachmentTitleParams = {
 export type RollbackVersionPayload = {
   CurrentVersion: string;
 };
+
+export type UploadedFileData = {
+  FileName: string;
+  FileExtension: string;
+  MimeType: string;
+  FileSize: number; // bytes
+  FileContent: string; // base64
+};
+
+export type UploadVersionPayload = UploadedFileData & {
+  FileId: string;
+};
+
+export type UploadVersionResponse = {
+  FileId: string;
+  VersionNo: string;
+  FileName: string;
+  FileExtension: string;
+  MimeType: string;
+  FileSize: number;
+  Erdat: string;
+  Erzet: string;
+  Ernam: string;
+};

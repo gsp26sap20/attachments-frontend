@@ -2,7 +2,11 @@ import { mutationOptions } from "@tanstack/react-query";
 import { axiosInstance } from "@/libs/axios-instance";
 import { ODATA_SERVICE } from "@/app-constant";
 import { MUTATION_API } from "../constants";
-import type { RollbackVersionPayload } from "../types";
+import type {
+  RollbackVersionPayload,
+  UploadVersionPayload,
+  UploadVersionResponse,
+} from "../types";
 import { fetchCsrfToken, getCsrfToken } from "@/libs/helpers";
 
 type Params = {
@@ -56,6 +60,38 @@ export function updateAttachmentTitleMutationOptions({
       }
       const res = await axiosInstance.put<unknown>(
         `${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.updateAttachmentTitle(fileId)}`,
+        payload,
+        {
+          headers: {
+            "accept-language": "en",
+            ...(token ? { "x-csrf-token": token } : {}),
+          },
+        },
+      );
+      return res;
+    },
+    onSuccess,
+    onError,
+  });
+}
+
+export function uploadVersionMutationOptions({
+  onSuccess,
+  onError,
+}: Omit<Params, "fileId" | "onSuccess"> & {
+  onSuccess?: (data: UploadVersionResponse) => void;
+}) {
+  return mutationOptions({
+    mutationFn: async (payload: UploadVersionPayload) => {
+      let token = getCsrfToken();
+
+      if (!token) {
+        await fetchCsrfToken();
+        token = getCsrfToken();
+      }
+
+      const res = await axiosInstance.post<UploadVersionResponse>(
+        `${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.uploadVersion}`,
         payload,
         {
           headers: {

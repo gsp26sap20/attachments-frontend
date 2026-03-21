@@ -10,6 +10,7 @@ import { ThemeProvider } from "@ui5/webcomponents-react/ThemeProvider";
 import {
   AttachmentsView,
   VersionDetailView,
+  UploadVersionView,
   AttachmentsDetailView,
 } from "@/features/attachments/components";
 
@@ -33,6 +34,11 @@ createRoot(document.getElementById("root")!).render(
             <Route
               path="/Attachments/:id/Versions/:versionNo"
               element={<VersionDetailView />}
+              caseSensitive
+            />
+            <Route
+              path="/Attachments/:id/Upload"
+              element={<UploadVersionView />}
               caseSensitive
             />
             <Route path="*" element={<Navigate replace to="/Attachments" />} />

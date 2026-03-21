@@ -24,7 +24,7 @@ export function FilePreview({
     return (
       <div
         className={cn(
-          "w-full h-full",
+          "w-full h-full flex items-center justify-center",
           {
             "p-4 rounded-lg border border-dashed": !onlyImage,
           },
