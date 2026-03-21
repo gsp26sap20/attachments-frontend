@@ -1,31 +1,21 @@
-import { API } from "../constants";
-import { ODATA_SERVICE } from "@/app-constant";
-import { axiosInstance } from "@/libs/axios-instance";
-import { keepPreviousData, queryOptions } from "@tanstack/react-query";
-import type { AttachmentListParams, AttachmentListResponse } from "../types";
-import type {
-  AttachmentAuditsParams,
-  AttachmentAuditsResponse,
-  AttachmentDetailParams,
-  AttachmentDetailResponse,
-  AttachmentVersionsParams,
-  AttachmentVersionsResponse,
-  VersionDetail,
-  VersionDetailParams,
-  AttachmentTitleParams,
-  AttachmentTitleResponse,
-} from "../types";
+import { API } from '../constants';
+import { ODATA_SERVICE } from '@/app-constant';
+import { axiosInstance } from '@/libs/axios-instance';
+import { keepPreviousData, queryOptions } from '@tanstack/react-query';
+import type { VersionDetail, AttachmentAuditsResponse } from '../types';
+import type { AttachmentListParams, AttachmentListResponse } from '../types';
+import type { AttachmentAuditsParams, AttachmentDetailParams } from '../types';
+import type { AttachmentTitleParams, AttachmentTitleResponse } from '../types';
+import type { AttachmentVersionsResponse, VersionDetailParams } from '../types';
+import type { AttachmentDetailResponse, AttachmentVersionsParams } from '../types';
 
 export function getAttachmentsQueryOptions(params: AttachmentListParams) {
   return queryOptions({
-    queryKey: ["attachments", params],
+    queryKey: ['attachments', params],
     queryFn: () => {
-      const res = axiosInstance.get<AttachmentListResponse>(
-        `${ODATA_SERVICE.ATTACHMENT}${API.endpoint}`,
-        {
-          params,
-        },
-      );
+      const res = axiosInstance.get<AttachmentListResponse>(`${ODATA_SERVICE.ATTACHMENT}${API.endpoint}`, {
+        params,
+      });
       return res;
     },
     staleTime: 2 * 60 * 1000, // 2 minutes
@@ -35,19 +25,13 @@ export function getAttachmentsQueryOptions(params: AttachmentListParams) {
   });
 }
 
-export function getAttachmentDetailQueryOptions(
-  id: string,
-  params: AttachmentDetailParams,
-) {
+export function getAttachmentDetailQueryOptions(id: string, params: AttachmentDetailParams) {
   return queryOptions({
-    queryKey: ["attachments", id, params],
+    queryKey: ['attachments', id, params],
     queryFn: () => {
-      const res = axiosInstance.get<AttachmentDetailResponse>(
-        `${ODATA_SERVICE.ATTACHMENT}${API.endpoint}(${id})`,
-        {
-          params,
-        },
-      );
+      const res = axiosInstance.get<AttachmentDetailResponse>(`${ODATA_SERVICE.ATTACHMENT}${API.endpoint}(${id})`, {
+        params,
+      });
       return res;
     },
     enabled: !!id,
@@ -58,12 +42,9 @@ export function getAttachmentDetailQueryOptions(
   });
 }
 
-export function getAttachmentVersionsQueryOptions(
-  fileId: string,
-  params: AttachmentVersionsParams,
-) {
+export function getAttachmentVersionsQueryOptions(fileId: string, params: AttachmentVersionsParams) {
   return queryOptions({
-    queryKey: ["attachments", fileId, "versions", params],
+    queryKey: ['attachments', fileId, 'versions', params],
     queryFn: () => {
       const res = axiosInstance.get<AttachmentVersionsResponse>(
         `${ODATA_SERVICE.ATTACHMENT}${API.versionsEndpoint(fileId)}`,
@@ -81,12 +62,9 @@ export function getAttachmentVersionsQueryOptions(
   });
 }
 
-export function getAttachmentAuditsQueryOptions(
-  fileId: string,
-  params: AttachmentAuditsParams,
-) {
+export function getAttachmentAuditsQueryOptions(fileId: string, params: AttachmentAuditsParams) {
   return queryOptions({
-    queryKey: ["attachments", fileId, "audit", params],
+    queryKey: ['attachments', fileId, 'audit', params],
     queryFn: () => {
       const res = axiosInstance.get<AttachmentAuditsResponse>(
         `${ODATA_SERVICE.ATTACHMENT}${API.auditEndpoint(fileId)}`,
@@ -104,13 +82,9 @@ export function getAttachmentAuditsQueryOptions(
   });
 }
 
-export function getAttachmentVersionDetailQueryOptions(
-  fileId: string,
-  versionNo: string,
-  params: VersionDetailParams,
-) {
+export function getAttachmentVersionDetailQueryOptions(fileId: string, versionNo: string, params: VersionDetailParams) {
   return queryOptions({
-    queryKey: ["attachments", fileId, "versions", versionNo, params],
+    queryKey: ['attachments', fileId, 'versions', versionNo, params],
     queryFn: () => {
       const res = axiosInstance.get<VersionDetail>(
         `${ODATA_SERVICE.ATTACHMENT}${API.versionDetailEndpoint(fileId, versionNo)}`,
@@ -128,12 +102,9 @@ export function getAttachmentVersionDetailQueryOptions(
   });
 }
 
-export function getAttachmentTitleQueryOptions(
-  id: string,
-  params: AttachmentTitleParams,
-) {
+export function getAttachmentTitleQueryOptions(id: string, params: AttachmentTitleParams) {
   return queryOptions({
-    queryKey: ["attachments", id, "title", params],
+    queryKey: ['attachments', id, 'title', params],
     queryFn: () => {
       const res = axiosInstance.get<AttachmentTitleResponse>(
         `${ODATA_SERVICE.ATTACHMENT}${API.attachmentTitleEndpoint(id)}`,

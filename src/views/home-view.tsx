@@ -1,6 +1,6 @@
-import * as React from "react";
-import { Controller, useForm } from "react-hook-form";
-import { Toast } from "@ui5/webcomponents-react/Toast";
+import * as React from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { Toast } from '@ui5/webcomponents-react/Toast';
 
 type LoginFormValues = {
   username: string;
@@ -10,12 +10,12 @@ type LoginFormValues = {
 };
 
 const LANGUAGE_OPTIONS = [
-  { value: "vi", label: "VI - Viet Nam" },
-  { value: "en", label: "EN - English" },
-  { value: "de", label: "DE - Deutsch" },
+  { value: 'vi', label: 'VI - Viet Nam' },
+  { value: 'en', label: 'EN - English' },
+  { value: 'de', label: 'DE - Deutsch' },
 ];
 
-export function App() {
+export function HomeView() {
   const [showToast, setShowToast] = React.useState(false);
 
   const {
@@ -24,10 +24,10 @@ export function App() {
     formState: { errors },
   } = useForm<LoginFormValues>({
     defaultValues: {
-      username: "",
-      password: "",
-      language: "vi",
-      client: "3xx",
+      username: '',
+      password: '',
+      language: 'vi',
+      client: '3xx',
     },
   });
 
@@ -58,18 +58,14 @@ export function App() {
 
       <section className="relative z-10 grid min-h-screen place-items-center px-6 pb-16 pt-20">
         <div className="w-full max-w-88 rounded-[0.9rem] border border-white/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.48),rgba(255,255,255,0.22))] px-4 pb-4 pt-[1.15rem] shadow-[0_18px_48px_rgba(113,144,176,0.2),inset_0_1px_0_rgba(255,255,255,0.45)] backdrop-blur-md sm:px-[1.35rem] sm:pb-[1.1rem] sm:pt-[1.4rem]">
-          <form
-            className="flex flex-col gap-3"
-            onSubmit={handleSubmit(onSubmit)}
-            noValidate
-          >
+          <form className="flex flex-col gap-3" onSubmit={handleSubmit(onSubmit)} noValidate>
             <div className="mb-1 flex flex-col gap-3">
               <label className="flex flex-col gap-1">
                 <span className="sr-only">User</span>
                 <Controller
                   control={control}
                   name="username"
-                  rules={{ required: "User is required." }}
+                  rules={{ required: 'User is required.' }}
                   render={({ field }) => (
                     <input
                       aria-label="User"
@@ -86,9 +82,7 @@ export function App() {
                   )}
                 />
                 {errors.username ? (
-                  <span className="mt-1 inline-block text-[0.72rem] text-[#b00]">
-                    {errors.username.message}
-                  </span>
+                  <span className="mt-1 inline-block text-[0.72rem] text-[#b00]">{errors.username.message}</span>
                 ) : null}
               </label>
 
@@ -97,7 +91,7 @@ export function App() {
                 <Controller
                   control={control}
                   name="password"
-                  rules={{ required: "Password is required." }}
+                  rules={{ required: 'Password is required.' }}
                   render={({ field }) => (
                     <input
                       aria-label="Password"
@@ -115,9 +109,7 @@ export function App() {
                   )}
                 />
                 {errors.password ? (
-                  <span className="mt-1 inline-block text-[0.72rem] text-[#b00]">
-                    {errors.password.message}
-                  </span>
+                  <span className="mt-1 inline-block text-[0.72rem] text-[#b00]">{errors.password.message}</span>
                 ) : null}
               </label>
 
@@ -151,10 +143,10 @@ export function App() {
                   control={control}
                   name="client"
                   rules={{
-                    required: "Client is required.",
+                    required: 'Client is required.',
                     pattern: {
                       value: /^[0-9]{3}$/,
-                      message: "Client must have exactly 3 digits.",
+                      message: 'Client must have exactly 3 digits.',
                     },
                   }}
                   render={({ field }) => (
@@ -167,7 +159,7 @@ export function App() {
                       placeholder="Client"
                       value={field.value}
                       onChange={(event) => {
-                        const nextValue = event.target.value.replace(/\D/g, "");
+                        const nextValue = event.target.value.replace(/\D/g, '');
                         field.onChange(nextValue);
                       }}
                       onBlur={field.onBlur}
@@ -175,9 +167,7 @@ export function App() {
                   )}
                 />
                 {errors.client ? (
-                  <span className="mt-1 inline-block text-[0.72rem] text-[#b00]">
-                    {errors.client.message}
-                  </span>
+                  <span className="mt-1 inline-block text-[0.72rem] text-[#b00]">{errors.client.message}</span>
                 ) : null}
               </label>
             </div>

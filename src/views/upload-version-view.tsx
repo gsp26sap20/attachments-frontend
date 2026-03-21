@@ -1,29 +1,29 @@
-import * as React from "react";
-import { useParams } from "react-router";
-import { ObjectPage } from "@ui5/webcomponents-react/ObjectPage";
-import { ObjectPageHeader } from "@ui5/webcomponents-react/ObjectPageHeader";
-import { ObjectPageTitle } from "@ui5/webcomponents-react/ObjectPageTitle";
-import { ObjectPageSection } from "@ui5/webcomponents-react/ObjectPageSection";
-import { Toolbar } from "@ui5/webcomponents-react/Toolbar";
-import { ToolbarButton } from "@ui5/webcomponents-react/ToolbarButton";
-import { Breadcrumbs } from "@ui5/webcomponents-react/Breadcrumbs";
-import { BreadcrumbsItem } from "@ui5/webcomponents-react/BreadcrumbsItem";
-import { Title } from "@ui5/webcomponents-react/Title";
-import { FlexBox } from "@ui5/webcomponents-react/FlexBox";
-import { Label } from "@ui5/webcomponents-react/Label";
-import { Text } from "@ui5/webcomponents-react/Text";
-import { Button } from "@ui5/webcomponents-react/Button";
-import { Toast } from "@ui5/webcomponents-react/Toast";
-import "@ui5/webcomponents-icons/decline.js";
-import "@ui5/webcomponents-icons/share.js";
-import { useNavigate } from "react-router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { BusyIndicator } from "@ui5/webcomponents-react/BusyIndicator";
-import "@ui5/webcomponents-icons/arrow-bottom.js";
-import { getAttachmentTitleQueryOptions } from "../options/query";
-import type { UploadedFileData } from "../types";
-import { uploadVersionMutationOptions } from "../options/mutation";
-import { UploadVersion } from "./upload-version";
+import * as React from 'react';
+import { useParams } from 'react-router';
+import { useNavigate } from 'react-router';
+import '@ui5/webcomponents-icons/share.js';
+import '@ui5/webcomponents-icons/decline.js';
+import '@ui5/webcomponents-icons/arrow-bottom.js';
+import { Text } from '@ui5/webcomponents-react/Text';
+import { Title } from '@ui5/webcomponents-react/Title';
+import { Label } from '@ui5/webcomponents-react/Label';
+import { Toast } from '@ui5/webcomponents-react/Toast';
+import { Button } from '@ui5/webcomponents-react/Button';
+import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
+import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
+import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
+import { UploadVersion } from '@/features/attachments/components';
+import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
+import type { UploadedFileData } from '@/features/attachments/types';
+import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
+import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
+import { BreadcrumbsItem } from '@ui5/webcomponents-react/BreadcrumbsItem';
+import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
+import { ObjectPageHeader } from '@ui5/webcomponents-react/ObjectPageHeader';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
+import { getAttachmentTitleQueryOptions } from '@/features/attachments/options/query';
+import { uploadVersionMutationOptions } from '@/features/attachments/options/mutation';
 
 export function UploadVersionView() {
   const { id } = useParams();
@@ -31,20 +31,20 @@ export function UploadVersionView() {
   const [fileData, setFileData] = React.useState<UploadedFileData | null>(null);
 
   const [toastVisible, setToastVisible] = React.useState(false);
-  const [toastMessage, setToastMessage] = React.useState("");
+  const [toastMessage, setToastMessage] = React.useState('');
   const navigate = useNavigate();
   const { data: title, isLoading: isTitleLoading } = useQuery(
     getAttachmentTitleQueryOptions(id!, {
-      "sap-client": 324,
+      'sap-client': 324,
     }),
   );
   const { mutate: uploadVersion, isPending: isUploading } = useMutation(
     uploadVersionMutationOptions({
       onSuccess: (data) => {
         queryClient.invalidateQueries({
-          queryKey: ["attachments", id],
+          queryKey: ['attachments', id],
         });
-        setToastMessage("Version uploaded successfully");
+        setToastMessage('Version uploaded successfully');
         setToastVisible(true);
         navigate(`/Attachments/${data.FileId}`);
       },
@@ -73,23 +73,18 @@ export function UploadVersionView() {
       <ObjectPage
         headerArea={
           <ObjectPageHeader>
-            <FlexBox
-              alignItems="Center"
-              justifyContent="Start"
-              wrap="Wrap"
-              className="p-2"
-            >
+            <FlexBox alignItems="Center" justifyContent="Start" wrap="Wrap" className="p-2">
               <FlexBox direction="Column" className="w-1/3">
                 <Label>File Extension</Label>
-                <Text>{fileData?.FileExtension || "-"}</Text>
+                <Text>{fileData?.FileExtension || '-'}</Text>
               </FlexBox>
               <FlexBox direction="Column" className="w-1/3">
                 <Label>File Size</Label>
-                <Text>{fileData?.FileSize || "-"}</Text>
+                <Text>{fileData?.FileSize || '-'}</Text>
               </FlexBox>
               <FlexBox direction="Column" className="w-1/3">
                 <Label>Mime Type</Label>
-                <Text>{fileData?.MimeType || "-"}</Text>
+                <Text>{fileData?.MimeType || '-'}</Text>
               </FlexBox>
             </FlexBox>
           </ObjectPageHeader>
@@ -102,7 +97,7 @@ export function UploadVersionView() {
         titleArea={
           <ObjectPageTitle
             actionsBar={
-              <Toolbar design="Transparent" style={{ height: "auto" }}>
+              <Toolbar design="Transparent" style={{ height: 'auto' }}>
                 <ToolbarButton
                   design="Emphasized"
                   text="Upload"
@@ -110,7 +105,7 @@ export function UploadVersionView() {
                     if (fileData) {
                       handleUpload(fileData);
                     } else {
-                      setToastMessage("Please select a file to upload");
+                      setToastMessage('Please select a file to upload');
                       setToastVisible(true);
                     }
                   }}
@@ -127,20 +122,14 @@ export function UploadVersionView() {
                   }
                 }}
               >
-                <BreadcrumbsItem data-route="/Attachments">
-                  Attachments
-                </BreadcrumbsItem>
+                <BreadcrumbsItem data-route="/Attachments">Attachments</BreadcrumbsItem>
                 <BreadcrumbsItem data-route={`/Attachments/${id}`}>
-                  {isTitleLoading
-                    ? "Loading..."
-                    : title?.value || "Unnamed Object"}
+                  {isTitleLoading ? 'Loading...' : title?.value || 'Unnamed Object'}
                 </BreadcrumbsItem>
                 <BreadcrumbsItem>Upload new version</BreadcrumbsItem>
               </Breadcrumbs>
             }
-            header={
-              <Title level="H2">{fileData?.FileName || "Unnamed Object"}</Title>
-            }
+            header={<Title level="H2">{fileData?.FileName || 'Unnamed Object'}</Title>}
             navigationBar={
               <Button
                 accessibleName="Close"
@@ -154,11 +143,7 @@ export function UploadVersionView() {
         }
       >
         {isTitleLoading && (
-          <FlexBox
-            alignItems="Center"
-            justifyContent="Center"
-            style={{ padding: "1rem", minHeight: "50dvh" }}
-          >
+          <FlexBox alignItems="Center" justifyContent="Center" style={{ padding: '1rem', minHeight: '50dvh' }}>
             <BusyIndicator delay={0} active size="L" />
           </FlexBox>
         )}
@@ -166,7 +151,7 @@ export function UploadVersionView() {
           aria-label="Upload new version"
           id="upload-new-version"
           titleText="Upload new version"
-          style={{ display: isTitleLoading ? "none" : "block" }}
+          style={{ display: isTitleLoading ? 'none' : 'block' }}
         >
           <UploadVersion
             onUpload={(fileData) => {
@@ -178,12 +163,7 @@ export function UploadVersionView() {
           />
         </ObjectPageSection>
       </ObjectPage>
-      <Toast
-        open={toastVisible}
-        onClose={() => setToastVisible(false)}
-        duration={2000}
-        className="py-1 px-2"
-      >
+      <Toast open={toastVisible} onClose={() => setToastVisible(false)} duration={2000} className="py-1 px-2">
         {toastMessage}
       </Toast>
       {isUploading && (
@@ -191,9 +171,9 @@ export function UploadVersionView() {
           alignItems="Center"
           justifyContent="Center"
           style={{
-            padding: "1rem",
-            minHeight: "50dvh",
-            position: "absolute",
+            padding: '1rem',
+            minHeight: '50dvh',
+            position: 'absolute',
             inset: 0,
           }}
         >

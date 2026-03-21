@@ -1,17 +1,16 @@
-import * as React from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as React from 'react';
+import { IS_DEV } from '@/app-env';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-const Devtools = import.meta.env.DEV
+const Devtools = IS_DEV
   ? React.lazy(() =>
-      import("@tanstack/react-query-devtools").then((mod) => ({
+      import('@tanstack/react-query-devtools').then((mod) => ({
         default: mod.ReactQueryDevtools,
       })),
     )
   : () => null;
 
-export function QueryProvider({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export function QueryProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   const [queryClient] = React.useState(() => new QueryClient());
 
   return (

@@ -1,52 +1,26 @@
-import "@/index.css";
-import { App } from "@/App";
-import { StrictMode } from "react";
-import "@ui5/webcomponents/dist/Assets.js";
-import { createRoot } from "react-dom/client";
-import "@ui5/webcomponents-react/dist/json-imports/i18n.js";
-import { QueryProvider } from "@/context-providers/query-provider";
-import { HashRouter, Navigate, Route, Routes } from "react-router";
-import { ThemeProvider } from "@ui5/webcomponents-react/ThemeProvider";
-import {
-  AttachmentsView,
-  VersionDetailView,
-  UploadVersionView,
-  AttachmentNewView,
-  AttachmentsDetailView,
-} from "@/features/attachments/components";
+import '@/index.css';
+import { StrictMode } from 'react';
+import '@ui5/webcomponents/dist/Assets.js';
+import { createRoot } from 'react-dom/client';
+import '@ui5/webcomponents-react/dist/json-imports/i18n.js';
+import { QueryProvider } from '@/context-providers/query-provider';
+import { HashRouter, Navigate, Route, Routes } from 'react-router';
+import { AttachmentNewView, AttachmentsDetailView } from '@/views';
+import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
+import { AttachmentsView, VersionDetailView, UploadVersionView, HomeView } from '@/views';
 
-createRoot(document.getElementById("root")!).render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
       <QueryProvider>
         <HashRouter>
           <Routes>
-            <Route path="/" element={<App />} />
-            <Route
-              path="/Attachments"
-              element={<AttachmentsView />}
-              caseSensitive
-            />
-            <Route
-              path="/Attachments/:id"
-              element={<AttachmentsDetailView />}
-              caseSensitive
-            />
-            <Route
-              path="/Attachments/New"
-              element={<AttachmentNewView />}
-              caseSensitive
-            />
-            <Route
-              path="/Attachments/:id/Versions/:versionNo"
-              element={<VersionDetailView />}
-              caseSensitive
-            />
-            <Route
-              path="/Attachments/:id/Upload"
-              element={<UploadVersionView />}
-              caseSensitive
-            />
+            <Route path="/" element={<HomeView />} />
+            <Route path="/Attachments" element={<AttachmentsView />} />
+            <Route path="/Attachments/New" element={<AttachmentNewView />} />
+            <Route path="/Attachments/:id" element={<AttachmentsDetailView />} />
+            <Route path="/Attachments/:id/Upload" element={<UploadVersionView />} />
+            <Route path="/Attachments/:id/Versions/:versionNo" element={<VersionDetailView />} />
             <Route path="*" element={<Navigate replace to="/Attachments" />} />
           </Routes>
         </HashRouter>

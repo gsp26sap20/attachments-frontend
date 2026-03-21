@@ -1,15 +1,15 @@
-import qs from "qs";
-import { ODATA_HOST } from "@/app-constant";
-import axios, { type AxiosRequestConfig } from "axios";
+import qs from 'qs';
+import { ODATA_BASE_URL } from '@/app-constant';
+import axios, { type AxiosRequestConfig } from 'axios';
 
-declare module "axios" {
+declare module 'axios' {
   export interface AxiosRequestConfig {
     requiresAuth?: boolean;
   }
 }
 
 const api = axios.create({
-  baseURL: ODATA_HOST,
+  baseURL: ODATA_BASE_URL,
   timeout: 30000,
   paramsSerializer: (params) =>
     qs.stringify(params, {
@@ -20,12 +20,8 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     config.headers = config.headers ?? {};
-    if (
-      !config.headers["Content-Type"] &&
-      config.data &&
-      !(config.data instanceof FormData)
-    ) {
-      config.headers["Content-Type"] = "application/json";
+    if (!config.headers['Content-Type'] && config.data && !(config.data instanceof FormData)) {
+      config.headers['Content-Type'] = 'application/json';
     }
     return config;
   },
@@ -36,15 +32,15 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response) => {
-    const token = response?.headers?.["x-csrf-token"];
+    const token = response?.headers?.['x-csrf-token'];
     if (token) {
-      sessionStorage.setItem("x-csrf-token", token);
+      sessionStorage.setItem('x-csrf-token', token);
     }
     return response.data;
   },
   async (error) => {
     if (error.response && error.response.status === 401) {
-      console.warn("Token was expired or invalid!");
+      console.warn('Token was expired or invalid!');
     }
     return Promise.reject(error);
   },
@@ -53,21 +49,9 @@ api.interceptors.response.use(
 type HttpClient = {
   get<T = unknown>(_url: string, _config?: AxiosRequestConfig): Promise<T>;
   delete<T = unknown>(_url: string, _config?: AxiosRequestConfig): Promise<T>;
-  post<T = unknown, D = unknown>(
-    _url: string,
-    _data?: D,
-    _config?: AxiosRequestConfig,
-  ): Promise<T>;
-  put<T = unknown, D = unknown>(
-    _url: string,
-    _data?: D,
-    _config?: AxiosRequestConfig,
-  ): Promise<T>;
-  patch<T = unknown, D = unknown>(
-    _url: string,
-    _data?: D,
-    _config?: AxiosRequestConfig,
-  ): Promise<T>;
+  post<T = unknown, D = unknown>(_url: string, _data?: D, _config?: AxiosRequestConfig): Promise<T>;
+  put<T = unknown, D = unknown>(_url: string, _data?: D, _config?: AxiosRequestConfig): Promise<T>;
+  patch<T = unknown, D = unknown>(_url: string, _data?: D, _config?: AxiosRequestConfig): Promise<T>;
 };
 
 export const axiosInstance: HttpClient = {

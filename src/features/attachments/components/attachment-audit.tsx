@@ -1,40 +1,40 @@
-import * as React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { AnalyticalTable } from "@ui5/webcomponents-react/AnalyticalTable";
-import { Title } from "@ui5/webcomponents-react/Title";
-import { Toolbar } from "@ui5/webcomponents-react/Toolbar";
-import { ToolbarSpacer } from "@ui5/webcomponents-react/ToolbarSpacer";
-import { getAttachmentAuditsQueryOptions } from "../options/query";
+import * as React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Title } from '@ui5/webcomponents-react/Title';
+import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
+import { getAttachmentAuditsQueryOptions } from '../options/query';
+import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
+import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
 
 const auditColumns = [
   {
-    Header: "Action",
-    accessor: "Action",
+    Header: 'Action',
+    accessor: 'Action',
   },
   {
-    Header: "Note",
-    accessor: "Note",
+    Header: 'Note',
+    accessor: 'Note',
   },
   {
-    Header: "Performed By",
-    accessor: "Ernam",
+    Header: 'Performed By',
+    accessor: 'Ernam',
   },
   {
-    Header: "Performed On",
-    accessor: "Erdat",
+    Header: 'Performed On',
+    accessor: 'Erdat',
   },
   {
-    Header: "Performed At",
-    accessor: "Erzet",
+    Header: 'Performed At',
+    accessor: 'Erzet',
   },
 ];
 
 export function AttachmentAudit({ fileId }: { fileId: string }) {
   const { data: auditsData, isFetching: isAuditsFetching } = useQuery(
     getAttachmentAuditsQueryOptions(fileId, {
-      "sap-client": 324,
+      'sap-client': 324,
       $count: true,
-      $select: "Action,Erdat,Ernam,Erzet,FileId,Note,Uname",
+      $select: 'Action,Erdat,Ernam,Erzet,FileId,Note,Uname',
       $skip: 0,
       $top: 10,
     }),
@@ -48,12 +48,7 @@ export function AttachmentAudit({ fileId }: { fileId: string }) {
     <AnalyticalTable
       header={
         <Toolbar className="py-2 px-4 rounded-t-xl">
-          <Title level="H4">
-            Audit{" "}
-            {auditsData?.["@odata.count"]
-              ? `(${auditsData["@odata.count"]})`
-              : ""}
-          </Title>
+          <Title level="H4">Audit {auditsData?.['@odata.count'] ? `(${auditsData['@odata.count']})` : ''}</Title>
           <ToolbarSpacer />
         </Toolbar>
       }

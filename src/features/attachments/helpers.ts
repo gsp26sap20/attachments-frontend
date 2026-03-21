@@ -1,7 +1,5 @@
 export function normalizeBase64(value?: string): string {
-  return typeof value === "string"
-    ? value.replace(/\s+/g, "").replace(/-/g, "+").replace(/_/g, "/")
-    : "";
+  return typeof value === 'string' ? value.replace(/\s+/g, '').replace(/-/g, '+').replace(/_/g, '/') : '';
 }
 
 export function hasValue(value?: string): boolean {
@@ -9,20 +7,20 @@ export function hasValue(value?: string): boolean {
 }
 
 export function isMimeType(mimeType?: string, pattern?: RegExp): boolean {
-  return typeof mimeType === "string" && !!pattern?.test(mimeType);
+  return typeof mimeType === 'string' && !!pattern?.test(mimeType);
 }
 
 export function toDataUrl(mimeType?: string, fileContent?: string): string {
   const normalized = normalizeBase64(fileContent);
 
-  if (!mimeType || !normalized) return "";
+  if (!mimeType || !normalized) return '';
 
   return `data:${mimeType};base64,${normalized}`;
 }
 
 export function decodeBase64ToText(fileContent?: string): string {
   const normalized = normalizeBase64(fileContent);
-  if (!normalized) return "";
+  if (!normalized) return '';
 
   try {
     const binary = atob(normalized);
@@ -33,27 +31,27 @@ export function decodeBase64ToText(fileContent?: string): string {
     }
 
     if (window.TextDecoder) {
-      return new TextDecoder("utf-8").decode(bytes);
+      return new TextDecoder('utf-8').decode(bytes);
     }
 
-    let escaped = "";
+    let escaped = '';
     for (let i = 0; i < bytes.length; i++) {
-      escaped += "%" + ("00" + bytes[i].toString(16)).slice(-2);
+      escaped += '%' + ('00' + bytes[i].toString(16)).slice(-2);
     }
 
     return decodeURIComponent(escaped);
   } catch {
-    return "";
+    return '';
   }
 }
 
 export function escapeHtml(value?: string): string {
-  return String(value || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 // ===== preview type checks =====
@@ -67,13 +65,7 @@ export function isPdfPreviewable(mime?: string, content?: string) {
 }
 
 export function isTextPreviewable(mime?: string, content?: string) {
-  return (
-    hasValue(content) &&
-    isMimeType(
-      mime,
-      /^(text\/|application\/(?:json|xml|javascript|xhtml\+xml))/i,
-    )
-  );
+  return hasValue(content) && isMimeType(mime, /^(text\/|application\/(?:json|xml|javascript|xhtml\+xml))/i);
 }
 
 export function isUnsupportedPreview(mime?: string, content?: string) {
@@ -90,13 +82,13 @@ export function isUnsupportedPreview(mime?: string, content?: string) {
 export function toPdfHtml(mime?: string, content?: string, fileName?: string) {
   const src = toDataUrl(mime, content);
 
-  if (!src || !isPdfPreviewable(mime, content)) return "";
+  if (!src || !isPdfPreviewable(mime, content)) return '';
 
   return `
     <div style="height:70vh;min-height:28rem;">
       <iframe 
         src="${src}#toolbar=1&navpanes=0"
-        title="${escapeHtml(fileName || "PDF preview")}"
+        title="${escapeHtml(fileName || 'PDF preview')}"
         style="width:100%;height:100%;border:none;background:#fff;"
       ></iframe>
     </div>
@@ -104,21 +96,17 @@ export function toPdfHtml(mime?: string, content?: string, fileName?: string) {
 }
 
 export function toTextContent(mime?: string, content?: string) {
-  if (!isTextPreviewable(mime, content)) return "";
+  if (!isTextPreviewable(mime, content)) return '';
   return decodeBase64ToText(content);
 }
 
-export function downloadFile(
-  base64?: string,
-  fileName?: string,
-  mimeType?: string,
-) {
+export function downloadFile(base64?: string, fileName?: string, mimeType?: string) {
   const url = toDataUrl(mimeType, base64);
   if (!url) return false;
 
-  const link = document.createElement("a");
+  const link = document.createElement('a');
   link.href = url;
-  link.download = fileName || "download";
+  link.download = fileName || 'download';
 
   document.body.appendChild(link);
   link.click();

@@ -1,9 +1,7 @@
-const IS_PROD = import.meta.env.PROD;
+export { ODATA_BASE_URL } from '@/app-env';
 
-export const ODATA_HOST = IS_PROD ? "https://s40lp1.ucc.cit.tum.de" : "/api";
 export const ODATA_SERVICE = {
-  ATTACHMENT:
-    "/sap/opu/odata4/sap/zui_attach_bind/srvd/sap/zui_attach_srv/0001",
-  AUTH: "/sap/opu/odata4/sap/zui_att_auth_bind/srvd/sap/zui_att_auth_srv/0001",
-  BIZ: "/sap/opu/odata4/sap/zui_bizobj_bind/srvd/sap/zui_bizobj_srv/0001",
+  ATTACHMENT: '/sap/opu/odata4/sap/zui_attach_bind/srvd/sap/zui_attach_srv/0001',
+  AUTH: '/sap/opu/odata4/sap/zui_att_auth_bind/srvd/sap/zui_att_auth_srv/0001',
+  BIZ: '/sap/opu/odata4/sap/zui_bizobj_bind/srvd/sap/zui_bizobj_srv/0001',
 };

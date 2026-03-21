@@ -1,15 +1,11 @@
-import { mutationOptions } from "@tanstack/react-query";
-import { axiosInstance } from "@/libs/axios-instance";
-import { ODATA_SERVICE } from "@/app-constant";
-import { MUTATION_API } from "../constants";
-import type {
-  CreateAttachmentPayload,
-  CreateAttachmentResponse,
-  RollbackVersionPayload,
-  UploadVersionPayload,
-  UploadVersionResponse,
-} from "../types";
-import { fetchCsrfToken, getCsrfToken } from "@/libs/helpers";
+import { MUTATION_API } from '../constants';
+import { ODATA_SERVICE } from '@/app-constant';
+import { axiosInstance } from '@/libs/axios-instance';
+import type { CreateAttachmentPayload } from '../types';
+import { mutationOptions } from '@tanstack/react-query';
+import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers';
+import type { RollbackVersionPayload, UploadVersionResponse } from '../types';
+import type { UploadVersionPayload, CreateAttachmentResponse } from '../types';
 
 type Params = {
   fileId: string;
@@ -22,11 +18,7 @@ type CreateAttachmentParams = {
   onError?: (_error: Error) => void;
 };
 
-export function rollbackVersionMutationOptions({
-  fileId,
-  onSuccess,
-  onError,
-}: Params) {
+export function rollbackVersionMutationOptions({ fileId, onSuccess, onError }: Params) {
   return mutationOptions({
     mutationFn: async (payload: RollbackVersionPayload) => {
       let token = getCsrfToken();
@@ -41,8 +33,8 @@ export function rollbackVersionMutationOptions({
         payload,
         {
           headers: {
-            "accept-language": "en",
-            ...(token ? { "x-csrf-token": token } : {}),
+            'accept-language': 'en',
+            ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
       );
@@ -53,11 +45,7 @@ export function rollbackVersionMutationOptions({
   });
 }
 
-export function deleteAttachmentMutationOptions({
-  fileId,
-  onSuccess,
-  onError,
-}: Params) {
+export function deleteAttachmentMutationOptions({ fileId, onSuccess, onError }: Params) {
   return mutationOptions({
     mutationFn: async () => {
       let token = getCsrfToken();
@@ -71,8 +59,8 @@ export function deleteAttachmentMutationOptions({
         `${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.deleteAttachment(fileId)}`,
         {
           headers: {
-            "accept-language": "en",
-            ...(token ? { "x-csrf-token": token } : {}),
+            'accept-language': 'en',
+            ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
       );
@@ -83,11 +71,7 @@ export function deleteAttachmentMutationOptions({
   });
 }
 
-export function updateAttachmentTitleMutationOptions({
-  fileId,
-  onSuccess,
-  onError,
-}: Params) {
+export function updateAttachmentTitleMutationOptions({ fileId, onSuccess, onError }: Params) {
   return mutationOptions({
     mutationFn: async (payload: { Title: string }) => {
       let token = getCsrfToken();
@@ -100,8 +84,8 @@ export function updateAttachmentTitleMutationOptions({
         payload,
         {
           headers: {
-            "accept-language": "en",
-            ...(token ? { "x-csrf-token": token } : {}),
+            'accept-language': 'en',
+            ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
       );
@@ -115,7 +99,7 @@ export function updateAttachmentTitleMutationOptions({
 export function uploadVersionMutationOptions({
   onSuccess,
   onError,
-}: Omit<Params, "fileId" | "onSuccess"> & {
+}: Omit<Params, 'fileId' | 'onSuccess'> & {
   onSuccess?: (data: UploadVersionResponse) => void;
 }) {
   return mutationOptions({
@@ -132,8 +116,8 @@ export function uploadVersionMutationOptions({
         payload,
         {
           headers: {
-            "accept-language": "en",
-            ...(token ? { "x-csrf-token": token } : {}),
+            'accept-language': 'en',
+            ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
       );
@@ -144,10 +128,7 @@ export function uploadVersionMutationOptions({
   });
 }
 
-export function createAttachmentMutationOptions({
-  onSuccess,
-  onError,
-}: CreateAttachmentParams) {
+export function createAttachmentMutationOptions({ onSuccess, onError }: CreateAttachmentParams) {
   return mutationOptions({
     mutationFn: async (payload: CreateAttachmentPayload) => {
       let token = getCsrfToken();
@@ -162,8 +143,8 @@ export function createAttachmentMutationOptions({
         payload,
         {
           headers: {
-            "accept-language": "en",
-            ...(token ? { "x-csrf-token": token } : {}),
+            'accept-language': 'en',
+            ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
       );

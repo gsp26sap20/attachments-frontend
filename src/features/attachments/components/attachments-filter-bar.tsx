@@ -1,9 +1,9 @@
-import { Input } from "@ui5/webcomponents-react/Input";
-import { FilterBar } from "@ui5/webcomponents-react/FilterBar";
-import { Title } from "@ui5/webcomponents-react/Title";
-import { FilterGroupItem } from "@ui5/webcomponents-react/FilterGroupItem";
-import { Select } from "@ui5/webcomponents-react/Select";
-import { Option } from "@ui5/webcomponents-react/Option";
+import { Input } from '@ui5/webcomponents-react/Input';
+import { Title } from '@ui5/webcomponents-react/Title';
+import { Select } from '@ui5/webcomponents-react/Select';
+import { Option } from '@ui5/webcomponents-react/Option';
+import { FilterBar } from '@ui5/webcomponents-react/FilterBar';
+import { FilterGroupItem } from '@ui5/webcomponents-react/FilterGroupItem';
 
 export function AttachmentsFilterBar() {
   return (

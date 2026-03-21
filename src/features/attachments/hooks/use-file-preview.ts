@@ -1,11 +1,7 @@
-import { useMemo } from "react";
-import * as helper from "../helpers";
+import { useMemo } from 'react';
+import * as helper from '../helpers';
 
-export function useFilePreview(
-  mimeType?: string,
-  fileContent?: string,
-  fileName?: string,
-) {
+export function useFilePreview(mimeType?: string, fileContent?: string, fileName?: string) {
   return useMemo(() => {
     return {
       isEmpty: !helper.hasValue(fileContent),

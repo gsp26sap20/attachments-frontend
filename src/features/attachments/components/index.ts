@@ -1,6 +1,6 @@
-export { AttachmentsView } from "./attachments-view";
-export { UploadVersionView } from "./upload-version-view";
-export { VersionDetailView } from "./version-detail-view";
-export { AttachmentNewView } from "./attachment-new-view";
-export { AttachmentsFilterBar } from "./attachments-filter-bar";
-export { AttachmentsDetailView } from "./attachments-detail-view";
+export { FilePreview } from './file-preview';
+export { UploadVersion } from './upload-version';
+export { AttachmentCard } from './attachment-card';
+export { AttachmentAudit } from './attachment-audit';
+export { AttachmentVersion } from './attachment-version';
+export { AttachmentsFilterBar } from './attachments-filter-bar';

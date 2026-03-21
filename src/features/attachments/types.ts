@@ -13,11 +13,11 @@ export type AttachmentListItem = {
 
 export type AttachmentListResponse = {
   value: AttachmentListItem[];
-  "@odata.count": string;
+  '@odata.count': string;
 };
 
 export type AttachmentListParams = {
-  "sap-client": number;
+  'sap-client': number;
   $count: boolean;
   $select: string;
   $skip: number;
@@ -26,7 +26,7 @@ export type AttachmentListParams = {
 };
 
 export type AttachmentDetailParams = {
-  "sap-client": number;
+  'sap-client': number;
   $select: string;
   $expand?: string;
 };
@@ -63,11 +63,11 @@ export type AttachmentVersionItem = {
 
 export type AttachmentVersionsResponse = {
   value: AttachmentVersionItem[];
-  "@odata.count": string;
+  '@odata.count': string;
 };
 
 export type AttachmentVersionsParams = {
-  "sap-client": number;
+  'sap-client': number;
   $count: boolean;
   $select: string;
   $skip: number;
@@ -85,12 +85,12 @@ export type AttachmentAuditItem = {
 };
 
 export type AttachmentAuditsResponse = {
-  "@odata.count": string;
+  '@odata.count': string;
   value: AttachmentAuditItem[];
 };
 
 export type AttachmentAuditsParams = {
-  "sap-client": number;
+  'sap-client': number;
   $count: boolean;
   $select: string;
   $skip: number;
@@ -113,7 +113,7 @@ export type VersionDetail = {
 };
 
 export type VersionDetailParams = {
-  "sap-client": number;
+  'sap-client': number;
   $select: string;
 };
 
@@ -122,7 +122,7 @@ export type AttachmentTitleResponse = {
 };
 
 export type AttachmentTitleParams = {
-  "sap-client": number;
+  'sap-client': number;
 };
 
 export type RollbackVersionPayload = {
