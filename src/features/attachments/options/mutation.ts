@@ -3,6 +3,8 @@ import { axiosInstance } from "@/libs/axios-instance";
 import { ODATA_SERVICE } from "@/app-constant";
 import { MUTATION_API } from "../constants";
 import type {
+  CreateAttachmentPayload,
+  CreateAttachmentResponse,
   RollbackVersionPayload,
   UploadVersionPayload,
   UploadVersionResponse,
@@ -12,6 +14,11 @@ import { fetchCsrfToken, getCsrfToken } from "@/libs/helpers";
 type Params = {
   fileId: string;
   onSuccess?: () => void;
+  onError?: (_error: Error) => void;
+};
+
+type CreateAttachmentParams = {
+  onSuccess?: (data: CreateAttachmentResponse) => void;
   onError?: (_error: Error) => void;
 };
 
@@ -92,6 +99,36 @@ export function uploadVersionMutationOptions({
 
       const res = await axiosInstance.post<UploadVersionResponse>(
         `${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.uploadVersion}`,
+        payload,
+        {
+          headers: {
+            "accept-language": "en",
+            ...(token ? { "x-csrf-token": token } : {}),
+          },
+        },
+      );
+      return res;
+    },
+    onSuccess,
+    onError,
+  });
+}
+
+export function createAttachmentMutationOptions({
+  onSuccess,
+  onError,
+}: CreateAttachmentParams) {
+  return mutationOptions({
+    mutationFn: async (payload: CreateAttachmentPayload) => {
+      let token = getCsrfToken();
+
+      if (!token) {
+        await fetchCsrfToken();
+        token = getCsrfToken();
+      }
+
+      const res = await axiosInstance.post<CreateAttachmentResponse>(
+        `${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.createAttachment}`,
         payload,
         {
           headers: {

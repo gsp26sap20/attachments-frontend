@@ -152,3 +152,14 @@ export type UploadVersionResponse = {
   Erzet: string;
   Ernam: string;
 };
+
+export type CreateAttachmentPayload = {
+  Title: string;
+  EditLock: boolean;
+};
+
+export type CreateAttachmentResponse = {
+  FileId: string;
+  Title: string;
+  EditLock: boolean;
+};
