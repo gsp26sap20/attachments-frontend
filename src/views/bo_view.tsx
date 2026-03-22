@@ -9,8 +9,6 @@ import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { Title } from '@ui5/webcomponents-react/Title';
-import { Card } from '@ui5/webcomponents-react/Card';
-import { CardHeader } from '@ui5/webcomponents-react/CardHeader';
 import { List } from '@ui5/webcomponents-react/List';
 import { ListItemStandard } from '@ui5/webcomponents-react/ListItemStandard';
 import { Input } from '@ui5/webcomponents-react/Input';
@@ -19,6 +17,8 @@ import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
+import { Dialog } from '@ui5/webcomponents-react/Dialog';
+import { Button } from '@ui5/webcomponents-react/Button';
 import type { AnalyticalTableColumnDefinition } from '@ui5/webcomponents-react/AnalyticalTable';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import '@ui5/webcomponents-icons/refresh.js';
@@ -88,22 +88,12 @@ function getStatusTone(status?: string) {
 
 	return 'bg-slate-500/15 text-slate-700 border-slate-500/25';
 }
-
-function StatCard({ label, value, note }: { label: string; value: string; note?: string }) {
-	return (
-		<div className="rounded-2xl border border-white/70 bg-white/70 p-4 shadow-[0_12px_30px_rgba(84,104,130,0.08)] backdrop-blur-sm">
-			<div className="text-[0.72rem] uppercase tracking-[0.18em] text-slate-500">{label}</div>
-			<div className="mt-2 text-2xl font-semibold text-slate-900">{value}</div>
-			{note ? <div className="mt-1 text-xs text-slate-500">{note}</div> : null}
-		</div>
-	);
-}
-
 export function BoView() {
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 	const [search, setSearch] = React.useState('');
 	const [selectedBoId, setSelectedBoId] = React.useState<string | null>(null);
+	const [detailOpen, setDetailOpen] = React.useState(false);
 
 	const { data, isFetching, isLoading, error } = useQuery(
 		getBizObjectsQueryOptions({
@@ -138,6 +128,7 @@ export function BoView() {
 	React.useEffect(() => {
 		if (filteredBizObjects.length === 0) {
 			setSelectedBoId(null);
+			setDetailOpen(false);
 			return;
 		}
 
@@ -158,11 +149,6 @@ export function BoView() {
 		() => rawColumns,
 		[],
 	);
-
-	const totalCount = bizObjects.length;
-	const filteredCount = filteredBizObjects.length;
-	const linkedCount = bizObjects.filter((item) => item.__OperationControl?.link_attachment).length;
-	const updatableCount = bizObjects.filter((item) => item.__EntityControl?.Updatable).length;
 
 	return (
 		<DynamicPage
@@ -224,7 +210,7 @@ export function BoView() {
 					'linear-gradient(180deg,rgba(243,248,252,0.95) 0%,rgba(239,245,250,0.95) 55%,rgba(231,240,248,0.95) 100%)',
 			}}
 		>
-			<div className="grid gap-4 p-4 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
+			<div className="w-full p-4">
 				<div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-[0_16px_40px_rgba(84,104,130,0.08)]">
 					<Toolbar className="border-b border-slate-200/80 px-4 py-3">
 						
@@ -258,6 +244,7 @@ export function BoView() {
 							const item = event.detail.row.original as BizObjectTableItem;
 							if (item?.BoId) {
 								setSelectedBoId(item.BoId);
+								setDetailOpen(true);
 							}
 						}}
 					/>
@@ -268,52 +255,72 @@ export function BoView() {
 						</div>
 					) : null}
 				</div>
-
-				<Card
-					header={
-						<CardHeader
-							avatar={<Icon name="document" />}
-							titleText={selectedBo?.BoTitle || 'Select a business object'}
-							subtitleText={selectedBo?.BoId || 'No item selected'}
-							additionalText={selectedBo ? selectedBo.BoType : 'Waiting for data'}
-						/>
-					}
-					className="overflow-hidden border border-slate-200/80 bg-white/90 shadow-[0_16px_40px_rgba(84,104,130,0.08)]"
-				>
-					{isLoading ? (
-						<FlexBox alignItems="Center" justifyContent="Center" style={{ minHeight: '22rem' }}>
-							<BusyIndicator delay={0} active size="L" />
-						</FlexBox>
-					) : selectedBo ? (
-						<div className="space-y-4 p-4">
-							<div className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${getStatusTone(selectedBo.Status)}`}>
-								{selectedBo.Status}
-							</div>
-
-							<div className="rounded-2xl bg-slate-50 p-4">
-								<div className="text-xs uppercase tracking-[0.18em] text-slate-500">Overview</div>
-								<div className="mt-2 text-base font-semibold text-slate-900">{selectedBo.BoTitle}</div>
-								<div className="mt-1 text-sm text-slate-600">Type {selectedBo.BoType}</div>
-							</div>
-
-							<List>
-								<ListItemStandard text="BO ID" description={selectedBo.BoId} />
-								<ListItemStandard text="Created" description={formatDateTime(selectedBo.Erdat, selectedBo.Erzet)} />
-								<ListItemStandard text="Created By" description={selectedBo.Ernam || '-'} />
-								<ListItemStandard text="Changed" description={formatDateTime(selectedBo.Aedat, selectedBo.Aezet)} />
-								<ListItemStandard text="Changed By" description={selectedBo.Aenam || '-'} />
-								<ListItemStandard text="Can link attachment" description={selectedBo.__OperationControl?.link_attachment ? 'Yes' : 'No'} />
-								<ListItemStandard text="Editable" description={selectedBo.__EntityControl?.Updatable ? 'Yes' : 'No'} />
-								<ListItemStandard text="Deletable" description={selectedBo.__EntityControl?.Deletable ? 'Yes' : 'No'} />
-							</List>
-
-						
-						</div>
-					) : (
-						<div className="p-6 text-sm text-slate-500">No business object is selected.</div>
-					)}
-				</Card>
 			</div>
+
+		<Dialog
+			open={detailOpen}
+			onClose={() => setDetailOpen(false)}
+			headerText={selectedBo?.BoTitle || 'Business Object detail'}
+			style={{ width: 'min(92vw, 72rem)' }}
+		>
+			{isLoading ? (
+				<FlexBox alignItems="Center" justifyContent="Center" style={{ minHeight: '22rem' }}>
+					<BusyIndicator delay={0} active size="L" />
+				</FlexBox>
+			) : selectedBo ? (
+				<div className="space-y-4 p-2">
+					<div className="flex flex-wrap items-start gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+						<span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-600/10 text-sky-700">
+							<Icon name="document" />
+						</span>
+						<div className="min-w-0 flex-1">
+							<div className="text-lg font-semibold text-slate-900">{selectedBo.BoTitle}</div>
+							<div className="mt-1 text-sm text-slate-600">BO ID {selectedBo.BoId} · Type {selectedBo.BoType}</div>
+						</div>
+						<div className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${getStatusTone(selectedBo.Status)}`}>
+							{selectedBo.Status}
+						</div>
+					</div>
+
+					<div className="grid gap-3 md:grid-cols-2">
+						<div className="rounded-2xl bg-slate-50 p-4">
+							<div className="text-xs uppercase tracking-[0.18em] text-slate-500">Overview</div>
+							<div className="mt-2 text-sm text-slate-600">Created {formatDateTime(selectedBo.Erdat, selectedBo.Erzet)}</div>
+							<div className="mt-1 text-sm text-slate-600">Created By {selectedBo.Ernam || '-'}</div>
+							<div className="mt-1 text-sm text-slate-600">Changed {formatDateTime(selectedBo.Aedat, selectedBo.Aezet)}</div>
+							<div className="mt-1 text-sm text-slate-600">Changed By {selectedBo.Aenam || '-'}</div>
+						</div>
+
+						<div className="rounded-2xl bg-slate-50 p-4">
+							<div className="text-xs uppercase tracking-[0.18em] text-slate-500">Capabilities</div>
+							<div className="mt-2 text-sm text-slate-600">Can link attachment {selectedBo.__OperationControl?.link_attachment ? 'Yes' : 'No'}</div>
+							<div className="mt-1 text-sm text-slate-600">Editable {selectedBo.__EntityControl?.Updatable ? 'Yes' : 'No'}</div>
+							<div className="mt-1 text-sm text-slate-600">Deletable {selectedBo.__EntityControl?.Deletable ? 'Yes' : 'No'}</div>
+							<div className="mt-1 text-sm text-slate-600">Messages {selectedBo.SAP__Messages?.length ?? 0}</div>
+						</div>
+					</div>
+
+					<List>
+						<ListItemStandard text="BO ID" description={selectedBo.BoId} />
+						<ListItemStandard text="BoType" description={selectedBo.BoType} />
+						<ListItemStandard text="BoTitle" description={selectedBo.BoTitle} />
+						<ListItemStandard text="Status" description={selectedBo.Status} />
+						<ListItemStandard text="Created" description={formatDateTime(selectedBo.Erdat, selectedBo.Erzet)} />
+						<ListItemStandard text="Created By" description={selectedBo.Ernam || '-'} />
+						<ListItemStandard text="Changed" description={formatDateTime(selectedBo.Aedat, selectedBo.Aezet)} />
+						<ListItemStandard text="Changed By" description={selectedBo.Aenam || '-'} />
+						<ListItemStandard text="Can link attachment" description={selectedBo.__OperationControl?.link_attachment ? 'Yes' : 'No'} />
+						<ListItemStandard text="Editable" description={selectedBo.__EntityControl?.Updatable ? 'Yes' : 'No'} />
+						<ListItemStandard text="Deletable" description={selectedBo.__EntityControl?.Deletable ? 'Yes' : 'No'} />
+					</List>
+				</div>
+			) : (
+				<div className="p-6 text-sm text-slate-500">No business object is selected.</div>
+			)}
+			<div slot="footer" className="flex items-center justify-end gap-2 px-2 pb-2 pt-4">
+				<Button onClick={() => setDetailOpen(false)}>Close</Button>
+			</div>
+		</Dialog>
 		</DynamicPage>
 	);
 }
