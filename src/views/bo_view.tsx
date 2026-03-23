@@ -356,18 +356,18 @@ export function BoView() {
 					<div className="grid gap-3 md:grid-cols-2">
 						<div className="rounded-2xl bg-slate-50 p-4">
 							<div className="text-xs uppercase tracking-[0.18em] text-slate-500">Overview</div>
-							<div className="mt-2 text-sm text-slate-600">Created {formatDateTime(selectedBo.Erdat, selectedBo.Erzet)}</div>
-							<div className="mt-1 text-sm text-slate-600">Created By {selectedBo.Ernam || '-'}</div>
-							<div className="mt-1 text-sm text-slate-600">Changed {formatDateTime(selectedBo.Aedat, selectedBo.Aezet)}</div>
-							<div className="mt-1 text-sm text-slate-600">Changed By {selectedBo.Aenam || '-'}</div>
+							<div className="mt-2 text-sm text-slate-600">Created:  {formatDateTime(selectedBo.Erdat, selectedBo.Erzet)}</div>
+							<div className="mt-1 text-sm text-slate-600">Created By: {selectedBo.Ernam || '-'}</div>
+							<div className="mt-1 text-sm text-slate-600">Changed:  {formatDateTime(selectedBo.Aedat, selectedBo.Aezet)}</div>
+							<div className="mt-1 text-sm text-slate-600">Changed By: {selectedBo.Aenam || '-'}</div>
 						</div>
 
 						<div className="rounded-2xl bg-slate-50 p-4">
 							<div className="text-xs uppercase tracking-[0.18em] text-slate-500">Capabilities</div>
-							<div className="mt-2 text-sm text-slate-600">Can link attachment {selectedBo.__OperationControl?.link_attachment ? 'Yes' : 'No'}</div>
-							<div className="mt-1 text-sm text-slate-600">Editable {selectedBo.__EntityControl?.Updatable ? 'Yes' : 'No'}</div>
-							<div className="mt-1 text-sm text-slate-600">Deletable {selectedBo.__EntityControl?.Deletable ? 'Yes' : 'No'}</div>
-							<div className="mt-1 text-sm text-slate-600">Messages {selectedBo.SAP__Messages?.length ?? 0}</div>
+							<div className="mt-2 text-sm text-slate-600">Can link attachment: {selectedBo.__OperationControl?.link_attachment ? 'Yes' : 'No'}</div>
+							<div className="mt-1 text-sm text-slate-600">Editable: {selectedBo.__EntityControl?.Updatable ? 'Yes' : 'No'}</div>
+							<div className="mt-1 text-sm text-slate-600">Deletable: {selectedBo.__EntityControl?.Deletable ? 'Yes' : 'No'}</div>
+							<div className="mt-1 text-sm text-slate-600">Messages: {selectedBo.SAP__Messages?.length ?? 0}</div>
 						</div>
 					</div>
 
@@ -399,9 +399,7 @@ export function BoView() {
 								/>
 							</div>
 						</div>
-						<div className="mt-3 text-xs text-slate-500">
-							Changes here will be sent in the PUT request when you press Update.
-						</div>
+						
 					</div>
 
 					<List>
