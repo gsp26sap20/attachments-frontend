@@ -39,3 +39,11 @@ export type BizObjectListParams = {
   $filter?: string;
   $orderby?: string;
 };
+
+export type CreateBizObjectPayload = {
+  BoType: string;
+  BoTitle: string;
+  Status: string;
+};
+
+export type CreateBizObjectResponse = BizObjectItem;

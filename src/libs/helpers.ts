@@ -1,12 +1,12 @@
 import { axiosInstance } from './axios-instance';
-import { ODATA_BASE_URL, ODATA_SERVICE } from '@/app-constant';
+import { ODATA_SERVICE } from '@/app-constant';
 
 export function getCsrfToken() {
   return sessionStorage.getItem('x-csrf-token');
 }
 
-export function fetchCsrfToken() {
-  return axiosInstance.get(`${ODATA_BASE_URL}${ODATA_SERVICE.ATTACHMENT}/$metadata`, {
+export function fetchCsrfToken(serviceRoot: string = ODATA_SERVICE.ATTACHMENT) {
+  return axiosInstance.get(`${serviceRoot}/$metadata`, {
     headers: {
       'x-csrf-token': 'Fetch',
     },

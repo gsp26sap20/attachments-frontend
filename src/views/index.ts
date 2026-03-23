@@ -5,3 +5,4 @@ export { VersionDetailView } from './version-detail-view';
 export { AttachmentNewView } from './attachment-new-view';
 export { AttachmentsDetailView } from './attachments-detail-view';
 export { BoView } from './bo_view';
+export { BoCreateView } from './bo_create';

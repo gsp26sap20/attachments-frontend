@@ -172,6 +172,11 @@ export function BoView() {
 								text="Attachments"
 								onClick={() => navigate('/Attachments')}
 							/>
+							<ToolbarButton
+								design="Emphasized"
+								text="Create Business Object"
+								onClick={() => navigate('/BO/Create')}
+							/>
 						</Toolbar>
 
 					
