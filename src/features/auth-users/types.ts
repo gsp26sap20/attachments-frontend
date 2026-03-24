@@ -1,0 +1,32 @@
+export type AuthUserItem = {
+  Uname: string;
+  Role: string;
+  Erdat: string | null;
+  Ernam: string;
+  __EntityControl: {
+    Deletable: boolean;
+    Updatable: boolean;
+  };
+  SAP__Messages: Array<{
+    code?: string;
+    message?: string;
+    target?: string;
+  }>;
+};
+
+export type AuthUserListResponse = {
+  '@odata.context': string;
+  '@odata.metadataEtag'?: string;
+  '@odata.count'?: string;
+  value: AuthUserItem[];
+};
+
+export type AuthUserListParams = {
+  'sap-client': number;
+  $count?: boolean;
+  $select?: string;
+  $skip?: number;
+  $top?: number;
+  $filter?: string;
+  $orderby?: string;
+};
