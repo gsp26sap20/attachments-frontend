@@ -12,17 +12,23 @@ import type { AnalyticalTableColumnDefinition } from '@ui5/webcomponents-react/A
 import { MessageStrip } from '@ui5/webcomponents-react/MessageStrip';
 import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
+import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { Input } from '@ui5/webcomponents-react/Input';
 import { Select } from '@ui5/webcomponents-react/Select';
 import { Option } from '@ui5/webcomponents-react/Option';
+import { Button } from '@ui5/webcomponents-react/Button';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { useNavigate } from 'react-router';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import '@ui5/webcomponents-icons/refresh.js';
+import '@ui5/webcomponents-icons/delete.js';
+import '@ui5/webcomponents-icons/edit.js';
 import '@ui5/webcomponents-icons/group.js';
 import '@ui5/webcomponents-icons/person-placeholder.js';
 import '@ui5/webcomponents-icons/checklist.js';
 import { getAuthUsersQueryOptions } from '@/features/auth-users/options/query';
+import { deleteAuthUserMutationOptions, updateAuthUserMutationOptions } from '@/features/auth-users/options/mutation';
 import type { AuthUserItem } from '@/features/auth-users/types';
 
 type UserTableItem = AuthUserItem & {
@@ -67,7 +73,15 @@ const rawColumns: AnalyticalTableColumnDefinition[] = [
 		accessor: 'RoleTone',
 		width: 140,
 	},
+	{
+		id: 'actions',
+		Header: 'Actions',
+		accessor: (row: Record<string, any>) => row.Uname,
+		width: 270,
+	},
 ];
+
+const ROLE_OPTIONS = ['ADMIN', 'USER', 'POWERUSER', 'SUPPORT'];
 
 function getRoleTone(role?: string) {
 	const normalized = (role || '').toUpperCase();
@@ -91,8 +105,16 @@ function pillClassName(tone: string) {
 
 export function UserListView() {
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 	const [search, setSearch] = React.useState('');
 	const [roleFilter, setRoleFilter] = React.useState('ALL');
+	const [feedbackMessage, setFeedbackMessage] = React.useState('');
+	const [roleDialogOpen, setRoleDialogOpen] = React.useState(false);
+	const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+	const [deleteDeniedDialogOpen, setDeleteDeniedDialogOpen] = React.useState(false);
+	const [deleteDeniedMessage, setDeleteDeniedMessage] = React.useState('');
+	const [selectedUser, setSelectedUser] = React.useState<UserTableItem | null>(null);
+	const [roleDraft, setRoleDraft] = React.useState('');
 
 	const { data, isFetching, isLoading, error, refetch } = useQuery(
 		getAuthUsersQueryOptions({
@@ -171,9 +193,99 @@ export function UserListView() {
 				};
 			}
 
+			if (column.accessor === 'Uname') {
+				return {
+					...column,
+					Cell: ({ row }: any) => {
+						const value = row.original as UserTableItem;
+
+						return (
+							<div className="flex flex-col gap-1">
+								<span className="font-semibold text-slate-900">{value.Uname}</span>
+								<span className="text-xs text-slate-500">Created by {value.Ernam}</span>
+							</div>
+						);
+					},
+				};
+			}
+
+			if (column.id === 'actions') {
+				return {
+					...column,
+					Cell: ({ row }: any) => {
+						const value = row.original as UserTableItem;
+
+						return (
+							<div className="flex items-center justify-end gap-2">
+								<Button
+									design="Emphasized"
+									icon="edit"
+									onClick={() => {
+										setFeedbackMessage('');
+										setSelectedUser(value);
+										setRoleDraft(value.Role || '');
+										setRoleDialogOpen(true);
+									}}
+								>
+									Update Role
+								</Button>
+								<Button
+									design="Negative"
+									icon="delete"
+									onClick={() => {
+										setFeedbackMessage('');
+										setSelectedUser(value);
+										setDeleteDialogOpen(true);
+									}}
+								>
+									Delete
+								</Button>
+							</div>
+						);
+					},
+				};
+			}
+
 			return column;
 		});
 	}, []);
+
+	const { mutate: updateUserRole } = useMutation(
+		updateAuthUserMutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({ queryKey: ['auth-users'] });
+				setFeedbackMessage('User role updated successfully');
+				setRoleDialogOpen(false);
+				setSelectedUser(null);
+			},
+			onError: (error) => {
+				setFeedbackMessage(error.message || 'Cannot update user role');
+			},
+		}),
+	);
+
+	const { mutate: deleteUser } = useMutation(
+		deleteAuthUserMutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({ queryKey: ['auth-users'] });
+				setFeedbackMessage('User deleted successfully');
+				setDeleteDialogOpen(false);
+				setSelectedUser(null);
+			},
+			onError: (error: any) => {
+				const status = error?.response?.status;
+
+				if (status === 403) {
+					setDeleteDialogOpen(false);
+					setDeleteDeniedMessage('You do not have permission to delete this user.');
+					setDeleteDeniedDialogOpen(true);
+					return;
+				}
+
+				setFeedbackMessage(error.message || 'Cannot delete user');
+			},
+		}),
+	);
 
 	return (
 		<DynamicPage
@@ -265,6 +377,14 @@ export function UserListView() {
 			}}
 		>
 			<div className="mx-auto flex h-full w-full max-w-[96rem] flex-col gap-4 p-4">
+				{feedbackMessage ? (
+					<MessageStrip
+						design={feedbackMessage === 'Sign in with role ADMIN to update roles or delete users.' ? 'Negative' : 'Information'}
+						hideCloseButton
+					>
+						{feedbackMessage}
+					</MessageStrip>
+				) : null}
 				{error ? (
 					<MessageStrip design="Negative" hideCloseButton>
 						{(error as Error).message || 'Cannot load Auth users'}
@@ -292,6 +412,82 @@ export function UserListView() {
 
 				{!isFetching && tableRows.length === 0 ? <IllustratedMessage name="NoData" /> : null}
 			</div>
+
+			{roleDialogOpen && selectedUser ? (
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm">
+					<div className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-5 shadow-2xl">
+						<div className="flex items-start justify-between gap-4">
+							<div>
+								<div className="text-lg font-semibold text-slate-900">Update role</div>
+								<div className="mt-1 text-sm text-slate-500">User: {selectedUser.Uname}</div>
+							</div>
+							<button className="text-sm text-slate-500" onClick={() => setRoleDialogOpen(false)} type="button">
+								Close
+							</button>
+						</div>
+
+						<div className="mt-5 grid gap-4">
+							<div>
+								<label className="mb-2 block text-sm font-medium text-slate-700">Role</label>
+								<Input value={roleDraft} onInput={(event) => setRoleDraft(event.target.value)} placeholder="Enter role" />
+							</div>
+							<div>
+								<label className="mb-2 block text-sm font-medium text-slate-700">Quick select</label>
+								<Select value={roleDraft} onChange={(event) => setRoleDraft(event.detail.selectedOption?.value || '')}>
+									{ROLE_OPTIONS.map((role) => (
+										<Option key={role} value={role}>
+											{role}
+										</Option>
+									))}
+								</Select>
+							</div>
+						</div>
+
+						<div className="mt-6 flex flex-wrap justify-end gap-3">
+							<Button design="Transparent" onClick={() => setRoleDialogOpen(false)}>
+								Cancel
+							</Button>
+							<Button
+								design="Emphasized"
+								disabled={!roleDraft.trim()}
+								onClick={() => {
+									updateUserRole({
+										uname: selectedUser.Uname,
+										payload: { Role: roleDraft.trim() },
+									});
+								}}
+							>
+								Save
+							</Button>
+						</div>
+					</div>
+				</div>
+			) : null}
+
+			<MessageBox
+				open={deleteDialogOpen}
+				type="Confirm"
+				titleText="Delete User"
+				actions={['Cancel', 'OK']}
+				onClose={(action) => {
+					setDeleteDialogOpen(false);
+					if (action === 'OK' && selectedUser) {
+						deleteUser({ uname: selectedUser.Uname });
+					}
+				}}
+			>
+				Are you sure you want to delete {selectedUser?.Uname || 'this user'}? This action cannot be undone.
+			</MessageBox>
+
+			<MessageBox
+				open={deleteDeniedDialogOpen}
+				type="Information"
+				titleText="Permission Denied"
+				actions={['OK']}
+				onClose={() => setDeleteDeniedDialogOpen(false)}
+			>
+				{deleteDeniedMessage}
+			</MessageBox>
 
 			{isLoading ? (
 				<FlexBox alignItems="Center" justifyContent="Center" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>

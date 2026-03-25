@@ -38,3 +38,11 @@ export type CreateAuthUserPayload = {
 
 export type CreateAuthUserResponse = AuthUserItem;
 
+export type UpdateAuthUserPayload = {
+  Role: string;
+};
+
+export type UpdateAuthUserResponse = AuthUserItem;
+
+export type DeleteAuthUserResponse = unknown;
+
