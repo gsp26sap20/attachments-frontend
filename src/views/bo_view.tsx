@@ -63,6 +63,12 @@ const rawColumns: AnalyticalTableColumnDefinition[] = [
 		accessor: 'Ernam',
 		width: 140,
 	},
+	{
+		id: 'actions',
+		Header: 'Actions',
+		accessor: 'BoId',
+		width: 280,
+	},
 	
 ];
 
@@ -212,8 +218,29 @@ export function BoView() {
 	);
 
 	const columns = React.useMemo(
-		() => rawColumns,
-		[],
+		() =>
+			rawColumns.map((column) => {
+				if (column.id === 'actions') {
+					return {
+						...column,
+						Cell: ({ row }: any) => {
+							const item = row.original as BizObjectTableItem;
+
+							return (
+								<div className="flex items-center justify-end gap-2">
+										<Button design="Emphasized" icon="list" onClick={() => navigate(`/BO/${item.BoId}/Attachments`)}>
+											Linked Attachments
+									</Button>
+									
+								</div>
+							);
+						},
+					};
+				}
+
+				return column;
+			}),
+		[navigate],
 	);
 
 	return (
