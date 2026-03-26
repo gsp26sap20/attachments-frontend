@@ -1,11 +1,13 @@
 import { toast } from '@/libs/toast';
 import { Controller, useForm } from 'react-hook-form';
+import { useAppStore } from '@/stores/app-stores';
 
 type LoginFormValues = {
   username: string;
   password: string;
   language: string;
   client: string;
+  role: string;
 };
 
 const LANGUAGE_OPTIONS = [
@@ -15,6 +17,8 @@ const LANGUAGE_OPTIONS = [
 ];
 
 export function HomeView() {
+  const setCurrentUserRole = useAppStore((state) => state.setCurrentUserRole);
+
   const {
     control,
     handleSubmit,
@@ -25,11 +29,14 @@ export function HomeView() {
       password: '',
       language: 'vi',
       client: '3xx',
+      role: 'USER',
     },
   });
 
-  const onSubmit = (_values: LoginFormValues) => {
+  const onSubmit = (values: LoginFormValues) => {
     toast('This function is not implemented yet.');
+    setCurrentUserRole(values.role === 'ADMIN' ? 'ADMIN' : 'USER');
+    return;
   };
 
   return (
@@ -165,6 +172,27 @@ export function HomeView() {
                 {errors.client ? (
                   <span className="mt-1 inline-block text-[0.72rem] text-[#b00]">{errors.client.message}</span>
                 ) : null}
+              </label>
+
+              <label className="flex flex-col gap-1">
+                <span className="text-xs text-[#1d2e45]">Role</span>
+                <Controller
+                  control={control}
+                  name="role"
+                  render={({ field }) => (
+                    <select
+                      aria-label="Role"
+                      className="w-full rounded-[0.55rem] border border-white/55 bg-white/75 px-3 py-[0.72rem] text-sm text-[#16314d] shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] outline-none transition focus:border-[#5a8db8] focus:bg-white"
+                      value={field.value}
+                      onChange={(event) => {
+                        field.onChange(event.target.value);
+                      }}
+                    >
+                      <option value="USER">USER</option>
+                      <option value="ADMIN">ADMIN</option>
+                    </select>
+                  )}
+                />
               </label>
             </div>
 

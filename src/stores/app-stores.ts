@@ -25,6 +25,7 @@ export type AppState = {
   viewMode: 'table' | 'grid';
   toast: ToastState;
   csrfToken: string | null;
+  currentUserRole: 'ADMIN' | 'USER' | '';
 };
 
 export type AppAction = {
@@ -32,13 +33,21 @@ export type AppAction = {
   showToast: (text: string, options?: ToastState['options']) => void;
   clearToast: () => void;
   setCsrfToken: (csrfToken: string) => void;
+  setCurrentUserRole: (_role: AppState['currentUserRole']) => void;
 };
 
 export type AppStore = AppState & AppAction;
 
+function getStoredCurrentUserRole(): AppState['currentUserRole'] {
+  const value = sessionStorage.getItem('current-user-role');
+
+  return value === 'ADMIN' ? 'ADMIN' : value === 'USER' ? 'USER' : '';
+}
+
 export const useAppStore = create<AppStore>()(
   devtools((set) => ({
     viewMode: 'table',
+    currentUserRole: getStoredCurrentUserRole(),
     setViewMode: (viewMode) => set({ viewMode }),
 
     toast: {
@@ -65,5 +74,9 @@ export const useAppStore = create<AppStore>()(
 
     csrfToken: null,
     setCsrfToken: (csrfToken) => set({ csrfToken }),
+    setCurrentUserRole: (currentUserRole) => {
+      sessionStorage.setItem('current-user-role', currentUserRole); // ???
+      set({ currentUserRole });
+    },
   })),
 );
