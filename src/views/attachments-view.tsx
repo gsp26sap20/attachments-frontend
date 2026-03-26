@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { cn } from '@/libs/utils';
 import '@ui5/webcomponents-icons/list.js';
+import '@ui5/webcomponents-icons/home.js';
 import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/table-view.js';
 import { useAppStore } from '@/stores/app-stores';
@@ -15,13 +16,10 @@ import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
-import { VariantItem } from '@ui5/webcomponents-react/VariantItem';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
-import { DynamicPageTitle } from '@ui5/webcomponents-react/DynamicPageTitle';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
-import { VariantManagement } from '@ui5/webcomponents-react/VariantManagement';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
 import { AttachmentsFilterBar, AttachmentCard } from '@/features/attachments/components';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
@@ -85,6 +83,20 @@ export function AttachmentsView() {
     <DynamicPage
       headerArea={
         <DynamicPageHeader style={{ padding: '1rem 2rem' }}>
+          <FlexBox alignItems="Center" className="text-primary gap-2">
+            <Icon
+              name="home"
+              className="text-primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/shell-home');
+              }}
+              mode="Interactive"
+            />
+            <Title level="H1" className="text-primary">
+              Attachments
+            </Title>
+          </FlexBox>
           <AttachmentsFilterBar onFilterChange={setFilter} onSearchChange={setSearch} />
         </DynamicPageHeader>
       }
@@ -92,21 +104,6 @@ export function AttachmentsView() {
         height: '100dvh',
       }}
       showFooter={true}
-      titleArea={
-        <DynamicPageTitle
-          heading={
-            <VariantManagement onClick={function fQ() {}}>
-              <VariantItem selected>Standard</VariantItem>
-            </VariantManagement>
-          }
-          snappedHeading={
-            <VariantManagement onClick={function fQ() {}}>
-              <VariantItem selected>Standard</VariantItem>
-            </VariantManagement>
-          }
-          style={{ minHeight: '0px', padding: '0rem 2rem' }}
-        />
-      }
     >
       {viewMode === 'table' && (
         <AnalyticalTable
