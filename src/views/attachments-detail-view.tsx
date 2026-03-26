@@ -17,6 +17,7 @@ import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
 import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
+import { AttachmentBizObjects } from '@/features/attachments/components';
 import { BreadcrumbsItem } from '@ui5/webcomponents-react/BreadcrumbsItem';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { ObjectPageHeader } from '@ui5/webcomponents-react/ObjectPageHeader';
@@ -231,6 +232,14 @@ export function AttachmentsDetailView() {
           style={{ display: isLoading ? 'none' : 'block' }}
         >
           <AttachmentAudit fileId={id!} />
+        </ObjectPageSection>
+        <ObjectPageSection
+          aria-label="Business Objects"
+          id="business-objects"
+          titleText="Business Objects"
+          style={{ display: isLoading ? 'none' : 'block' }}
+        >
+          <AttachmentBizObjects fileId={id!} />
         </ObjectPageSection>
         <ObjectPageSection
           aria-label="File Preview"
