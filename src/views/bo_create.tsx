@@ -33,6 +33,7 @@ const DEFAULT_FORM: FormState = {
 };
 
 const STATUS_OPTIONS = ['NEW', 'APPROVED', 'ACTIVE', 'REJECTED', 'ERROR'];
+const BO_TYPE_MAX_LENGTH = 10;
 
 export function BoCreateView() {
   const navigate = useNavigate();
@@ -105,8 +106,11 @@ export function BoCreateView() {
                   <Label>BO Type</Label>
                   <Input
                     value={form.BoType}
+                    maxlength={BO_TYPE_MAX_LENGTH}
                     placeholder="Enter BO type"
-                    onInput={(event) => setForm((prev) => ({ ...prev, BoType: event.target.value }))}
+                    onInput={(event) =>
+                      setForm((prev) => ({ ...prev, BoType: event.target.value.slice(0, BO_TYPE_MAX_LENGTH) }))
+                    }
                   />
                 </FlexBox>
 

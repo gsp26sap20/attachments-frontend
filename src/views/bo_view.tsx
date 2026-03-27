@@ -85,6 +85,8 @@ const DEFAULT_FORM: BizObjectFormState = {
   Status: '',
 };
 
+const BO_TYPE_MAX_LENGTH = 10;
+
 function formatDateTime(date?: string | null, time?: string | null) {
   if (!date && !time) return '-';
   if (!date) return time || '-';
@@ -413,8 +415,11 @@ export function BoView() {
                   <Label>BoType</Label>
                   <Input
                     value={editForm.BoType}
+                    maxlength={BO_TYPE_MAX_LENGTH}
                     placeholder="Enter BO type"
-                    onInput={(event) => setEditForm((prev) => ({ ...prev, BoType: event.target.value }))}
+                    onInput={(event) =>
+                      setEditForm((prev) => ({ ...prev, BoType: event.target.value.slice(0, BO_TYPE_MAX_LENGTH) }))
+                    }
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
