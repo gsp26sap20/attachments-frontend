@@ -8,7 +8,10 @@ import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
-import type { AnalyticalTableColumnDefinition } from '@ui5/webcomponents-react/AnalyticalTable';
+import type {
+  AnalyticalTableCellInstance,
+  AnalyticalTableColumnDefinition,
+} from '@ui5/webcomponents-react/AnalyticalTable';
 import { MessageStrip } from '@ui5/webcomponents-react/MessageStrip';
 import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
@@ -76,7 +79,7 @@ const rawColumns: AnalyticalTableColumnDefinition[] = [
   {
     id: 'actions',
     Header: 'Actions',
-    accessor: (row: Record<string, any>) => row.Uname,
+    accessor: 'Uname',
     width: 270,
   },
 ];
@@ -104,6 +107,35 @@ function pillClassName(tone: string) {
   return `inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${tone}`;
 }
 
+function RoleToneCell({ row }: AnalyticalTableCellInstance) {
+  const value = row.original as UserTableItem;
+
+  return <span className={pillClassName(value.RoleTone)}>{value.__EntityControl?.Deletable ? 'Yes' : 'No'}</span>;
+}
+
+function PermissionToneCell({ row }: AnalyticalTableCellInstance) {
+  const value = row.original as UserTableItem;
+
+  return (
+    <span className={pillClassName(value.PermissionTone)}>{value.__EntityControl?.Updatable ? 'Yes' : 'No'}</span>
+  );
+}
+
+function MessageCountCell({ value }: AnalyticalTableCellInstance) {
+  return <span>{value}</span>;
+}
+
+function UserNameCell({ row }: AnalyticalTableCellInstance) {
+  const value = row.original as UserTableItem;
+
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="font-semibold text-slate-900">{value.Uname}</span>
+      <span className="text-xs text-slate-500">Created by {value.Ernam}</span>
+    </div>
+  );
+}
+
 export function UserListView() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -128,7 +160,7 @@ export function UserListView() {
     }),
   );
 
-  const users = data?.value ?? [];
+  const users = React.useMemo(() => data?.value ?? [], [data]);
 
   const roleOptions = React.useMemo(() => {
     return ['ALL', ...Array.from(new Set(users.map((user) => user.Role).filter(Boolean)))].filter(Boolean);
@@ -168,56 +200,35 @@ export function UserListView() {
       if (column.accessor === 'RoleTone') {
         return {
           ...column,
-          Cell: ({ row }: any) => {
-            const value = row.original as UserTableItem;
-            return (
-              <span className={pillClassName(value.RoleTone)}>{value.__EntityControl?.Deletable ? 'Yes' : 'No'}</span>
-            );
-          },
+          Cell: RoleToneCell,
         };
       }
 
       if (column.accessor === 'PermissionTone') {
         return {
           ...column,
-          Cell: ({ row }: any) => {
-            const value = row.original as UserTableItem;
-            return (
-              <span className={pillClassName(value.PermissionTone)}>
-                {value.__EntityControl?.Updatable ? 'Yes' : 'No'}
-              </span>
-            );
-          },
+          Cell: PermissionToneCell,
         };
       }
 
       if (column.accessor === 'MessageCount') {
         return {
           ...column,
-          Cell: ({ value }: any) => <span>{value}</span>,
+          Cell: MessageCountCell,
         };
       }
 
       if (column.accessor === 'Uname') {
         return {
           ...column,
-          Cell: ({ row }: any) => {
-            const value = row.original as UserTableItem;
-
-            return (
-              <div className="flex flex-col gap-1">
-                <span className="font-semibold text-slate-900">{value.Uname}</span>
-                <span className="text-xs text-slate-500">Created by {value.Ernam}</span>
-              </div>
-            );
-          },
+          Cell: UserNameCell,
         };
       }
 
       if (column.id === 'actions') {
         return {
           ...column,
-          Cell: ({ row }: any) => {
+          Cell: ({ row }: AnalyticalTableCellInstance) => {
             const value = row.original as UserTableItem;
 
             return (
@@ -269,6 +280,13 @@ export function UserListView() {
     }),
   );
 
+  type DeleteUserError = {
+    response?: {
+      status?: number;
+    };
+    message?: string;
+  };
+
   const { mutate: deleteUser } = useMutation(
     deleteAuthUserMutationOptions({
       onSuccess: () => {
@@ -277,7 +295,7 @@ export function UserListView() {
         setDeleteDialogOpen(false);
         setSelectedUser(null);
       },
-      onError: (error: any) => {
+      onError: (error: DeleteUserError) => {
         const status = error?.response?.status;
 
         if (status === 403) {

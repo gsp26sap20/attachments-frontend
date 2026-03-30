@@ -19,6 +19,7 @@ import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { Toast } from '@ui5/webcomponents-react/Toast';
+import type { AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import '@ui5/webcomponents-icons/refresh.js';
@@ -33,7 +34,6 @@ import {
 } from '@/features/biz-object/options/mutation';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import type { AttachmentListItem } from '@/features/attachments/types';
-import type { AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
 type LinkedAttachmentRow = {
   Title: string;
@@ -111,6 +111,8 @@ export function BoWListAttchmentView() {
       $expand: '_Links($expand=_Attach)',
     }),
   );
+
+  const linkedAttachmentsResponse = React.useMemo(() => data, [data]);
 
   const { data: attachmentData, isFetching: isSearching } = useInfiniteQuery(
     attachmentsQueryOptions({
@@ -194,7 +196,7 @@ export function BoWListAttchmentView() {
   );
 
   const linkedAttachments = React.useMemo<LinkedAttachmentRow[]>(() => {
-    return (data?._Links ?? []).map((link) => {
+    return (linkedAttachmentsResponse?._Links ?? []).map((link) => {
       const attachment = link._Attach;
 
       return {
@@ -207,7 +209,7 @@ export function BoWListAttchmentView() {
         AttachmentCreatedOn: formatDate(attachment.Erdat, attachment.Erzet),
       };
     });
-  }, [data]);
+  }, [linkedAttachmentsResponse]);
 
   const linkedAttachmentFileIds = React.useMemo(() => {
     return new Set(linkedAttachments.map((item) => item.FileId));

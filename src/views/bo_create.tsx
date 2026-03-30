@@ -45,7 +45,7 @@ export function BoCreateView() {
 
   const { mutate: createBizObject, isPending } = useMutation(
     createBizObjectMutationOptions({
-      onSuccess: (data) => {
+      onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['biz-objects'] });
         setToastMessage('Business Object created successfully');
         setNavigateAfterToast(true);
