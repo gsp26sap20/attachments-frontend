@@ -22,7 +22,10 @@ import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toast } from '@ui5/webcomponents-react/Toast';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
-import type { AnalyticalTableColumnDefinition } from '@ui5/webcomponents-react/AnalyticalTable';
+import type {
+  AnalyticalTableCellInstance,
+  AnalyticalTableColumnDefinition,
+} from '@ui5/webcomponents-react/AnalyticalTable';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/list.js';
@@ -85,6 +88,8 @@ const DEFAULT_FORM: BizObjectFormState = {
   Status: '',
 };
 
+const BO_TYPE_MAX_LENGTH = 10;
+
 function formatDateTime(date?: string | null, time?: string | null) {
   if (!date && !time) return '-';
   if (!date) return time || '-';
@@ -105,6 +110,20 @@ function getStatusTone(status?: string) {
 
   return 'bg-slate-500/15 text-slate-700 border-slate-500/25';
 }
+
+function BusinessObjectActionCell({ row }: AnalyticalTableCellInstance) {
+  const navigate = useNavigate();
+  const item = row.original as BizObjectTableItem;
+
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <Button design="Emphasized" icon="list" onClick={() => navigate(`/business-objects/${item.BoId}/attachments`)}>
+        Linked Attachments
+      </Button>
+    </div>
+  );
+}
+
 export function BoView() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -125,7 +144,7 @@ export function BoView() {
     }),
   );
 
-  const bizObjects = data?.value ?? [];
+  const bizObjects = React.useMemo(() => data?.value ?? [], [data]);
 
   const filteredBizObjects = React.useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
@@ -217,27 +236,13 @@ export function BoView() {
         if (column.id === 'actions') {
           return {
             ...column,
-            Cell: ({ row }: any) => {
-              const item = row.original as BizObjectTableItem;
-
-              return (
-                <div className="flex items-center justify-end gap-2">
-                  <Button
-                    design="Emphasized"
-                    icon="list"
-                    onClick={() => navigate(`/business-objects/${item.BoId}/attachments`)}
-                  >
-                    Linked Attachments
-                  </Button>
-                </div>
-              );
-            },
+            Cell: BusinessObjectActionCell,
           };
         }
 
         return column;
       }),
-    [navigate],
+    [],
   );
 
   return (
@@ -413,8 +418,11 @@ export function BoView() {
                   <Label>BoType</Label>
                   <Input
                     value={editForm.BoType}
+                    maxlength={BO_TYPE_MAX_LENGTH}
                     placeholder="Enter BO type"
-                    onInput={(event) => setEditForm((prev) => ({ ...prev, BoType: event.target.value }))}
+                    onInput={(event) =>
+                      setEditForm((prev) => ({ ...prev, BoType: event.target.value.slice(0, BO_TYPE_MAX_LENGTH) }))
+                    }
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
