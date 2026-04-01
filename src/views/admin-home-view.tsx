@@ -1,18 +1,18 @@
-import '@ui5/webcomponents-icons/log.js';
-import { ODATA_BASE_URL } from '@/app-env';
 import { useNavigate } from 'react-router';
-import '@ui5/webcomponents-icons/attachment.js';
 import { Card } from '@ui5/webcomponents-react/Card';
+import { CardHeader } from '@ui5/webcomponents-react/CardHeader';
+import { Button } from '@ui5/webcomponents-react/Button';
+import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Title } from '@ui5/webcomponents-react/Title';
 import '@ui5/webcomponents-icons/person-placeholder.js';
-import { Button } from '@ui5/webcomponents-react/Button';
-import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
-import '@ui5/webcomponents-icons/business-objects-mobile.js';
-import { CardHeader } from '@ui5/webcomponents-react/CardHeader';
+import '@ui5/webcomponents-icons/document.js';
+import '@ui5/webcomponents-icons/log.js';
+import { ODATA_BASE_URL } from '@/app-env';
 
-export function ShellHomeView() {
+export function AdminHomeView() {
   const navigate = useNavigate();
+
   return (
     <main className="relative isolate min-h-screen overflow-hidden bg-[linear-gradient(180deg,#d9eafb_0%,#dceaf7_44%,#e1ecf6_100%)] text-[#16314d]">
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
@@ -22,15 +22,14 @@ export function ShellHomeView() {
         <div className="absolute left-1/2 -top-88 h-208 w-208 -translate-x-1/2 rounded-[54%_46%_39%_61%/40%_55%_45%_60%] bg-white/20" />
         <div className="absolute -bottom-8 -right-32 h-136 w-3xl rotate-28 rounded-[60%_40%_47%_53%/38%_48%_52%_62%] bg-white/20" />
       </div>
-      <header
-        className="absolute left-[1.1rem] top-[0.95rem] z-10 inline-flex items-center gap-[0.55rem]"
-        aria-label="System brand"
-      >
+
+      <header className="absolute left-[1.1rem] top-[0.95rem] z-10 inline-flex items-center gap-[0.55rem]" aria-label="System brand">
         <div className="hidden flex-col leading-none text-[#16507b] sm:flex">
           <strong className="text-[0.74rem] font-bold">SAP Digital</strong>
           <span className="text-[0.66rem] opacity-80">Gateway Access</span>
         </div>
       </header>
+
       <div className="absolute right-[1.1rem] top-[0.95rem] z-10" aria-label="System brand">
         <a href={`${ODATA_BASE_URL}/sap/public/bc/icf/logoff?sap-client=324`}>
           <Button design="Transparent" icon="log">
@@ -38,47 +37,36 @@ export function ShellHomeView() {
           </Button>
         </a>
       </div>
+
       <FlexBox justifyContent="Center" alignItems="Center" className="h-screen w-screen p-8">
         <FlexBox direction="Column" alignItems="Center" justifyContent="Center" style={{ gap: '1rem' }}>
-          <Title level="H1">Select an application</Title>
-          <Card
-            header={
-              <CardHeader
-                interactive
-                onClick={() => navigate('/attachments')}
-                avatar={<Icon name="attachment" />}
-                subtitleText="File Attachments Management"
-                titleText="File Attachments"
-              />
-            }
-          ></Card>
-          <Card
-            header={
-              <CardHeader
-                interactive
-                onClick={() => navigate('/business-objects')}
-                avatar={<Icon name="business-objects-mobile" />}
-                subtitleText="Business Objects Management"
-                titleText="Business Objects"
-              />
-            }
-          ></Card>
-          <Card
-            header={
-              <CardHeader
-                interactive
-                onClick={() => navigate('/admin')}
-                avatar={<Icon name="person-placeholder" />}
-                subtitleText="Users Management and Configuration File"
-                titleText="Admin"
-              />
-            }
-          ></Card>
+          <Title level="H1">Admin applications</Title>
+          <div className="grid w-full max-w-2xl gap-4 sm:grid-cols-2">
+            <Card
+              header={
+                <CardHeader
+                  interactive
+                  onClick={() => navigate('/users')}
+                  avatar={<Icon name="person-placeholder" />}
+                  subtitleText="Users Management"
+                  titleText="Users Management"
+                />
+              }
+            />
+            <Card
+              header={
+                <CardHeader
+                  interactive
+                  onClick={() => navigate('/configuration-files')}
+                  avatar={<Icon name="document" />}
+                  subtitleText="Configuration File CRUD"
+                  titleText="Configuration File"
+                />
+              }
+            />
+          </div>
         </FlexBox>
       </FlexBox>
-      <footer className="absolute bottom-[0.95rem] left-4 right-4 z-10 text-center text-[0.7rem] text-muted-foreground sm:left-auto sm:right-5 sm:text-left">
-        Copyright (c) {new Date().getFullYear()} SAP SE All Rights Reserved.
-      </footer>
     </main>
   );
 }
