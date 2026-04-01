@@ -28,6 +28,7 @@ import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/delete.js';
 import '@ui5/webcomponents-icons/edit.js';
 import '@ui5/webcomponents-icons/group.js';
+import '@ui5/webcomponents-icons/home.js';
 import '@ui5/webcomponents-icons/person-placeholder.js';
 import '@ui5/webcomponents-icons/checklist.js';
 import { getAuthUsersQueryOptions } from '@/features/auth-users/options/query';
@@ -368,6 +369,7 @@ export function UserListView() {
             <Toolbar className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
               <ToolbarSpacer />
               <ToolbarButton design="Emphasized" text="Create User" onClick={() => navigate('/users/create')} />
+              <ToolbarButton design="Transparent" icon="home" text="Home" onClick={() => navigate('/')} />
               <div className="min-w-64">
                 <Input
                   placeholder="Search user, role, creator"

@@ -29,6 +29,7 @@ import type {
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/list.js';
+import '@ui5/webcomponents-icons/home.js';
 import '@ui5/webcomponents-icons/document.js';
 import { getBizObjectsQueryOptions } from '@/features/biz-object/options/query';
 import { deleteBizObjectMutationOptions, updateBizObjectMutationOptions } from '@/features/biz-object/options/mutation';
@@ -263,9 +264,9 @@ export function BoView() {
               />
               <ToolbarButton
                 design="Transparent"
-                icon="list"
-                text="Attachments"
-                onClick={() => navigate('/attachments')}
+                icon="home"
+                text="Home"
+                onClick={() => navigate('/')}
               />
               <ToolbarButton
                 design="Emphasized"
