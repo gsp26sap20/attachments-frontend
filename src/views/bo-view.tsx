@@ -9,8 +9,6 @@ import type { AnalyticalTableCellInstance, AnalyticalTableColumnDefinition } fro
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
-import { Select } from '@ui5/webcomponents-react/Select';
-import { Option } from '@ui5/webcomponents-react/Option';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Input } from '@ui5/webcomponents-react/Input';
 import { Button } from '@ui5/webcomponents-react/Button';
@@ -46,7 +44,6 @@ function BusinessObjectActionCell({ row }: AnalyticalTableCellInstance) {
 
   return (
     <div className="flex items-center justify-end gap-2">
-      
       <Button design="Emphasized" icon="list" onClick={() => navigate(`/business-objects/${item.BoId}/attachments`)}>
         Linked Attachments
       </Button>
@@ -60,7 +57,7 @@ export function BoView() {
   const [toastVisible, setToastVisible] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState('');
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const rowsPerPage = 10;
 
   const { data, isFetching, isLoading, error, refetch } = useQuery(
     getBizObjectsQueryOptions({

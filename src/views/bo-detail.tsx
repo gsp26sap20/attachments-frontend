@@ -2,7 +2,6 @@ import * as React from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
-import { ObjectPageHeader } from '@ui5/webcomponents-react/ObjectPageHeader';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
 import { BreadcrumbsItem } from '@ui5/webcomponents-react/BreadcrumbsItem';
@@ -12,9 +11,6 @@ import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Input } from '@ui5/webcomponents-react/Input';
 import { Label } from '@ui5/webcomponents-react/Label';
-import { List } from '@ui5/webcomponents-react/List';
-import { ListItemStandard } from '@ui5/webcomponents-react/ListItemStandard';
-import { Text } from '@ui5/webcomponents-react/Text';
 import { Toast } from '@ui5/webcomponents-react/Toast';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
@@ -29,7 +25,6 @@ import '@ui5/webcomponents-icons/list.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import { getBizObjectsQueryOptions } from '@/features/biz-object/options/query';
 import { deleteBizObjectMutationOptions, updateBizObjectMutationOptions } from '@/features/biz-object/options/mutation';
-import type { BizObjectItem } from '@/features/biz-object/types';
 
 type BizObjectFormState = {
   BoType: string;
@@ -253,7 +248,7 @@ export function BoDetailView() {
         ) : selectedBo ? (
           <div className="p-2">
             <TabContainer headerBackgroundDesign="Solid" tabLayout="Standard" overflowMode="End">
-              <Tab text="Overview"selected>
+              <Tab text="Overview" selected>
                 <div className="space-y-4 p-2">
                   <div className="grid gap-4 md:grid-cols-3">
                     <div className={sectionCardClass}>
@@ -293,7 +288,7 @@ export function BoDetailView() {
                 </div>
               </Tab>
 
-              <Tab text="Edit Details" >
+              <Tab text="Edit Details">
                 <div className="p-2">
                   {isEditMode ? (
                     <div className="grid gap-4 md:grid-cols-3">
@@ -342,7 +337,7 @@ export function BoDetailView() {
                 </div>
               </Tab>
 
-              <Tab text="Permissions" >
+              <Tab text="Permissions">
                 <div className="grid gap-4 p-2 md:grid-cols-3">
                   <div className={sectionCardClass}>
                     <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Editable</div>

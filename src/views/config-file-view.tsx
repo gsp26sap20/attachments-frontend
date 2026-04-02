@@ -58,13 +58,6 @@ const columns: AnalyticalTableColumnDefinition[] = [
   { id: 'actions', Header: 'Actions', accessor: 'FileExt', width: 220 },
 ];
 
-function formatBytes(bytes: number) {
-  if (!Number.isFinite(bytes)) return '-';
-  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  if (bytes >= 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${bytes} B`;
-}
-
 export function ConfigFileView() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -105,11 +98,6 @@ export function ConfigFileView() {
         .some((value) => value.toLowerCase().includes(normalizedSearch));
     });
   }, [configFiles, search]);
-
-  const totalCount = configFiles.length;
-  const activeCount = configFiles.filter((item) => item.IsActive === 'X').length;
-  const updatableCount = configFiles.filter((item) => item.__EntityControl?.Updatable).length;
-  const deletableCount = configFiles.filter((item) => item.__EntityControl?.Deletable).length;
 
   const { mutate: createMutation, isPending: isCreating } = useMutation(
     createConfigFileMutationOptions({
@@ -240,8 +228,7 @@ export function ConfigFileView() {
     <DynamicPage
       headerArea={
         <DynamicPageHeader>
-            <div className="mx-auto flex w-full max-w-[96rem] items-center gap-4 px-4 py-3">
-
+          <div className="mx-auto flex w-full max-w-[96rem] items-center gap-4 px-4 py-3">
             <Toolbar className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
               <Title level="H2">Configuration File</Title>
               <ToolbarSpacer />
@@ -382,7 +369,10 @@ export function ConfigFileView() {
           </div>
           <div className="flex flex-col gap-1.5">
             <Label>Status</Label>
-            <Select value={form.IsActive} onChange={(event) => setForm((prev) => ({ ...prev, IsActive: event.detail.selectedOption?.value || 'X' }))}>
+            <Select
+              value={form.IsActive}
+              onChange={(event) => setForm((prev) => ({ ...prev, IsActive: event.detail.selectedOption?.value || 'X' }))}
+            >
               <Option value="X">Active</Option>
               <Option value="">Inactive</Option>
             </Select>
@@ -405,7 +395,7 @@ export function ConfigFileView() {
         actions={['Cancel', 'OK']}
         onClose={(action) => {
           if (action === 'OK' && deleteTarget) {
-              deleteMutation(deleteTarget.FileExt);
+            deleteMutation(deleteTarget.FileExt);
           }
           setDeleteTarget(null);
         }}

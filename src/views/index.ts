@@ -6,11 +6,11 @@ export { UploadVersionView } from './upload-version-view';
 export { VersionDetailView } from './version-detail-view';
 export { AttachmentNewView } from './attachment-new-view';
 export { AttachmentsDetailView } from './attachments-detail-view';
-export { BoView } from './bo_view.tsx';
-export { BoDetailView } from './bo_detail.tsx';
-export { BoCreateView } from './bo_create';
-export { BoWListAttchmentView } from './bo_link_to_attachment';
-export { UserListView } from './user_list';
-export { UserCreateView } from './user_create';
+export { BoView } from './bo-view';
+export { BoDetailView } from './bo-detail';
+export { BoCreateView } from './bo-create';
+export { BoWListAttchmentView } from './bo-link-to-attachment';
+export { UserListView } from './user-list';
+export { UserCreateView } from './user-create';
 export { ConfigFileView } from './config-file-view';
 
