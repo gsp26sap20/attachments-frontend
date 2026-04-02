@@ -46,8 +46,8 @@ type LinkedAttachmentRow = {
 };
 
 const columns: AnalyticalTableColumnDefinition[] = [
-  { Header: 'Title', accessor: 'Title', width: 280 },
   { Header: 'File ID', accessor: 'FileId', width: 290 },
+  { Header: 'Title', accessor: 'Title', width: 280 },
   { Header: 'Version', accessor: 'CurrentVersion', width: 110 },
   {
     Header: 'Status',
@@ -66,12 +66,15 @@ const columns: AnalyticalTableColumnDefinition[] = [
         >
           {isActive ? 'Active' : 'Inactive'}
         </span>
+        
       );
     },
+    
   },
   { Header: 'Linked On', accessor: 'LinkedOn', width: 170 },
   { Header: 'Linked By', accessor: 'LinkedBy', width: 140 },
   { Header: 'Attachment Created', accessor: 'AttachmentCreatedOn', width: 180 },
+               
 ];
 
 function formatDate(date?: string | null, time?: string | null) {
@@ -167,9 +170,34 @@ export function BoWListAttchmentView() {
   );
 
   const tableColumns = React.useMemo<AnalyticalTableColumnDefinition[]>(
-    () => [
-      ...columns,
-      {
+    () =>
+      columns.map((column) => {
+        if (column.accessor === 'FileId') {
+          return {
+            ...column,
+            Cell: function FileIdCell({ row }: AnalyticalTableCellInstance) {
+              const item = row.original as AttachmentListItem;
+
+              return (
+                <button
+                  type="button"
+                  className="max-w-full truncate text-left font-medium text-sky-700 underline-offset-2 hover:underline"
+                  title={item.FileId}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setSearchOpen(false);
+                    navigate(`/attachments/${item.FileId}`);
+                  }}
+                >
+                  {item.FileId}
+                </button>
+              );
+            },
+          };
+        }
+
+        return column;
+      }).concat({
         Header: 'Action',
         id: 'action',
         accessor: 'FileId',
@@ -181,7 +209,8 @@ export function BoWListAttchmentView() {
             <Button
               design="Negative"
               disabled={isUnlinking}
-              onClick={() => {
+              onClick={(event) => {
+                event.stopPropagation();
                 setSelectedLinkTarget(item);
                 setDeleteDialogOpen(true);
               }}
@@ -190,9 +219,8 @@ export function BoWListAttchmentView() {
             </Button>
           );
         },
-      },
-    ],
-    [isUnlinking],
+      }),
+    [isUnlinking, navigate],
   );
 
   const linkedAttachments = React.useMemo<LinkedAttachmentRow[]>(() => {
@@ -241,21 +269,6 @@ export function BoWListAttchmentView() {
         <DynamicPageHeader>
           <div className="p-4">
             <div className="rounded-3xl border border-slate-200/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(239,246,255,0.92))] p-4 shadow-sm">
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
-                  <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Linked attachments</div>
-                  <div className="mt-2 text-3xl font-semibold text-slate-900">{linkedAttachments.length}</div>
-                </div>
-                <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
-                  <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Active</div>
-                  <div className="mt-2 text-3xl font-semibold text-slate-900">{activeCount}</div>
-                </div>
-                <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
-                  <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Inactive</div>
-                  <div className="mt-2 text-3xl font-semibold text-slate-900">{inactiveCount}</div>
-                </div>
-              </div>
-
               <Toolbar className="mt-4 rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
                 <Title level="H2">BO Attachment List</Title>
                 <ToolbarSpacer />
@@ -389,7 +402,8 @@ export function BoWListAttchmentView() {
                         <Button
                           design="Emphasized"
                           disabled={isLinking}
-                          onClick={() => {
+                          onClick={(event) => {
+                            event.stopPropagation();
                             linkAttachment({ bo_id: boId, file_id: item.FileId });
                           }}
                         >
@@ -405,6 +419,15 @@ export function BoWListAttchmentView() {
               visibleRowCountMode="Auto"
               rowHeight={44}
               scaleWidthMode="Smart"
+              onRowClick={(event) => {
+                const item = event.detail.row.original as AttachmentListItem;
+                if (!item?.FileId) {
+                  return;
+                }
+
+                setSearchOpen(false);
+                navigate(`/attachments/${item.FileId}`);
+              }}
               noDataText={
                 attachmentSearchFilter || attachmentSearchText
                   ? 'No attachments match the current search.'
