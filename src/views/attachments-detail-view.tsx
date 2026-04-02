@@ -262,7 +262,7 @@ export function AttachmentsDetailView() {
           titleText="Business Objects"
           style={{ display: isLoading ? 'none' : 'block' }}
         >
-          <AttachmentBizObjects fileId={id!} />
+          <AttachmentBizObjects fileId={id!} isActive={attachment?.IsActive || false} />
         </ObjectPageSection>
         <Toast open={toastVisible} onClose={() => setToastVisible(false)} duration={2000} className="py-1 px-2">
           {toastMessage}
