@@ -11,20 +11,69 @@ import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Input } from '@ui5/webcomponents-react/Input';
 import { Label } from '@ui5/webcomponents-react/Label';
+import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
+import { Text } from '@ui5/webcomponents-react/Text';
 import { Toast } from '@ui5/webcomponents-react/Toast';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
+import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
-import { TabContainer } from '@ui5/webcomponents-react/TabContainer';
-import { Tab } from '@ui5/webcomponents-react/Tab';
+import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
 import '@ui5/webcomponents-icons/decline.js';
 import '@ui5/webcomponents-icons/document.js';
 import '@ui5/webcomponents-icons/edit.js';
 import '@ui5/webcomponents-icons/delete.js';
 import '@ui5/webcomponents-icons/list.js';
 import '@ui5/webcomponents-icons/refresh.js';
-import { getBizObjectsQueryOptions } from '@/features/biz-object/options/query';
+import { getBizObjectLinkedAttachmentsQueryOptions, getBizObjectsQueryOptions } from '@/features/biz-object/options/query';
 import { deleteBizObjectMutationOptions, updateBizObjectMutationOptions } from '@/features/biz-object/options/mutation';
+import type { AnalyticalTableCellInstance, AnalyticalTableColumnDefinition } from '@ui5/webcomponents-react/AnalyticalTable';
+
+type LinkedAttachmentRow = {
+  FileId: string;
+  Title: string;
+  CurrentVersion: string;
+  IsActive: boolean;
+  LinkedOn: string;
+  LinkedBy: string;
+};
+
+const linkedAttachmentColumns: AnalyticalTableColumnDefinition[] = [
+  {
+    Header: 'File ID',
+    accessor: 'FileId',
+    width: 240,
+  },
+  {
+    Header: 'Title',
+    accessor: 'Title',
+    width: 320,
+  },
+  {
+    Header: 'Version',
+    accessor: 'CurrentVersion',
+    width: 110,
+  },
+  {
+    Header: 'Status',
+    accessor: 'IsActive',
+    width: 120,
+    Cell: ({ row }: AnalyticalTableCellInstance) => {
+      const value = row.original as LinkedAttachmentRow;
+      return value.IsActive ? 'Active' : 'Inactive';
+    },
+  },
+  {
+    Header: 'Linked On',
+    accessor: 'LinkedOn',
+    width: 180,
+  },
+  {
+    Header: 'Linked By',
+    accessor: 'LinkedBy',
+    width: 140,
+  },
+];
 
 type BizObjectFormState = {
   BoType: string;
@@ -48,33 +97,24 @@ function formatDateTime(date?: string | null, time?: string | null) {
   return `${date} ${time}`;
 }
 
-function getStatusTone(status?: string) {
-  const normalized = (status || '').toUpperCase();
-
-  if (normalized === 'NEW') return 'bg-emerald-500/15 text-emerald-700 border-emerald-500/25';
-  if (normalized === 'APPROVED' || normalized === 'ACTIVE') {
-    return 'bg-sky-500/15 text-sky-700 border-sky-500/25';
-  }
-  if (normalized === 'REJECTED' || normalized === 'ERROR') {
-    return 'bg-rose-500/15 text-rose-700 border-rose-500/25';
-  }
-
-  return 'bg-slate-500/15 text-slate-700 border-slate-500/25';
-}
-
 function getBooleanTone(value: boolean) {
   return value
     ? 'bg-emerald-500/15 text-emerald-700 border-emerald-500/25'
     : 'bg-slate-500/15 text-slate-700 border-slate-500/25';
 }
 
-const sectionCardClass = 'rounded-2xl border border-slate-200 bg-white p-4 shadow-sm';
+function formatLinkedDate(date?: string | null, time?: string | null) {
+  if (!date && !time) return '-';
+  if (!date) return time || '-';
+  if (!time) return date;
+
+  return `${date} ${time}`;
+}
 
 export function BoDetailView() {
   const { boId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [isEditMode, setIsEditMode] = React.useState(false);
   const [form, setForm] = React.useState<BizObjectFormState>(DEFAULT_FORM);
   const [toastVisible, setToastVisible] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState('');
@@ -95,12 +135,29 @@ export function BoDetailView() {
     return data?.value.find((item) => item.BoId === boId) ?? null;
   }, [boId, data]);
 
+  const { data: linkedAttachmentsData, isFetching: isLinkedAttachmentsLoading } = useQuery(
+    getBizObjectLinkedAttachmentsQueryOptions(boId || '', {
+      'sap-client': 324,
+      $expand: '_Links($expand=_Attach)',
+    }),
+  );
+
+  const linkedAttachments = React.useMemo<LinkedAttachmentRow[]>(() => {
+    return linkedAttachmentsData?._Links?.map((link) => ({
+      FileId: link._Attach.FileId,
+      Title: link._Attach.Title,
+      CurrentVersion: link._Attach.CurrentVersion,
+      IsActive: link._Attach.IsActive,
+      LinkedOn: formatLinkedDate(link.Erdat, link.Erzet),
+      LinkedBy: link.Ernam || '-',
+    })) ?? [];
+  }, [linkedAttachmentsData]);
+
   const canSave = Boolean(selectedBo && form.BoType.trim() && form.BoTitle.trim() && form.Status.trim());
-  const boMessages = selectedBo?.SAP__Messages ?? [];
   const linkedAttachmentsEnabled = Boolean(selectedBo?.__OperationControl?.link_attachment);
 
   React.useEffect(() => {
-    if (!isEditMode || !selectedBo) {
+    if (!selectedBo) {
       return;
     }
 
@@ -109,7 +166,7 @@ export function BoDetailView() {
       BoTitle: selectedBo.BoTitle || '',
       Status: selectedBo.Status || '',
     });
-  }, [isEditMode, selectedBo]);
+  }, [selectedBo]);
 
   React.useEffect(() => {
     if (!error) {
@@ -127,7 +184,6 @@ export function BoDetailView() {
         queryClient.invalidateQueries({ queryKey: ['biz-objects'] });
         setToastMessage('Business Object updated successfully');
         setToastVisible(true);
-        setIsEditMode(false);
       },
       onError: (updateError) => {
         setToastMessage(updateError.message || 'Cannot update Business Object');
@@ -153,14 +209,13 @@ export function BoDetailView() {
   );
 
   return (
-    <div className="relative">
+    <div className="relative min-h-screen bg-slate-50">
       <ObjectPage
         mode="Default"
         hidePinButton
         onBeforeNavigate={() => undefined}
         onSelectedSectionChange={() => undefined}
         onToggleHeaderArea={() => undefined}
-      
         titleArea={
           <ObjectPageTitle
             breadcrumbs={
@@ -170,69 +225,34 @@ export function BoDetailView() {
               </Breadcrumbs>
             }
             header={
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-600/10 text-sky-700">
                   <Icon name="document" />
                 </span>
-                <div>
-                  <div className="text-lg font-semibold text-slate-900">{isLoading ? 'Loading...' : selectedBo?.BoTitle || 'Unnamed Business Object'}</div>
-                  <div className="text-sm text-slate-500">
-                    BO ID {selectedBo?.BoId } 
+                <div className="min-w-0">
+                  <div className="text-lg font-semibold text-slate-900">
+                    {isLoading ? 'Loading...' : selectedBo?.BoTitle || 'Unnamed Business Object'}
                   </div>
+                  <div className="text-sm text-slate-500">BO ID {selectedBo?.BoId || '-'}</div>
                 </div>
               </div>
             }
-           
             actionsBar={
               <Toolbar design="Transparent" style={{ height: 'auto' }}>
-                {!isEditMode ? (
-                  <>
-                    <ToolbarButton
-                      design="Transparent"
-                      icon="refresh"
-                      text="Refresh"
-                      onClick={() => queryClient.invalidateQueries({ queryKey: ['biz-objects'] })}
-                    />
-                    <ToolbarButton
-                      design="Emphasized"
-                      icon="edit"
-                      text="Edit"
-                      onClick={() => setIsEditMode(true)}
-                      disabled={!selectedBo?.__EntityControl?.Updatable}
-                    />
-                    <ToolbarButton
-                      design="Transparent"
-                      icon="list"
-                      text="Linked Attachments"
-                      onClick={() => navigate(`/business-objects/${boId}/attachments`)}
-                      disabled={!boId}
-                    />
-                    <ToolbarButton
-                      design="Transparent"
-                      icon="delete"
-                      text="Delete"
-                      onClick={() => setDeleteDialogOpen(true)}
-                      disabled={!selectedBo?.__EntityControl?.Deletable || isDeleting}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <ToolbarButton
-                      design="Emphasized"
-                      text="Save"
-                      onClick={() => {
-                        if (!selectedBo) return;
-                        updateBizObject({
-                          BoType: form.BoType.trim(),
-                          BoTitle: form.BoTitle.trim(),
-                          Status: form.Status.trim(),
-                        });
-                      }}
-                      disabled={!canSave || isUpdating}
-                    />
-                    <ToolbarButton design="Transparent" text="Cancel" onClick={() => setIsEditMode(false)} disabled={isUpdating} />
-                  </>
-                )}
+                <ToolbarButton
+                  design="Transparent"
+                  icon="refresh"
+                  text="Refresh"
+                  onClick={() => queryClient.invalidateQueries({ queryKey: ['biz-objects'] })}
+                />
+              
+                <ToolbarButton
+                  design="Transparent"
+                  icon="delete"
+                  text="Delete"
+                  onClick={() => setDeleteDialogOpen(true)}
+                  disabled={!selectedBo?.__EntityControl?.Deletable || isDeleting}
+                />
               </Toolbar>
             }
             navigationBar={
@@ -246,127 +266,128 @@ export function BoDetailView() {
             <BusyIndicator delay={0} active size="L" />
           </FlexBox>
         ) : selectedBo ? (
-          <div className="p-2">
-            <TabContainer headerBackgroundDesign="Solid" tabLayout="Standard" overflowMode="End">
-              <Tab text="Overview" selected>
-                <div className="space-y-4 p-2">
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <div className={sectionCardClass}>
-                      <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Type</div>
-                      <div className="mt-2 text-lg font-semibold text-slate-900">{selectedBo.BoType || '-'}</div>
-                    </div>
-                    <div className={sectionCardClass}>
-                      <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Status</div>
-                      <div className="mt-2 text-lg font-semibold text-slate-900">
-                        <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${getStatusTone(selectedBo.Status)}`}>
-                          {selectedBo.Status || '-'}
-                        </span>
-                      </div>
-                    </div>
-                    <div className={sectionCardClass}>
-                      <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Attachment Link</div>
-                      <div className="mt-2 text-lg font-semibold text-slate-900">
-                        <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${getBooleanTone(linkedAttachmentsEnabled)}`}>
-                          {linkedAttachmentsEnabled ? 'Enabled' : 'Disabled'}
-                        </span>
-                      </div>
-                    </div>
+          <div className="space-y-4 p-2">
+            <ObjectPageSection id="overview" titleText="Overview" aria-label="Overview">
+              <div className="grid gap-4 p-2 lg:grid-cols-2">
+                <div className="space-y-3">
+                  <div>
+                    <Label>BO Type</Label>
+                    <Input
+                      value={form.BoType}
+                      placeholder={selectedBo.BoType || 'Enter BO type'}
+                      maxlength={BO_TYPE_MAX_LENGTH}
+                      onInput={(event) => setForm((prev) => ({ ...prev, BoType: event.target.value }))}
+                    />
                   </div>
-
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <div className={sectionCardClass}>
-                      <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Created</div>
-                      <div className="mt-2 text-sm text-slate-700">{formatDateTime(selectedBo.Erdat, selectedBo.Erzet)}</div>
-                      <div className="mt-1 text-sm text-slate-700">By {selectedBo.Ernam || '-'}</div>
-                    </div>
-                    <div className={sectionCardClass}>
-                      <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Changed</div>
-                      <div className="mt-2 text-sm text-slate-700">{formatDateTime(selectedBo.Aedat, selectedBo.Aezet)}</div>
-                      <div className="mt-1 text-sm text-slate-700">By {selectedBo.Aenam || '-'}</div>
-                    </div>
+                  <div>
+                    <Label>Status</Label>
+                    <select
+                      className="h-[2.625rem] w-full rounded-[0.55rem] border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-sky-500"
+                      value={form.Status}
+                      onChange={(event) => setForm((prev) => ({ ...prev, Status: event.target.value }))}
+                    >
+                      <option value="" disabled>
+                        Select status
+                      </option>
+                      {STATUS_OPTIONS.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                </div>
-              </Tab>
-
-              <Tab text="Edit Details">
-                <div className="p-2">
-                  {isEditMode ? (
-                    <div className="grid gap-4 md:grid-cols-3">
-                      <div className="flex flex-col gap-1.5">
-                        <Label>BoType</Label>
-                        <Input
-                          value={form.BoType}
-                          maxlength={BO_TYPE_MAX_LENGTH}
-                          placeholder="Enter BO type"
-                          onInput={(event) =>
-                            setForm((prev) => ({ ...prev, BoType: event.target.value.slice(0, BO_TYPE_MAX_LENGTH) }))
-                          }
-                        />
-                      </div>
-                      <div className="flex flex-col gap-1.5 md:col-span-2">
-                        <Label>BoTitle</Label>
-                        <Input
-                          value={form.BoTitle}
-                          placeholder="Enter BO title"
-                          onInput={(event) => setForm((prev) => ({ ...prev, BoTitle: event.target.value }))}
-                        />
-                      </div>
-                      <div className="flex flex-col gap-1.5">
-                        <Label>Status</Label>
-                        <select
-                          className="h-[2.625rem] rounded-[0.55rem] border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-sky-500"
-                          value={form.Status}
-                          onChange={(event) => setForm((prev) => ({ ...prev, Status: event.target.value }))}
-                        >
-                          <option value="" disabled>
-                            Select status
-                          </option>
-                          {STATUS_OPTIONS.map((status) => (
-                            <option key={status} value={status}>
-                              {status}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-                      Click <span className="font-semibold text-slate-900">Edit</span> in the header to modify BoType, BoTitle, or Status.
-                    </div>
-                  )}
-                </div>
-              </Tab>
-
-              <Tab text="Permissions">
-                <div className="grid gap-4 p-2 md:grid-cols-3">
-                  <div className={sectionCardClass}>
-                    <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Editable</div>
-                    <div className="mt-2 text-lg font-semibold text-slate-900">
-                      <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${getBooleanTone(Boolean(selectedBo.__EntityControl?.Updatable))}`}>
-                        {selectedBo.__EntityControl?.Updatable ? 'Yes' : 'No'}
+                  <div>
+                    <Label>Linked Attachments</Label>
+                    <div className="pt-2">
+                      <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${getBooleanTone(linkedAttachmentsEnabled)}`}>
+                        {linkedAttachmentsEnabled ? 'Enabled' : 'Disabled'}
                       </span>
                     </div>
                   </div>
-                  <div className={sectionCardClass}>
-                    <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Deletable</div>
-                    <div className="mt-2 text-lg font-semibold text-slate-900">
-                      <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${getBooleanTone(Boolean(selectedBo.__EntityControl?.Deletable))}`}>
-                        {selectedBo.__EntityControl?.Deletable ? 'Yes' : 'No'}
-                      </span>
-                    </div>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <Label>Title</Label>
+                    <Input
+                      value={form.BoTitle}
+                      placeholder={selectedBo.BoTitle || 'Enter BO title'}
+                      onInput={(event) => setForm((prev) => ({ ...prev, BoTitle: event.target.value }))}
+                    />
                   </div>
-                  <div className={sectionCardClass}>
-                    <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Messages</div>
-                    <div className="mt-2 text-lg font-semibold text-slate-900">{boMessages.length}</div>
+                  <div>
+                    <Label>Create on</Label>
+                    <Text>{formatDateTime(selectedBo.Erdat, selectedBo.Erzet)}</Text>
+                  </div>
+                  <div>
+                    <Label>Created By</Label>
+                    <Text>{selectedBo.Ernam || '-'}</Text>
+                  </div>
+                  <div>
+                    <Label>Last Changed</Label>
+                    <Text>{formatDateTime(selectedBo.Aedat, selectedBo.Aezet)}</Text>
                   </div>
                 </div>
-              </Tab>
-            </TabContainer>
+              </div>
+            </ObjectPageSection>
+
+            <ObjectPageSection id="linked-attachments" titleText="Linked Attachments" aria-label="Linked Attachments">
+              <AnalyticalTable
+                data={linkedAttachments}
+                columns={linkedAttachmentColumns}
+                loading={isLinkedAttachmentsLoading}
+                selectionMode="None"
+                rowHeight={44}
+                visibleRows={8}
+                sortable={false}
+                groupable={false}
+                scaleWidthMode="Smart"
+                header={
+                  <Toolbar design="Transparent" style={{ height: 'auto' }}>
+                    <Text className="text-sm font-medium text-slate-900">
+                      Linked Attachments {linkedAttachments.length ? `(${linkedAttachments.length})` : ''}
+                    </Text>
+                    <ToolbarSpacer />
+                    <Button
+                      design="Transparent"
+                      icon="list"
+                      onClick={() => navigate(`/business-objects/${boId}/attachments`)}
+                      disabled={!boId}
+                    >
+                      Manage Links
+                    </Button>
+                  </Toolbar>
+                }
+                onRowClick={(event) => {
+                  const item = event.detail.row.original as LinkedAttachmentRow;
+                  if (!item?.FileId) return;
+                  navigate(`/attachments/${item.FileId}`);
+                }}
+              />
+            </ObjectPageSection>
           </div>
         ) : (
           <div className="p-6 text-sm text-slate-500">No business object is selected.</div>
         )}
       </ObjectPage>
+
+      {selectedBo ? (
+        <div className="fixed bottom-4 right-18 z-30">
+          <Button
+            design="Emphasized"
+            disabled={!canSave || isUpdating}
+            onClick={() => {
+              if (!selectedBo) return;
+              updateBizObject({
+                BoType: form.BoType.trim(),
+                BoTitle: form.BoTitle.trim(),
+                Status: form.Status.trim(),
+              });
+            }}
+          >
+            Save
+          </Button>
+        </div>
+      ) : null}
 
       <MessageBox
         open={deleteDialogOpen}

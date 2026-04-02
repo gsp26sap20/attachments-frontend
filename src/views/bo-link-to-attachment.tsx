@@ -258,7 +258,9 @@ export function BoWListAttchmentView() {
               </span>
               <div>
                 <div className="text-lg font-semibold text-slate-900">Linked Attachments</div>
-                <div className="text-sm text-slate-500">Attachments linked to BO {boId || '-'}</div>
+                <div className="text-sm text-slate-500">
+                  BO {boId || '-'} · {linkedAttachments.length} total · {activeCount} active · {inactiveCount} inactive
+                </div>
               </div>
             </div>
           }
@@ -266,38 +268,19 @@ export function BoWListAttchmentView() {
         />
       }
       headerArea={
-        <DynamicPageHeader>
-          <div className="p-4">
-            <div className="rounded-3xl border border-slate-200/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(239,246,255,0.92))] p-4 shadow-sm">
-              <Toolbar className="mt-4 rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
-                <Title level="H2">BO Attachment List</Title>
-                <ToolbarSpacer />
-                <ToolbarButton
-                  design="Emphasized"
-                  icon="value-help"
-                  text="Link to Attachment"
-                  onClick={openLinkDialog}
-                />
-                <ToolbarButton
-                  design="Transparent"
-                  icon="navigation-left-arrow"
-                  text="Back to BO"
-                  onClick={() => navigate('/business-objects')}
-                />
-                <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={() => refetch()} />
-              </Toolbar>
-            </div>
-          </div>
+        <DynamicPageHeader style={{ padding: '1rem 2rem' }}>
+          <Toolbar className="rounded-xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
+            <Title level="H2">Attachments linked to Business Objects</Title>
+            <ToolbarSpacer />
+            <ToolbarButton design="Emphasized" icon="value-help" text="Link to Attachment" onClick={openLinkDialog} />
+            <ToolbarButton design="Transparent" icon="navigation-left-arrow" text="Back to BO" onClick={() => navigate('/business-objects')} />
+            <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={() => refetch()} />
+          </Toolbar>
         </DynamicPageHeader>
       }
-      style={{
-        height: '100dvh',
-        overflow: 'hidden',
-        position: 'relative',
-        background: 'linear-gradient(180deg,rgba(242,247,251,0.98) 0%,rgba(231,240,248,0.98) 100%)',
-      }}
+      style={{ height: '100dvh' }}
     >
-      <div className="mx-auto flex h-full w-full max-w-7xl flex-col gap-4 p-4">
+      <div className="flex h-full w-full flex-col gap-4 p-4">
         {feedbackMessage ? (
           <MessageStrip design="Information" hideCloseButton>
             {feedbackMessage}
@@ -309,7 +292,7 @@ export function BoWListAttchmentView() {
           </MessageStrip>
         ) : null}
 
-        <div className="min-h-0 flex-1 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+        <div className="min-h-0 flex-1 overflow-hidden rounded-2xl border border-slate-200/80 bg-white">
           {linkedAttachments.length > 0 ? (
             <AnalyticalTable
               data={linkedAttachments}
@@ -377,7 +360,7 @@ export function BoWListAttchmentView() {
             onSearchChange={setAttachmentSearchText}
           />
 
-          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white">
             <AnalyticalTable
               data={attachmentSearchData}
               columns={
