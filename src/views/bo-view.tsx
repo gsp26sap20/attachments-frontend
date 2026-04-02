@@ -10,7 +10,6 @@ import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { Title } from '@ui5/webcomponents-react/Title';
-import { Input } from '@ui5/webcomponents-react/Input';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Bar } from '@ui5/webcomponents-react/Bar';
@@ -23,6 +22,7 @@ import '@ui5/webcomponents-icons/list.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import { getBizObjectsQueryOptions } from '@/features/biz-object/options/query';
 import type { BizObjectItem } from '@/features/biz-object/types';
+import { BizObjectFilterBar } from '@/features/biz-object/components/biz-object-filter-bar';
 
 const rawColumns: AnalyticalTableColumnDefinition[] = [
   { Header: 'BO ID', accessor: 'BoId', width: 260 },
@@ -54,6 +54,7 @@ function BusinessObjectActionCell({ row }: AnalyticalTableCellInstance) {
 export function BoView() {
   const navigate = useNavigate();
   const [search, setSearch] = React.useState('');
+  const [filter, setFilter] = React.useState('');
   const [toastVisible, setToastVisible] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState('');
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -65,6 +66,7 @@ export function BoView() {
       $select:
         'BoId,BoType,BoTitle,Status,Erdat,Erzet,Ernam,Aedat,Aezet,Aenam,__EntityControl/Deletable,__EntityControl/Updatable,__OperationControl/link_attachment',
       $top: 100,
+      $filter: filter || undefined,
     }),
   );
 
@@ -94,7 +96,7 @@ export function BoView() {
 
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [search, rowsPerPage]);
+  }, [filter, search, rowsPerPage]);
 
   React.useEffect(() => {
     if (currentPage > totalPages) {
@@ -134,20 +136,26 @@ export function BoView() {
       headerArea={
         <DynamicPageHeader>
           <div className="flex flex-col gap-4 p-4">
-            <Toolbar className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
-              <Title level="H2">Business Object</Title>
-              <ToolbarSpacer />
-              <ToolbarButton
-                design="Transparent"
-                icon="refresh"
-                text="Refresh"
-                onClick={() => {
-                  refetch();
-                }}
-              />
-              <ToolbarButton design="Transparent" icon="home" text="Home" onClick={() => navigate('/')} />
-              <ToolbarButton design="Emphasized" text="Create Business Object" onClick={() => navigate('/business-objects/create')} />
-            </Toolbar>
+            <div className="rounded-3xl border border-slate-200/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(239,246,255,0.92))] p-4 shadow-sm">
+              <Toolbar className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
+                <Title level="H2">Business Object</Title>
+                <ToolbarSpacer />
+                <ToolbarButton
+                  design="Transparent"
+                  icon="refresh"
+                  text="Refresh"
+                  onClick={() => {
+                    refetch();
+                  }}
+                />
+                <ToolbarButton design="Transparent" icon="home" text="Home" onClick={() => navigate('/')} />
+                <ToolbarButton design="Emphasized" text="Create Business Object" onClick={() => navigate('/business-objects/create')} />
+              </Toolbar>
+
+              <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white/90 p-3 shadow-sm">
+                <BizObjectFilterBar onFilterChange={setFilter} onSearchChange={setSearch} />
+              </div>
+            </div>
           </div>
         </DynamicPageHeader>
       }
@@ -185,17 +193,6 @@ export function BoView() {
     >
       <div className="w-full p-4">
         <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-[0_16px_40px_rgba(84,104,130,0.08)]">
-          <Toolbar className="border-b border-slate-200/80 px-4 py-3">
-            <ToolbarSpacer />
-            <Input
-              aria-label="Search BO"
-              placeholder="Search by title, type, status, id"
-              value={search}
-              onInput={(event) => setSearch(event.target.value)}
-              style={{ minWidth: '18rem' }}
-            />
-          </Toolbar>
-
           <AnalyticalTable
             data={pagedRows}
             columns={columns}
