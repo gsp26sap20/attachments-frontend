@@ -1,0 +1,25 @@
+name: Mirror
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git remote set-url mirror https://x-access-token:${{ secrets.ORG_REPO_TOKEN }}@github.com/gsp26sap20/attachments-frontend.git \
+          || git remote add mirror https://x-access-token:${{ secrets.ORG_REPO_TOKEN }}@github.com/gsp26sap20/attachments-frontend.git
+
+          git push mirror main --force
