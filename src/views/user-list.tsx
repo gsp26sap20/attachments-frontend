@@ -1,40 +1,34 @@
 import * as React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
-import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
+import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
+import type { AnalyticalTableCellInstance, AnalyticalTableColumnDefinition } from '@ui5/webcomponents-react/AnalyticalTable';
+import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
+import { Button } from '@ui5/webcomponents-react/Button';
+import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
+import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
+import { Input } from '@ui5/webcomponents-react/Input';
+import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
+import { Option } from '@ui5/webcomponents-react/Option';
+import { Select } from '@ui5/webcomponents-react/Select';
+import { Toast } from '@ui5/webcomponents-react/Toast';
+import { Title } from '@ui5/webcomponents-react/Title';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
-import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
-import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
-import type {
-  AnalyticalTableCellInstance,
-  AnalyticalTableColumnDefinition,
-} from '@ui5/webcomponents-react/AnalyticalTable';
-import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
-import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
-import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
-import { Toast } from '@ui5/webcomponents-react/Toast';
-import { Input } from '@ui5/webcomponents-react/Input';
-import { Select } from '@ui5/webcomponents-react/Select';
-import { Option } from '@ui5/webcomponents-react/Option';
-import { Button } from '@ui5/webcomponents-react/Button';
-import { Icon } from '@ui5/webcomponents-react/Icon';
-import { Title } from '@ui5/webcomponents-react/Title';
-import { useNavigate } from 'react-router';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
-import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/delete.js';
-import '@ui5/webcomponents-icons/edit.js';
 import '@ui5/webcomponents-icons/group.js';
 import '@ui5/webcomponents-icons/home.js';
 import '@ui5/webcomponents-icons/person-placeholder.js';
 import '@ui5/webcomponents-icons/checklist.js';
+import '@ui5/webcomponents-icons/refresh.js';
 import { getAuthUsersQueryOptions } from '@/features/auth-users/options/query';
 import { deleteAuthUserMutationOptions, updateAuthUserMutationOptions } from '@/features/auth-users/options/mutation';
 import type { AuthUserItem } from '@/features/auth-users/types';
 import { getBackendErrorMessage } from '@/libs/error-message';
+import { UserSearchHelpBar } from '@/components/user-search-help-bar';
 
 type UserTableItem = AuthUserItem & {
   RoleTone: string;
@@ -43,47 +37,14 @@ type UserTableItem = AuthUserItem & {
 };
 
 const rawColumns: AnalyticalTableColumnDefinition[] = [
-  {
-    Header: 'User',
-    accessor: 'Uname',
-    width: 220,
-  },
-  {
-    Header: 'Role',
-    accessor: 'Role',
-    width: 160,
-  },
-  {
-    Header: 'Created On',
-    accessor: 'Erdat',
-    width: 150,
-  },
-  {
-    Header: 'Created By',
-    accessor: 'Ernam',
-    width: 150,
-  },
-  {
-    Header: 'Messages',
-    accessor: 'MessageCount',
-    width: 120,
-  },
-  {
-    Header: 'Updatable',
-    accessor: 'PermissionTone',
-    width: 140,
-  },
-  {
-    Header: 'Deletable',
-    accessor: 'RoleTone',
-    width: 140,
-  },
-  {
-    id: 'actions',
-    Header: 'Actions',
-    accessor: 'Uname',
-    width: 270,
-  },
+  { Header: 'User', accessor: 'Uname', width: 220 },
+  { Header: 'Role', accessor: 'Role', width: 160 },
+  { Header: 'Created On', accessor: 'Erdat', width: 150 },
+  { Header: 'Created By', accessor: 'Ernam', width: 150 },
+  { Header: 'Messages', accessor: 'MessageCount', width: 120 },
+  { Header: 'Updatable', accessor: 'PermissionTone', width: 140 },
+  { Header: 'Deletable', accessor: 'RoleTone', width: 140 },
+  { id: 'actions', Header: 'Actions', accessor: 'Uname', width: 270 },
 ];
 
 const ROLE_OPTIONS = ['ADMIN', 'USER'];
@@ -92,17 +53,14 @@ function getRoleTone(role?: string) {
   const normalized = (role || '').toUpperCase();
 
   if (normalized === 'ADMIN') return 'bg-sky-500/15 text-sky-700 border-sky-500/25';
-  if (normalized === 'POWERUSER' || normalized === 'SUPPORT')
-    return 'bg-amber-500/15 text-amber-800 border-amber-500/25';
+  if (normalized === 'POWERUSER' || normalized === 'SUPPORT') return 'bg-amber-500/15 text-amber-800 border-amber-500/25';
   if (normalized === 'USER') return 'bg-emerald-500/15 text-emerald-700 border-emerald-500/25';
 
   return 'bg-slate-500/15 text-slate-700 border-slate-500/25';
 }
 
 function getPermissionTone(enabled: boolean) {
-  return enabled
-    ? 'bg-emerald-500/15 text-emerald-700 border-emerald-500/25'
-    : 'bg-rose-500/15 text-rose-700 border-rose-500/25';
+  return enabled ? 'bg-emerald-500/15 text-emerald-700 border-emerald-500/25' : 'bg-rose-500/15 text-rose-700 border-rose-500/25';
 }
 
 function pillClassName(tone: string) {
@@ -111,16 +69,12 @@ function pillClassName(tone: string) {
 
 function RoleToneCell({ row }: AnalyticalTableCellInstance) {
   const value = row.original as UserTableItem;
-
   return <span className={pillClassName(value.RoleTone)}>{value.__EntityControl?.Deletable ? 'Yes' : 'No'}</span>;
 }
 
 function PermissionToneCell({ row }: AnalyticalTableCellInstance) {
   const value = row.original as UserTableItem;
-
-  return (
-    <span className={pillClassName(value.PermissionTone)}>{value.__EntityControl?.Updatable ? 'Yes' : 'No'}</span>
-  );
+  return <span className={pillClassName(value.PermissionTone)}>{value.__EntityControl?.Updatable ? 'Yes' : 'No'}</span>;
 }
 
 function MessageCountCell({ value }: AnalyticalTableCellInstance) {
@@ -145,14 +99,13 @@ type UserListViewProps = {
 export function UserListView({ embedded = false }: UserListViewProps = {}) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [search, setSearch] = React.useState('');
-  const [roleFilter, setRoleFilter] = React.useState('ALL');
   const [toastVisible, setToastVisible] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState('');
   const [roleDialogOpen, setRoleDialogOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [selectedUser, setSelectedUser] = React.useState<UserTableItem | null>(null);
   const [roleDraft, setRoleDraft] = React.useState('');
+  const [filterString, setFilterString] = React.useState('');
 
   const { data, isFetching, isLoading, error, refetch } = useQuery(
     getAuthUsersQueryOptions({
@@ -160,6 +113,7 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
       $count: true,
       $top: 200,
       $skip: 0,
+      ...(filterString ? { $filter: filterString } : {}),
       $select: 'Uname,Role,Erdat,Ernam,__EntityControl/Deletable,__EntityControl/Updatable,SAP__Messages',
       $orderby: 'Uname asc',
     }),
@@ -167,43 +121,17 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
 
   const users = React.useMemo(() => data?.value ?? [], [data]);
 
-  const roleOptions = React.useMemo(() => {
-    return ['ALL', ...Array.from(new Set(users.map((user) => user.Role).filter(Boolean)))].filter(Boolean);
-  }, [users]);
-
-  const filteredUsers = React.useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase();
-
-    return users.filter((user) => {
-      const matchesSearch =
-        !normalizedSearch ||
-        [user.Uname, user.Role, user.Erdat, user.Ernam]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(normalizedSearch));
-      const matchesRole = roleFilter === 'ALL' || user.Role === roleFilter;
-
-      return matchesSearch && matchesRole;
-    });
-  }, [roleFilter, search, users]);
-
   const tableRows = React.useMemo<UserTableItem[]>(() => {
-    return filteredUsers.map((user) => ({
+    return users.map((user) => ({
       ...user,
       RoleTone: getRoleTone(user.Role),
       PermissionTone: getPermissionTone(Boolean(user.__EntityControl?.Updatable)),
       MessageCount: user.SAP__Messages?.length ?? 0,
     }));
-  }, [filteredUsers]);
-
-  const totalCount = data?.['@odata.count'] ? Number(data['@odata.count']) : users.length;
-  const adminCount = users.filter((user) => (user.Role || '').toUpperCase() === 'ADMIN').length;
-  const updatableCount = users.filter((user) => user.__EntityControl?.Updatable).length;
-  const deletableCount = users.filter((user) => user.__EntityControl?.Deletable).length;
+  }, [users]);
 
   React.useEffect(() => {
-    if (!error) {
-      return;
-    }
+    if (!error) return;
 
     setToastMessage(getBackendErrorMessage(error, 'Cannot load Auth users'));
     setToastVisible(true);
@@ -219,7 +147,7 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
 
             return (
               <div className="flex items-center justify-end gap-2">
-              
+               
                 <Button
                   design="Negative"
                   icon="delete"
@@ -227,6 +155,7 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
                     setSelectedUser(value);
                     setDeleteDialogOpen(true);
                   }}
+                  disabled={!value.__EntityControl?.Deletable}
                 >
                   Delete
                 </Button>
@@ -236,33 +165,10 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
         };
       }
 
-      if (column.accessor === 'RoleTone') {
-        return {
-          ...column,
-          Cell: RoleToneCell,
-        };
-      }
-
-      if (column.accessor === 'PermissionTone') {
-        return {
-          ...column,
-          Cell: PermissionToneCell,
-        };
-      }
-
-      if (column.accessor === 'MessageCount') {
-        return {
-          ...column,
-          Cell: MessageCountCell,
-        };
-      }
-
-      if (column.accessor === 'Uname') {
-        return {
-          ...column,
-          Cell: UserNameCell,
-        };
-      }
+      if (column.accessor === 'RoleTone') return { ...column, Cell: RoleToneCell };
+      if (column.accessor === 'PermissionTone') return { ...column, Cell: PermissionToneCell };
+      if (column.accessor === 'MessageCount') return { ...column, Cell: MessageCountCell };
+      if (column.accessor === 'Uname') return { ...column, Cell: UserNameCell };
 
       return column;
     });
@@ -277,19 +183,12 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
         setRoleDialogOpen(false);
         setSelectedUser(null);
       },
-      onError: (error) => {
-        setToastMessage(getBackendErrorMessage(error, 'Cannot update user role'));
+      onError: (updateError) => {
+        setToastMessage(getBackendErrorMessage(updateError, 'Cannot update user role'));
         setToastVisible(true);
       },
     }),
   );
-
-  type DeleteUserError = {
-    response?: {
-      status?: number;
-    };
-    message?: string;
-  };
 
   const { mutate: deleteUser } = useMutation(
     deleteAuthUserMutationOptions({
@@ -300,17 +199,17 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
         setDeleteDialogOpen(false);
         setSelectedUser(null);
       },
-      onError: (error: DeleteUserError) => {
-        const status = error?.response?.status;
+      onError: (deleteError) => {
+        const errorWithResponse = deleteError as Error & { response?: { status?: number } };
 
-        if (status === 403) {
+        if (errorWithResponse?.response?.status === 403) {
           setDeleteDialogOpen(false);
           setToastMessage('You do not have permission to delete this user.');
           setToastVisible(true);
           return;
         }
 
-        setToastMessage(getBackendErrorMessage(error, 'Cannot delete user'));
+        setToastMessage(getBackendErrorMessage(errorWithResponse, 'Cannot delete user'));
         setToastVisible(true);
       },
     }),
@@ -320,48 +219,19 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
     <>
       <div className="flex flex-col gap-4">
         <FlexBox alignItems="Center" className="text-primary gap-2">
-          <Icon
-            name="home"
-            className="text-primary"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate('/shell-home');
-            }}
-            mode="Interactive"
-          />
-          <Title level="H1" className="text-primary">
-            Users
-          </Title>
+          <Title level="H1" className="text-primary">Users</Title>
         </FlexBox>
 
         <Toolbar className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
           <ToolbarButton design="Emphasized" text="Create User" onClick={() => navigate('/users/create')} />
           <ToolbarSpacer />
-          <div className="min-w-64">
-            <Input placeholder="Search user, role, creator" value={search} onInput={(event) => setSearch(event.target.value)} />
-          </div>
-          <div className="min-w-40">
-            <Select value={roleFilter} onChange={(event) => setRoleFilter(event.detail.selectedOption?.value || 'ALL')}>
-              <Option value="ALL">All roles</Option>
-              {roleOptions
-                .filter((role) => role !== 'ALL')
-                .map((role) => (
-                  <Option key={role} value={role}>
-                    {role}
-                  </Option>
-                ))}
-            </Select>
-          </div>
           <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={() => refetch()} />
         </Toolbar>
+
+        <UserSearchHelpBar onFilterChange={setFilterString} />
       </div>
 
-      {error ? null : null}
-
-      <div
-        className={embedded ? 'overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm' : 'overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm'}
-        style={{ height: embedded ? 'min(72dvh, 56rem)' : '680px' }}
-      >
+      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm" style={{ height: embedded ? 'min(72dvh, 56rem)' : '680px' }}>
         <AnalyticalTable
           data={tableRows}
           columns={columns}
@@ -373,7 +243,7 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
           scaleWidthMode="Smart"
           rowHeight={44}
           selectionMode="None"
-          noDataText={search || roleFilter !== 'ALL' ? 'No users match the current filters.' : 'No users found.'}
+          noDataText={filterString ? 'No users match the current filters.' : 'No users found.'}
         />
       </div>
 
@@ -387,9 +257,7 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
                 <div className="text-lg font-semibold text-slate-900">Update role</div>
                 <div className="mt-1 text-sm text-slate-500">User: {selectedUser.Uname}</div>
               </div>
-              <button className="text-sm text-slate-500" onClick={() => setRoleDialogOpen(false)} type="button">
-                Close
-              </button>
+              <button className="text-sm text-slate-500" onClick={() => setRoleDialogOpen(false)} type="button">Close</button>
             </div>
 
             <div className="mt-5 grid gap-4">
@@ -401,26 +269,19 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
                 <label className="mb-2 block text-sm font-medium text-slate-700">Quick select</label>
                 <Select value={roleDraft} onChange={(event) => setRoleDraft(event.detail.selectedOption?.value || '')}>
                   {ROLE_OPTIONS.map((role) => (
-                    <Option key={role} value={role}>
-                      {role}
-                    </Option>
+                    <Option key={role} value={role}>{role}</Option>
                   ))}
                 </Select>
               </div>
             </div>
 
             <div className="mt-6 flex flex-wrap justify-end gap-3">
-              <Button design="Transparent" onClick={() => setRoleDialogOpen(false)}>
-                Cancel
-              </Button>
+              <Button design="Transparent" onClick={() => setRoleDialogOpen(false)}>Cancel</Button>
               <Button
                 design="Emphasized"
                 disabled={!roleDraft.trim()}
                 onClick={() => {
-                  updateUserRole({
-                    uname: selectedUser.Uname,
-                    payload: { Role: roleDraft.trim() },
-                  });
+                  updateUserRole({ uname: selectedUser.Uname, payload: { Role: roleDraft.trim() } });
                 }}
               >
                 Save
@@ -445,9 +306,7 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
         Are you sure you want to delete {selectedUser?.Uname || 'this user'}? This action cannot be undone.
       </MessageBox>
 
-      <Toast open={toastVisible} duration={2500} onClose={() => setToastVisible(false)}>
-        {toastMessage}
-      </Toast>
+      <Toast open={toastVisible} duration={2500} onClose={() => setToastVisible(false)}>{toastMessage}</Toast>
 
       {isLoading ? (
         <FlexBox alignItems="Center" justifyContent="Center" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
@@ -462,55 +321,7 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
   }
 
   return (
-    <DynamicPage
-      headerArea={
-        <DynamicPageHeader style={{ padding: '1rem 2rem' }}>
-          <div className="flex flex-col gap-4">
-            <FlexBox alignItems="Center" className="text-primary gap-2">
-              <Icon
-                name="home"
-                className="text-primary"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate('/shell-home');
-                }}
-                mode="Interactive"
-              />
-              <Title level="H1" className="text-primary">
-                Users
-              </Title>
-            </FlexBox>
-
-            <Toolbar className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
-              <ToolbarButton design="Emphasized" text="Create User" onClick={() => navigate('/users/create')} />
-              <ToolbarSpacer />
-              <div className="min-w-64">
-                <Input placeholder="Search user, role, creator" value={search} onInput={(event) => setSearch(event.target.value)} />
-              </div>
-              <div className="min-w-40">
-                <Select value={roleFilter} onChange={(event) => setRoleFilter(event.detail.selectedOption?.value || 'ALL')}>
-                  <Option value="ALL">All roles</Option>
-                  {roleOptions
-                    .filter((role) => role !== 'ALL')
-                    .map((role) => (
-                      <Option key={role} value={role}>
-                        {role}
-                      </Option>
-                    ))}
-                </Select>
-              </div>
-              <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={() => refetch()} />
-            </Toolbar>
-          </div>
-        </DynamicPageHeader>
-      }
-      style={{
-        height: '100dvh',
-        overflow: 'hidden',
-        position: 'relative',
-        background: 'linear-gradient(180deg,rgba(242,247,251,0.98) 0%,rgba(231,240,248,0.98) 100%)',
-      }}
-    >
+    <DynamicPage style={{ height: '100dvh', overflow: 'hidden', position: 'relative', background: 'linear-gradient(180deg,rgba(242,247,251,0.98) 0%,rgba(231,240,248,0.98) 100%)' }}>
       <section className="mx-auto flex w-full max-w-[96rem] flex-col gap-4 p-4 h-full">{content}</section>
     </DynamicPage>
   );

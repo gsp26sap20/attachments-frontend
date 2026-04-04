@@ -20,6 +20,7 @@ import { Title } from '@ui5/webcomponents-react/Title';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
+import { ConfigFileSearchHelpBar } from '@/components/config-file-search-help-bar';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import '@ui5/webcomponents-icons/add.js';
 import '@ui5/webcomponents-icons/delete.js';
@@ -70,7 +71,6 @@ type ConfigFileViewProps = {
 export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [search, setSearch] = React.useState('');
   const [toastVisible, setToastVisible] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState('');
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -78,10 +78,12 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
   const [editingKey, setEditingKey] = React.useState('');
   const [deleteTarget, setDeleteTarget] = React.useState<ConfigFileItem | null>(null);
   const [form, setForm] = React.useState<ConfigFileFormState>(DEFAULT_FORM);
+  const [filterString, setFilterString] = React.useState('');
 
   const { data, isLoading, isFetching, error, refetch } = useQuery(
     getConfigFilesQueryOptions({
       'sap-client': 324,
+      ...(filterString ? { $filter: filterString } : {}),
     }),
   );
 
@@ -95,18 +97,6 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
     setToastMessage(getBackendErrorMessage(error, 'Cannot load configuration files.'));
     setToastVisible(true);
   }, [error]);
-
-  const filteredConfigFiles = React.useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase();
-
-    if (!normalizedSearch) return configFiles;
-
-    return configFiles.filter((item) => {
-      return [item.FileExt, item.MimeType, item.Description, String(item.MaxBytes)]
-        .filter(Boolean)
-        .some((value) => value.toLowerCase().includes(normalizedSearch));
-    });
-  }, [configFiles, search]);
 
   const { mutate: createMutation, isPending: isCreating } = useMutation(
     createConfigFileMutationOptions({
@@ -237,40 +227,25 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
     <>
       <div className="flex flex-col gap-4">
         <FlexBox alignItems="Center" className="text-primary gap-2">
-          <Icon
-            name="home"
-            className="text-primary"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate('/shell-home');
-            }}
-            mode="Interactive"
-          />
           <Title level="H1" className="text-primary">
             Configuration Files
           </Title>
         </FlexBox>
 
         <Toolbar className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
-          <ToolbarButton design="Emphasized" icon="add" text="Add Config File" onClick={openCreateDialog} />
+          <ToolbarButton design="Emphasized"  text="Create Config File" onClick={openCreateDialog} />
           <ToolbarSpacer />
-          <Input
-            placeholder="Search file ext, mime type, description"
-            value={search}
-            onInput={(event) => setSearch(event.target.value)}
-            style={{ minWidth: '20rem' }}
-          />
           <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={() => refetch()} />
         </Toolbar>
+
+        <ConfigFileSearchHelpBar onFilterChange={setFilterString} />
       </div>
 
       {error ? null : null}
 
       <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
-       
-
         <AnalyticalTable
-          data={filteredConfigFiles}
+          data={configFiles}
           columns={columnsWithActions}
           loading={isLoading || isFetching}
           rowHeight={44}
@@ -294,7 +269,7 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
           }}
         />
 
-        {!isLoading && filteredConfigFiles.length === 0 ? (
+        {!isLoading && configFiles.length === 0 ? (
           <div className="border-t border-slate-200/80 p-6">
             <IllustratedMessage name="NoData" />
           </div>
@@ -405,24 +380,6 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
 
   return (
     <DynamicPage
-      headerArea={
-        <DynamicPageHeader style={{ padding: '1rem 2rem' }}>
-          <div className="flex flex-col gap-4">
-            <Toolbar className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
-              <ToolbarButton design="Emphasized" icon="add" text="Add Config File" onClick={openCreateDialog} />
-              <ToolbarButton design="Transparent" icon="home" text="Home" onClick={() => navigate('/shell-home')} />
-              <ToolbarSpacer />
-              <Input
-                placeholder="Search file ext, mime type, description"
-                value={search}
-                onInput={(event) => setSearch(event.target.value)}
-                style={{ minWidth: '20rem' }}
-              />
-              <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={() => refetch()} />
-            </Toolbar>
-          </div>
-        </DynamicPageHeader>
-      }
       style={{
         height: '100dvh',
         overflow: 'hidden',

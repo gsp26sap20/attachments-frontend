@@ -14,6 +14,7 @@ interface SearchHelpDialogProps {
   options?: SearchHelpToken['key'][];
   field: string;
   label: string;
+  placeholder?: string;
   afterFilterStringBuild: (s: string) => void;
 }
 
@@ -28,7 +29,7 @@ function createToken(defaultKey: SearchHelpToken['key']): SearchHelpToken {
 
 const defaultOptions: SearchHelpToken['key'][] = ['contains', 'equal to', 'starts with', 'ends with'];
 
-export function SearchHelpDialog({ options = defaultOptions, field, label, ...props }: SearchHelpDialogProps) {
+export function SearchHelpDialog({ options = defaultOptions, field, label, placeholder, ...props }: SearchHelpDialogProps) {
   const { afterFilterStringBuild } = props;
   const [open, setOpen] = React.useState(false);
   const [tokens, setTokens] = React.useState<SearchHelpToken[]>(() => [createToken(options[0])]);
@@ -119,6 +120,7 @@ export function SearchHelpDialog({ options = defaultOptions, field, label, ...pr
         tokens={cleanTokens}
         onTokensDelete={handleTokensDelete}
         icon={<Icon className="h-full" name="value-help" onClick={() => setOpen(true)} />}
+        placeholder={placeholder || `Search ${label}`}
         onValueHelpTrigger={() => setOpen(true)}
       />
       <Dialog
@@ -151,6 +153,7 @@ export function SearchHelpDialog({ options = defaultOptions, field, label, ...pr
                 key={token.id}
                 value={token}
                 options={options}
+                placeholder={placeholder || `Search ${label}`}
                 onChange={(value) => {
                   handleTokenChange(token.id, value);
                 }}
