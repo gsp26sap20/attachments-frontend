@@ -77,6 +77,8 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
   const [deleteTarget, setDeleteTarget] = React.useState<ConfigFileItem | null>(null);
   const [form, setForm] = React.useState<ConfigFileFormState>(DEFAULT_FORM);
   const [filterString, setFilterString] = React.useState('');
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const rowsPerPage = 10;
 
   const { data, isLoading, isFetching, error, refetch } = useQuery(
     getConfigFilesQueryOptions({
@@ -87,6 +89,9 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
 
   const configFiles = React.useMemo(() => data?.value ?? [], [data]);
 
+  const totalRows = configFiles.length;
+  const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
+
   React.useEffect(() => {
     if (!error) {
       return;
@@ -95,6 +100,21 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
     setToastMessage(getBackendErrorMessage(error, 'Cannot load configuration files.'));
     setToastVisible(true);
   }, [error]);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [filterString]);
+
+  React.useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const pagedRows = React.useMemo(() => {
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    return configFiles.slice(startIndex, startIndex + rowsPerPage);
+  }, [configFiles, currentPage, rowsPerPage]);
 
   const { mutate: createMutation, isPending: isCreating } = useMutation(
     createConfigFileMutationOptions({
@@ -243,7 +263,7 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
 
       <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
         <AnalyticalTable
-          data={configFiles}
+          data={pagedRows}
           columns={columnsWithActions}
           loading={isLoading || isFetching}
           rowHeight={44}
@@ -266,6 +286,28 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
             setDialogOpen(true);
           }}
         />
+
+        {configFiles.length > 0 ? (
+          <Bar className="border-t border-slate-200/80 bg-white px-4 py-3">
+            <div className="flex w-full flex-wrap items-center gap-3">
+              <div className="ml-auto flex items-center gap-2">
+                <Button design="Transparent" onClick={() => setCurrentPage((page) => Math.max(1, page - 1))} disabled={currentPage === 1}>
+                  Previous
+                </Button>
+                <div className="min-w-24 text-center text-sm font-medium text-slate-700">
+                  Page {currentPage} / {totalPages}
+                </div>
+                <Button
+                  design="Transparent"
+                  onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          </Bar>
+        ) : null}
 
         {!isLoading && configFiles.length === 0 ? (
           <div className="border-t border-slate-200/80 p-6">
@@ -308,7 +350,7 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
             <Label>File Ext</Label>
             <Input
               value={form.FileExt}
-              placeholder="pdf"
+              placeholder="Enter file extension, e.g. .pdf"
               onInput={(event) => setForm((prev) => ({ ...prev, FileExt: event.target.value }))}
               disabled={dialogMode === 'edit'}
             />
@@ -317,7 +359,7 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
             <Label>Mime Type</Label>
             <Input
               value={form.MimeType}
-              placeholder="application/pdf"
+              placeholder="Enter MIME type, e.g. application/pdf"
               onInput={(event) => setForm((prev) => ({ ...prev, MimeType: event.target.value }))}
             />
           </div>
@@ -326,7 +368,7 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
             <Input
               type="Number"
               value={form.MaxBytes}
-              placeholder="15728640"
+              placeholder="Enter maximum bytes"
               onInput={(event) => setForm((prev) => ({ ...prev, MaxBytes: event.target.value }))}
             />
           </div>
@@ -334,7 +376,7 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
             <Label>Description</Label>
             <Input
               value={form.Description}
-              placeholder="Word document"
+              placeholder="Enter description"
               onInput={(event) => setForm((prev) => ({ ...prev, Description: event.target.value }))}
             />
           </div>

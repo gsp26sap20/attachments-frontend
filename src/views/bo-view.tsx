@@ -170,7 +170,6 @@ export function BoView() {
               </span>
               <div>
                 <div className="text-lg font-semibold text-slate-900">Business Object View</div>
-                <div className="text-sm text-slate-500">List and inspect BizObject records from the BIZ service</div>
               </div>
             </div>
           }

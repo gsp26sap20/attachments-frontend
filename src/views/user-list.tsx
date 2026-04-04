@@ -5,6 +5,7 @@ import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
 import type { AnalyticalTableCellInstance, AnalyticalTableColumnDefinition } from '@ui5/webcomponents-react/AnalyticalTable';
 import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
+import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
@@ -106,6 +107,8 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
   const [selectedUser, setSelectedUser] = React.useState<UserTableItem | null>(null);
   const [roleDraft, setRoleDraft] = React.useState('');
   const [filterString, setFilterString] = React.useState('');
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const rowsPerPage = 10;
 
   const { data, isFetching, isLoading, error, refetch } = useQuery(
     getAuthUsersQueryOptions({
@@ -129,6 +132,24 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
       MessageCount: user.SAP__Messages?.length ?? 0,
     }));
   }, [users]);
+
+  const totalRows = tableRows.length;
+  const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [filterString]);
+
+  React.useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const pagedRows = React.useMemo(() => {
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    return tableRows.slice(startIndex, startIndex + rowsPerPage);
+  }, [currentPage, rowsPerPage, tableRows]);
 
   React.useEffect(() => {
     if (!error) return;
@@ -232,19 +253,45 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm" style={{ height: embedded ? 'min(72dvh, 56rem)' : '680px' }}>
-        <AnalyticalTable
-          data={tableRows}
-          columns={columns}
-          sortable
-          groupable
-          loading={isFetching || isLoading}
-          visibleRowCountMode="Fixed"
-          style={{ height: '100%' }}
-          scaleWidthMode="Smart"
-          rowHeight={44}
-          selectionMode="None"
-          noDataText={filterString ? 'No users match the current filters.' : 'No users found.'}
-        />
+        <div className="flex h-full flex-col">
+          <div className="min-h-0 flex-1">
+            <AnalyticalTable
+              data={pagedRows}
+              columns={columns}
+              sortable
+              groupable
+              loading={isFetching || isLoading}
+              visibleRowCountMode="Fixed"
+              style={{ height: '100%' }}
+              scaleWidthMode="Smart"
+              rowHeight={44}
+              selectionMode="None"
+              noDataText={filterString ? 'No users match the current filters.' : 'No users found.'}
+            />
+          </div>
+
+          {tableRows.length > 0 ? (
+            <Bar className="border-t border-slate-200/80 bg-white px-4 py-3">
+              <div className="flex w-full flex-wrap items-center gap-3">
+                <div className="ml-auto flex items-center gap-2">
+                  <Button design="Transparent" onClick={() => setCurrentPage((page) => Math.max(1, page - 1))} disabled={currentPage === 1}>
+                    Previous
+                  </Button>
+                  <div className="min-w-24 text-center text-sm font-medium text-slate-700">
+                    Page {currentPage} / {totalPages}
+                  </div>
+                  <Button
+                    design="Transparent"
+                    onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            </Bar>
+          ) : null}
+        </div>
       </div>
 
       {!isFetching && tableRows.length === 0 ? <IllustratedMessage name="NoData" /> : null}
