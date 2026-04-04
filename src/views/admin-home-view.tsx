@@ -4,7 +4,6 @@ import { TabContainer } from '@ui5/webcomponents-react/TabContainer';
 import '@ui5/webcomponents-icons/person-placeholder.js';
 import '@ui5/webcomponents-icons/document.js';
 import '@ui5/webcomponents-icons/log.js';
-import { ODATA_BASE_URL } from '@/app-env';
 import { UserListView } from './user-list';
 import { ConfigFileView } from './config-file-view';
 import { ToolbarButton } from '@ui5/webcomponents-react';

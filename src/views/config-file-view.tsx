@@ -1,14 +1,12 @@
 import * as React from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
-import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
 import type { AnalyticalTableCellInstance, AnalyticalTableColumnDefinition } from '@ui5/webcomponents-react/AnalyticalTable';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
-import { Icon } from '@ui5/webcomponents-react/Icon';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
 import { Input } from '@ui5/webcomponents-react/Input';
 import { Label } from '@ui5/webcomponents-react/Label';
@@ -26,7 +24,6 @@ import '@ui5/webcomponents-icons/edit.js';
 import '@ui5/webcomponents-icons/document.js';
 import '@ui5/webcomponents-icons/home.js';
 import '@ui5/webcomponents-icons/refresh.js';
-import { useNavigate } from 'react-router';
 import { createConfigFileMutationOptions, deleteConfigFileMutationOptions, updateConfigFileMutationOptions } from '@/features/config-files/options/mutation';
 import { getConfigFilesQueryOptions } from '@/features/config-files/options/query';
 import type { ConfigFileItem, CreateConfigFilePayload, UpdateConfigFilePayload } from '@/features/config-files/types';
@@ -67,7 +64,6 @@ type ConfigFileViewProps = {
 };
 
 export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [toastVisible, setToastVisible] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState('');
