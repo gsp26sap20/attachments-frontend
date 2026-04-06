@@ -11,6 +11,7 @@ import { Toast } from '@ui5/webcomponents-react/Toast';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
+import { formatFileSize } from '@/features/attachments/helpers';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
 import { UploadVersion } from '@/features/attachments/components';
 import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
@@ -79,7 +80,7 @@ export function UploadVersionView() {
               </FlexBox>
               <FlexBox direction="Column" className="w-1/3">
                 <Label>File Size</Label>
-                <Text>{fileData?.FileSize || '-'}</Text>
+                <Text>{fileData?.FileSize ? formatFileSize(fileData?.FileSize) : '-'}</Text>
               </FlexBox>
               <FlexBox direction="Column" className="w-1/3">
                 <Label>Mime Type</Label>
@@ -99,7 +100,7 @@ export function UploadVersionView() {
               <Toolbar design="Transparent" style={{ height: 'auto' }}>
                 <ToolbarButton
                   design="Emphasized"
-                  text="Upload"
+                  text="Save"
                   onClick={() => {
                     if (fileData) {
                       handleUpload(fileData);

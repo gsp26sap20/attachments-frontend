@@ -29,10 +29,12 @@ jobs:
       - name: Build
         env:
           VITE_ODATA_ORIGIN: ${{ vars.VITE_ODATA_ORIGIN }}
+          VITE_GOOGLE_APP_ID: ${{ vars.VITE_GOOGLE_APP_ID }}
+          VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
         run: npm run build
 
       - name: Deploy to SAP
         env:
           SAP_USERNAME: ${{ secrets.SAP_USERNAME }}
           SAP_PASSWORD: ${{ secrets.SAP_PASSWORD }}
-        run: npm exec fiori deploy --config ui5-deploy.yaml --yes --username SAP_USERNAME --password SAP_PASSWORD
+        run: npm run deploy:ci

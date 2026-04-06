@@ -11,7 +11,6 @@ import { Toast } from '@ui5/webcomponents-react/Toast';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
-import { downloadFile } from '@/features/attachments/helpers';
 import { FilePreview } from '@/features/attachments/components';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
 import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
@@ -20,6 +19,7 @@ import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
 import { BreadcrumbsItem } from '@ui5/webcomponents-react/BreadcrumbsItem';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { ObjectPageHeader } from '@ui5/webcomponents-react/ObjectPageHeader';
+import { downloadFile, formatFileSize } from '@/features/attachments/helpers';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
 import { attachmentTitleQueryOptions } from '@/features/attachments/options/query';
@@ -51,7 +51,7 @@ export function VersionDetailView() {
         queryClient.invalidateQueries({
           queryKey: ['attachments', id],
         });
-        setToastMessage('Version rolled back successfully');
+        setToastMessage(`Version ${versionNo} is now current`);
         setToastVisible(true);
       },
       onError: (error) => {
@@ -79,7 +79,7 @@ export function VersionDetailView() {
             <FlexBox alignItems="Center" justifyContent="SpaceBetween" wrap="Wrap" className="p-2">
               <FlexBox direction="Column" className="w-1/3">
                 <Label>File Size</Label>
-                <Text>{version?.FileSize}</Text>
+                <Text>{version?.FileSize ? formatFileSize(version?.FileSize) : ''}</Text>
               </FlexBox>
               <FlexBox direction="Column" className="w-1/3">
                 <Label>File Extension</Label>
