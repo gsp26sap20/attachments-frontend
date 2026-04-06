@@ -37,27 +37,33 @@ export function UserSearchHelpBar({ onFilterChange }: UserSearchHelpBarProps) {
         </Button>
       </div>
       <div className="grid gap-3 xl:grid-cols-3">
-        <SearchHelpDialog
-          key={`user-name-${resetKey}`}
-          label="User Name"
-          field="Uname"
-          placeholder="Search by user name"
-          afterFilterStringBuild={setUserNameFilterString}
-        />
-        <SearchHelpDialog
-          key={`role-${resetKey}`}
-          label="Role"
-          field="Role"
-          placeholder="Search by role"
-          afterFilterStringBuild={setRoleFilterString}
-        />
-        <SearchHelpDialog
-          key={`created-by-${resetKey}`}
-          label="Created By"
-          field="Ernam"
-          placeholder="Search by creator"
-          afterFilterStringBuild={setCreatedByFilterString}
-        />
+        <div className="space-y-1.5">
+          <div className="text-xs font-semibold tracking-wide text-slate-500">User Name</div>
+          <SearchHelpDialog
+            key={`user-name-${resetKey}`}
+            label="User Name"
+            field="Uname"
+            afterFilterStringBuild={setUserNameFilterString}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <div className="text-xs font-semibold tracking-wide text-slate-500">Role</div>
+          <SearchHelpDialog
+            key={`role-${resetKey}`}
+            label="Role"
+            field="Role"
+            afterFilterStringBuild={setRoleFilterString}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <div className="text-xs font-semibold tracking-wide text-slate-500">Created By</div>
+          <SearchHelpDialog
+            key={`created-by-${resetKey}`}
+            label="Created By"
+            field="Ernam"
+            afterFilterStringBuild={setCreatedByFilterString}
+          />
+        </div>
       </div>
     </div>
   );

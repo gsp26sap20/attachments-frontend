@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router';
-import { Tab, TabContainer, ToolbarButton } from '@ui5/webcomponents-react';
+import { Tab } from '@ui5/webcomponents-react';
+import { TabContainer } from '@ui5/webcomponents-react/TabContainer';
+import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import '@ui5/webcomponents-icons/person-placeholder.js';
 import '@ui5/webcomponents-icons/document.js';
 import '@ui5/webcomponents-icons/log.js';

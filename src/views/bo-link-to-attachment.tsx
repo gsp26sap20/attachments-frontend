@@ -431,5 +431,3 @@ export function BoWListAttachmentView() {
     </DynamicPage>
   );
 }
-
-export default BoWListAttachmentView;

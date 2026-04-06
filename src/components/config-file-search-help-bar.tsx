@@ -37,25 +37,34 @@ export function ConfigFileSearchHelpBar({ onFilterChange }: ConfigFileSearchHelp
         </Button>
       </div>
       <div className="grid gap-3 xl:grid-cols-3">
-        <SearchHelpDialog
-          key={`file-ext-${resetKey}`}
-          label="File Ext"
-          field="FileExt"
-          options={['equal to', 'contains', 'starts with', 'ends with']}
-          afterFilterStringBuild={setFileExtFilterString}
-        />
-        <SearchHelpDialog
-          key={`mime-type-${resetKey}`}
-          label="Mime Type"
-          field="MimeType"
-          afterFilterStringBuild={setMimeTypeFilterString}
-        />
-        <SearchHelpDialog
-          key={`description-${resetKey}`}
-          label="Description"
-          field="Description"
-          afterFilterStringBuild={setDescriptionFilterString}
-        />
+        <div className="space-y-1.5">
+          <div className="text-xs font-semibold tracking-wide text-slate-500">File Ext</div>
+          <SearchHelpDialog
+            key={`file-ext-${resetKey}`}
+            label="File Ext"
+            field="FileExt"
+            options={['equal to', 'contains', 'starts with', 'ends with']}
+            afterFilterStringBuild={setFileExtFilterString}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <div className="text-xs font-semibold tracking-wide text-slate-500">Mime Type</div>
+          <SearchHelpDialog
+            key={`mime-type-${resetKey}`}
+            label="Mime Type"
+            field="MimeType"
+            afterFilterStringBuild={setMimeTypeFilterString}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <div className="text-xs font-semibold tracking-wide text-slate-500">Description</div>
+          <SearchHelpDialog
+            key={`description-${resetKey}`}
+            label="Description"
+            field="Description"
+            afterFilterStringBuild={setDescriptionFilterString}
+          />
+        </div>
       </div>
     </div>
   );
