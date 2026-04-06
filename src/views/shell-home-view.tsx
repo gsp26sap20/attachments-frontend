@@ -67,10 +67,10 @@ export function ShellHomeView() {
             header={
               <CardHeader
                 interactive
-                onClick={() => navigate('/users')}
+                onClick={() => navigate('/admin')}
                 avatar={<Icon name="person-placeholder" />}
-                subtitleText="Users Management"
-                titleText="Users"
+                subtitleText="Users Management and Configuration Files"
+                titleText="Admin"
               />
             }
           ></Card>
