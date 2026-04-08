@@ -14,4 +14,6 @@ jobs:
         run: |
           git clone --mirror https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git tmp
           cd tmp
-          git push --mirror https://x-access-token:${{ secrets.ORG_REPO_TOKEN }}@${{ vars.ORG_REPO_URL }}
+
+          git push --prune --force https://x-access-token:${{ secrets.ORG_REPO_TOKEN }}@${{ vars.ORG_REPO_URL }} 'refs/heads/*:refs/heads/*'
+          git push --force https://x-access-token:${{ secrets.ORG_REPO_TOKEN }}@${{ vars.ORG_REPO_URL }} 'refs/tags/*:refs/tags/*'
