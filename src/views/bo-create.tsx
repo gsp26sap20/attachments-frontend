@@ -18,7 +18,7 @@ import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import '@ui5/webcomponents-icons/decline.js';
 import '@ui5/webcomponents-icons/document.js';
-import { createBizObjectMutationOptions } from '@/features/biz-object/options/mutation';
+import { createBizObjectMutationOptions } from '@/features/business-objects/options/mutation';
 import { getBackendErrorMessage } from '@/libs/error-message';
 
 type FormState = {
@@ -127,7 +127,7 @@ export function BoCreateView() {
                 <FlexBox direction="Column" style={{ minWidth: '14rem' }}>
                   <Label>Status</Label>
                   <select
-                    className="h-[2.625rem] rounded-[0.55rem] border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-sky-500"
+                    className="h-10.5 rounded-[0.55rem] border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-sky-500"
                     value={form.Status}
                     onChange={(event) => setForm((prev) => ({ ...prev, Status: event.target.value }))}
                   >

@@ -27,11 +27,11 @@ import '@ui5/webcomponents-icons/navigation-left-arrow.js';
 import '@ui5/webcomponents-icons/document.js';
 import '@ui5/webcomponents-icons/value-help.js';
 import { AttachmentsFilterBar } from '@/features/attachments/components/attachments-filter-bar';
-import { getBizObjectLinkedAttachmentsQueryOptions } from '@/features/biz-object/options/query';
+import { getBizObjectLinkedAttachmentsQueryOptions } from '@/features/business-objects/options/query';
 import {
   linkAttachmentToBoMutationOptions,
   unlinkAttachmentFromBoMutationOptions,
-} from '@/features/biz-object/options/mutation';
+} from '@/features/business-objects/options/mutation';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import type { AttachmentListItem } from '@/features/attachments/types';
 import { getBackendErrorMessage } from '@/libs/error-message';
@@ -67,15 +67,12 @@ const columns: AnalyticalTableColumnDefinition[] = [
         >
           {isActive ? 'Active' : 'Inactive'}
         </span>
-        
       );
     },
-    
   },
   { Header: 'Linked On', accessor: 'LinkedOn', width: 170 },
   { Header: 'Linked By', accessor: 'LinkedBy', width: 140 },
   { Header: 'Attachment Created', accessor: 'AttachmentCreatedOn', width: 180 },
-               
 ];
 
 function formatDate(date?: string | null, time?: string | null) {
@@ -172,55 +169,57 @@ export function BoWListAttachmentView() {
 
   const tableColumns = React.useMemo<AnalyticalTableColumnDefinition[]>(
     () =>
-      columns.map((column) => {
-        if (column.accessor === 'FileId') {
-          return {
-            ...column,
-            Cell: function FileIdCell({ row }: AnalyticalTableCellInstance) {
-              const item = row.original as AttachmentListItem;
+      columns
+        .map((column) => {
+          if (column.accessor === 'FileId') {
+            return {
+              ...column,
+              Cell: function FileIdCell({ row }: AnalyticalTableCellInstance) {
+                const item = row.original as AttachmentListItem;
 
-              return (
-                <button
-                  type="button"
-                  className="max-w-full truncate text-left font-medium text-sky-700 underline-offset-2 hover:underline"
-                  title={item.FileId}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setSearchOpen(false);
-                    navigate(`/attachments/${item.FileId}`);
-                  }}
-                >
-                  {item.FileId}
-                </button>
-              );
-            },
-          };
-        }
+                return (
+                  <button
+                    type="button"
+                    className="max-w-full truncate text-left font-medium text-sky-700 underline-offset-2 hover:underline"
+                    title={item.FileId}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setSearchOpen(false);
+                      navigate(`/attachments/${item.FileId}`);
+                    }}
+                  >
+                    {item.FileId}
+                  </button>
+                );
+              },
+            };
+          }
 
-        return column;
-      }).concat({
-        Header: 'Action',
-        id: 'action',
-        accessor: 'FileId',
-        width: 160,
-        Cell: function UnlinkCell({ row }: AnalyticalTableCellInstance) {
-          const item = row.original as LinkedAttachmentRow;
+          return column;
+        })
+        .concat({
+          Header: 'Action',
+          id: 'action',
+          accessor: 'FileId',
+          width: 160,
+          Cell: function UnlinkCell({ row }: AnalyticalTableCellInstance) {
+            const item = row.original as LinkedAttachmentRow;
 
-          return (
-            <Button
-              design="Negative"
-              disabled={isUnlinking}
-              onClick={(event) => {
-                event.stopPropagation();
-                setSelectedLinkTarget(item);
-                setDeleteDialogOpen(true);
-              }}
-            >
-              Unlink BO
-            </Button>
-          );
-        },
-      }),
+            return (
+              <Button
+                design="Negative"
+                disabled={isUnlinking}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setSelectedLinkTarget(item);
+                  setDeleteDialogOpen(true);
+                }}
+              >
+                Unlink BO
+              </Button>
+            );
+          },
+        }),
     [isUnlinking, navigate],
   );
 
@@ -274,7 +273,12 @@ export function BoWListAttachmentView() {
             <Title level="H2">Attachments linked to Business Objects</Title>
             <ToolbarSpacer />
             <ToolbarButton design="Emphasized" icon="value-help" text="Link to Attachment" onClick={openLinkDialog} />
-            <ToolbarButton design="Transparent" icon="navigation-left-arrow" text="Back to BO" onClick={() => navigate('/business-objects')} />
+            <ToolbarButton
+              design="Transparent"
+              icon="navigation-left-arrow"
+              text="Back to BO"
+              onClick={() => navigate('/business-objects')}
+            />
             <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={() => refetch()} />
           </Toolbar>
         </DynamicPageHeader>
@@ -289,7 +293,7 @@ export function BoWListAttachmentView() {
         ) : null}
         {error ? (
           <MessageStrip design="Negative" hideCloseButton>
-              {getBackendErrorMessage(error, 'Cannot load linked attachments.')}
+            {getBackendErrorMessage(error, 'Cannot load linked attachments.')}
           </MessageStrip>
         ) : null}
 
@@ -356,10 +360,7 @@ export function BoWListAttachmentView() {
         style={{ width: 'min(96vw, 88rem)' }}
       >
         <div className="flex flex-col gap-4 p-2">
-          <AttachmentsFilterBar
-            onFilterChange={setAttachmentSearchFilter}
-            onSearchChange={setAttachmentSearchText}
-          />
+          <AttachmentsFilterBar onFilterChange={setAttachmentSearchFilter} onSearchChange={setAttachmentSearchText} />
 
           <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white">
             <AnalyticalTable

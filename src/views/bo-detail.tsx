@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useNavigate, useParams } from 'react-router';
+import { API } from '@/features/business-objects/constants';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
@@ -25,9 +26,18 @@ import '@ui5/webcomponents-icons/edit.js';
 import '@ui5/webcomponents-icons/delete.js';
 import '@ui5/webcomponents-icons/list.js';
 import '@ui5/webcomponents-icons/refresh.js';
-import { getBizObjectLinkedAttachmentsQueryOptions, getBizObjectsQueryOptions } from '@/features/biz-object/options/query';
-import { deleteBizObjectMutationOptions, updateBizObjectMutationOptions } from '@/features/biz-object/options/mutation';
-import type { AnalyticalTableCellInstance, AnalyticalTableColumnDefinition } from '@ui5/webcomponents-react/AnalyticalTable';
+import {
+  bizObjectDetailQueryOptions,
+  getBizObjectLinkedAttachmentsQueryOptions,
+} from '@/features/business-objects/options/query';
+import {
+  deleteBizObjectMutationOptions,
+  updateBizObjectMutationOptions,
+} from '@/features/business-objects/options/mutation';
+import type {
+  AnalyticalTableCellInstance,
+  AnalyticalTableColumnDefinition,
+} from '@ui5/webcomponents-react/AnalyticalTable';
 import { getBackendErrorMessage } from '@/libs/error-message';
 
 type LinkedAttachmentRow = {
@@ -113,61 +123,65 @@ function formatLinkedDate(date?: string | null, time?: string | null) {
 }
 
 export function BoDetailView() {
-  const { boId } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [form, setForm] = React.useState<BizObjectFormState>(DEFAULT_FORM);
   const [toastVisible, setToastVisible] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState('');
-  const [navigateAfterToast, setNavigateAfterToast] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [navigateAfterToast, setNavigateAfterToast] = React.useState(false);
 
-  const { data, isLoading, error } = useQuery(
-    getBizObjectsQueryOptions({
+  const {
+    data: bizObject,
+    error,
+    isFetching: isBizObjectFetching,
+    refetch: refetchBizObject,
+  } = useQuery(
+    bizObjectDetailQueryOptions(id!, {
       'sap-client': 324,
-      $select:
-        'BoId,BoType,BoTitle,Status,Erdat,Erzet,Ernam,Aedat,Aezet,Aenam,__EntityControl/Deletable,__EntityControl/Updatable,__OperationControl/link_attachment,SAP__Messages',
-      $top: 200,
+      $select: API.select,
     }),
   );
 
-  const selectedBo = React.useMemo(() => {
-    if (!boId) return null;
-    return data?.value.find((item) => item.BoId === boId) ?? null;
-  }, [boId, data]);
-
-  const { data: linkedAttachmentsData, isFetching: isLinkedAttachmentsLoading } = useQuery(
-    getBizObjectLinkedAttachmentsQueryOptions(boId || '', {
+  const {
+    data: linkedAttachmentsData,
+    isFetching: isLinkedAttachmentsLoading,
+    refetch: refetchLinkedAttachments,
+  } = useQuery(
+    getBizObjectLinkedAttachmentsQueryOptions(id || '', {
       'sap-client': 324,
       $expand: '_Links($expand=_Attach)',
     }),
   );
 
   const linkedAttachments = React.useMemo<LinkedAttachmentRow[]>(() => {
-    return linkedAttachmentsData?._Links?.map((link) => ({
-      FileId: link._Attach.FileId,
-      Title: link._Attach.Title,
-      CurrentVersion: link._Attach.CurrentVersion,
-      IsActive: link._Attach.IsActive,
-      LinkedOn: formatLinkedDate(link.Erdat, link.Erzet),
-      LinkedBy: link.Ernam || '-',
-    })) ?? [];
+    return (
+      linkedAttachmentsData?._Links?.map((link) => ({
+        FileId: link._Attach.FileId,
+        Title: link._Attach.Title,
+        CurrentVersion: link._Attach.CurrentVersion,
+        IsActive: link._Attach.IsActive,
+        LinkedOn: formatLinkedDate(link.Erdat, link.Erzet),
+        LinkedBy: link.Ernam || '-',
+      })) ?? []
+    );
   }, [linkedAttachmentsData]);
 
-  const canSave = Boolean(selectedBo && form.BoType.trim() && form.BoTitle.trim() && form.Status.trim());
-  const linkedAttachmentsEnabled = Boolean(selectedBo?.__OperationControl?.link_attachment);
+  const canSave = Boolean(bizObject && form.BoType.trim() && form.BoTitle.trim() && form.Status.trim());
+  const linkedAttachmentsEnabled = Boolean(bizObject?.__OperationControl?.link_attachment);
 
   React.useEffect(() => {
-    if (!selectedBo) {
+    if (!bizObject) {
       return;
     }
 
     setForm({
-      BoType: selectedBo.BoType || '',
-      BoTitle: selectedBo.BoTitle || '',
-      Status: selectedBo.Status || '',
+      BoType: bizObject.BoType || '',
+      BoTitle: bizObject.BoTitle || '',
+      Status: bizObject.Status || '',
     });
-  }, [selectedBo]);
+  }, [bizObject]);
 
   React.useEffect(() => {
     if (!error) {
@@ -180,7 +194,7 @@ export function BoDetailView() {
 
   const { mutate: updateBizObject, isPending: isUpdating } = useMutation(
     updateBizObjectMutationOptions({
-      boId: boId || '',
+      boId: id || '',
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['biz-objects'] });
         setToastMessage('Business Object updated successfully');
@@ -195,7 +209,7 @@ export function BoDetailView() {
 
   const { mutate: deleteBizObject, isPending: isDeleting } = useMutation(
     deleteBizObjectMutationOptions({
-      boId: boId || '',
+      boId: id || '',
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['biz-objects'] });
         setToastMessage('Business Object deleted successfully');
@@ -222,7 +236,9 @@ export function BoDetailView() {
             breadcrumbs={
               <Breadcrumbs onItemClick={() => navigate('/business-objects')}>
                 <BreadcrumbsItem>Business Objects</BreadcrumbsItem>
-                <BreadcrumbsItem>{isLoading ? 'Loading...' : selectedBo?.BoTitle || 'Unnamed Business Object'}</BreadcrumbsItem>
+                <BreadcrumbsItem>
+                  {isBizObjectFetching ? 'Loading...' : bizObject?.BoTitle || 'Unnamed Business Object'}
+                </BreadcrumbsItem>
               </Breadcrumbs>
             }
             header={
@@ -232,9 +248,9 @@ export function BoDetailView() {
                 </span>
                 <div className="min-w-0">
                   <div className="text-lg font-semibold text-slate-900">
-                    {isLoading ? 'Loading...' : selectedBo?.BoTitle || 'Unnamed Business Object'}
+                    {isBizObjectFetching ? 'Loading...' : bizObject?.BoTitle || 'Unnamed Business Object'}
                   </div>
-                  <div className="text-sm text-slate-500">BO ID {selectedBo?.BoId || '-'}</div>
+                  <div className="text-sm text-slate-500">BO ID {bizObject?.BoId || '-'}</div>
                 </div>
               </div>
             }
@@ -244,29 +260,38 @@ export function BoDetailView() {
                   design="Transparent"
                   icon="refresh"
                   text="Refresh"
-                  onClick={() => queryClient.invalidateQueries({ queryKey: ['biz-objects'] })}
+                  onClick={() => {
+                    refetchBizObject();
+                    refetchLinkedAttachments();
+                  }}
                 />
-              
+
                 <ToolbarButton
                   design="Transparent"
                   icon="delete"
                   text="Delete"
                   onClick={() => setDeleteDialogOpen(true)}
-                  disabled={!selectedBo?.__EntityControl?.Deletable || isDeleting}
+                  disabled={!bizObject?.__EntityControl?.Deletable || isDeleting}
                 />
               </Toolbar>
             }
             navigationBar={
-              <Button accessibleName="Back" design="Transparent" icon="decline" tooltip="Back" onClick={() => navigate('/business-objects')} />
+              <Button
+                accessibleName="Back"
+                design="Transparent"
+                icon="decline"
+                tooltip="Back"
+                onClick={() => navigate('/business-objects')}
+              />
             }
           />
         }
       >
-        {isLoading ? (
+        {isBizObjectFetching ? (
           <FlexBox alignItems="Center" justifyContent="Center" style={{ padding: '1rem', minHeight: '50dvh' }}>
             <BusyIndicator delay={0} active size="L" />
           </FlexBox>
-        ) : selectedBo ? (
+        ) : bizObject ? (
           <div className="space-y-4 p-2">
             <ObjectPageSection id="overview" titleText="Overview" aria-label="Overview">
               <div className="grid gap-4 p-2 lg:grid-cols-2">
@@ -275,7 +300,7 @@ export function BoDetailView() {
                     <Label>BO Type</Label>
                     <Input
                       value={form.BoType}
-                      placeholder={selectedBo.BoType || 'Enter BO type'}
+                      placeholder={bizObject.BoType || 'Enter BO type'}
                       maxlength={BO_TYPE_MAX_LENGTH}
                       onInput={(event) => setForm((prev) => ({ ...prev, BoType: event.target.value }))}
                     />
@@ -283,7 +308,7 @@ export function BoDetailView() {
                   <div>
                     <Label>Status</Label>
                     <select
-                      className="h-[2.625rem] w-full rounded-[0.55rem] border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-sky-500"
+                      className="h-10.5 w-full rounded-[0.55rem] border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-sky-500"
                       value={form.Status}
                       onChange={(event) => setForm((prev) => ({ ...prev, Status: event.target.value }))}
                     >
@@ -300,7 +325,9 @@ export function BoDetailView() {
                   <div>
                     <Label>Linked Attachments</Label>
                     <div className="pt-2">
-                      <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${getBooleanTone(linkedAttachmentsEnabled)}`}>
+                      <span
+                        className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${getBooleanTone(linkedAttachmentsEnabled)}`}
+                      >
                         {linkedAttachmentsEnabled ? 'Enabled' : 'Disabled'}
                       </span>
                     </div>
@@ -311,21 +338,21 @@ export function BoDetailView() {
                     <Label>Title</Label>
                     <Input
                       value={form.BoTitle}
-                      placeholder={selectedBo.BoTitle || 'Enter BO title'}
+                      placeholder={bizObject.BoTitle || 'Enter BO title'}
                       onInput={(event) => setForm((prev) => ({ ...prev, BoTitle: event.target.value }))}
                     />
                   </div>
                   <div>
                     <Label>Create on</Label>
-                    <Text>{formatDateTime(selectedBo.Erdat, selectedBo.Erzet)}</Text>
+                    <Text>{formatDateTime(bizObject.Erdat, bizObject.Erzet)}</Text>
                   </div>
                   <div>
                     <Label>Created By</Label>
-                    <Text>{selectedBo.Ernam || '-'}</Text>
+                    <Text>{bizObject.Ernam || '-'}</Text>
                   </div>
                   <div>
                     <Label>Last Changed</Label>
-                    <Text>{formatDateTime(selectedBo.Aedat, selectedBo.Aezet)}</Text>
+                    <Text>{formatDateTime(bizObject.Aedat, bizObject.Aezet)}</Text>
                   </div>
                 </div>
               </div>
@@ -351,8 +378,8 @@ export function BoDetailView() {
                     <Button
                       design="Transparent"
                       icon="list"
-                      onClick={() => navigate(`/business-objects/${boId}/attachments`)}
-                      disabled={!boId}
+                      onClick={() => navigate(`/business-objects/${id}/attachments`)}
+                      disabled={!id}
                     >
                       Manage Links
                     </Button>
@@ -371,13 +398,13 @@ export function BoDetailView() {
         )}
       </ObjectPage>
 
-      {selectedBo ? (
+      {bizObject ? (
         <div className="fixed bottom-4 right-8 z-30">
           <Button
             design="Emphasized"
             disabled={!canSave || isUpdating}
             onClick={() => {
-              if (!selectedBo) return;
+              if (!bizObject) return;
               updateBizObject({
                 BoType: form.BoType.trim(),
                 BoTitle: form.BoTitle.trim(),
@@ -397,7 +424,7 @@ export function BoDetailView() {
         actions={['Cancel', 'OK']}
         onClose={(action) => {
           setDeleteDialogOpen(false);
-          if (action === 'OK' && selectedBo?.BoId) {
+          if (action === 'OK' && bizObject?.BoId) {
             deleteBizObject();
           }
         }}

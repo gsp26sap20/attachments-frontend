@@ -16,18 +16,34 @@ export type BizObjectItem = {
   __OperationControl: {
     link_attachment: boolean;
   };
-  SAP__Messages: Array<{
-    code: string;
-    message: string;
-    target?: string;
-  }>;
-  "#com.sap.gateway.srvd.zui_bizobj_srv.v0001.link_attachment(file_id)": Record<string, never>;
+  // SAP__Messages: Array<{
+  //   code: string;
+  //   message: string;
+  //   target?: string;
+  // }>;
+  // '#com.sap.gateway.srvd.zui_bizobj_srv.v0001.link_attachment(file_id)': Record<string, never>;
+  // TODO: Remove
+};
+
+export type BizObjectListParams = {
+  'sap-client': number;
+  $count?: boolean;
+  $select?: string;
+  $skip?: number;
+  $top?: number;
+  $filter?: string;
+  $search?: string;
 };
 
 export type BizObjectListResponse = {
-  "@odata.context": string;
-  "@odata.metadataEtag"?: string;
+  '@odata.count': string;
   value: BizObjectItem[];
+};
+
+export type BizObjectDetailParams = {
+  'sap-client': number;
+  $select?: string;
+  $expand?: string;
 };
 
 export type BizObjectLinkedAttachmentItem = {
@@ -65,8 +81,8 @@ export type BizObjectLinkedAttachmentItem = {
 };
 
 export type BizObjectLinkedAttachmentResponse = {
-  "@odata.context": string;
-  "@odata.metadataEtag"?: string;
+  '@odata.context': string;
+  '@odata.metadataEtag'?: string;
   BoId: string;
   BoType: string;
   BoTitle: string;
@@ -95,16 +111,6 @@ export type BizObjectLinkedAttachmentResponse = {
 export type BizObjectLinkedAttachmentParams = {
   'sap-client': number;
   $expand: string;
-};
-
-export type BizObjectListParams = {
-  "sap-client": number;
-  $count?: boolean;
-  $select?: string;
-  $skip?: number;
-  $top?: number;
-  $filter?: string;
-  $orderby?: string;
 };
 
 export type CreateBizObjectPayload = {

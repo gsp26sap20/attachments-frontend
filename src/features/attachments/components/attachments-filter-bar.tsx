@@ -34,6 +34,7 @@ export function AttachmentsFilterBar({ onFilterChange, onSearchChange }: Attachm
     setIdFilterString('');
     setTitleFilterString('');
     setCreatedByFilterString('');
+    onSearchChange('');
     onFilterChange('');
   };
 

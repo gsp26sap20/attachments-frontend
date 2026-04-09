@@ -1,0 +1,160 @@
+import * as React from 'react';
+import { toast } from '@/libs/toast';
+import '@ui5/webcomponents-icons/home.js';
+import { useNavigate } from 'react-router';
+import '@ui5/webcomponents-icons/refresh.js';
+import '@ui5/webcomponents-icons/document.js';
+import { Bar } from '@ui5/webcomponents-react/Bar';
+import { Icon } from '@ui5/webcomponents-react/Icon';
+import { Title } from '@ui5/webcomponents-react/Title';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { Button } from '@ui5/webcomponents-react/Button';
+import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
+import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
+import { API } from '@/features/business-objects/constants';
+import '@ui5/webcomponents-icons/navigation-right-arrow.js';
+import { getBackendErrorMessage } from '@/libs/error-message';
+import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
+import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
+import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
+import { BizObjectsFilterBar } from '@/features/business-objects/components';
+import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
+import { bizObjectsQueryOptions } from '@/features/business-objects/options/query';
+import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
+
+const rawColumns = [
+  { Header: 'ID', accessor: 'BoId' },
+  { Header: 'Title', accessor: 'BoTitle' },
+  { Header: 'Type', accessor: 'BoType' },
+  { Header: 'Status', accessor: 'Status' },
+  { Header: 'Created On', accessor: 'Erdat' },
+  { Header: 'Created By', accessor: 'Ernam' },
+];
+// TODO: Handle display Type and Status with human-readable format
+
+const ROWS_PER_PAGE = 10;
+
+export function BoListView() {
+  const navigate = useNavigate();
+  const [search, setSearch] = React.useState('');
+  const [filter, setFilter] = React.useState('');
+
+  const { data, isFetching, isFetchingNextPage, error, refetch, hasNextPage, fetchNextPage } = useInfiniteQuery(
+    bizObjectsQueryOptions({
+      'sap-client': 324,
+      $skip: 0,
+      $top: ROWS_PER_PAGE,
+      $count: true,
+      $select: API.select, // TODO: The same handle applies to Attachments.
+      $filter: filter || undefined,
+      $search: search || undefined,
+    }),
+  );
+
+  const totalCount = data?.pages[data.pages.length - 1]['@odata.count'] ?? 0;
+  const bizObjects = React.useMemo(() => data?.pages.flatMap((page) => page.value) ?? [], [data?.pages]);
+
+  React.useEffect(() => {
+    if (!error) {
+      return;
+    }
+    toast(getBackendErrorMessage(error, 'Cannot load Business Objects data.'));
+  }, [error]);
+
+  const columns = React.useMemo(
+    () => [
+      ...rawColumns,
+      {
+        Header: '',
+        id: 'nav',
+        width: 60,
+        disableSortBy: true,
+        disableGroupBy: true,
+        Cell: (props: AnalyticalTableCellInstance) => (
+          <Icon
+            name="navigation-right-arrow"
+            onClick={() => navigate(`/business-objects/${props.row.original.BoId}`)}
+          />
+        ),
+        // TODO: Implement the same process to other tables.
+      },
+    ],
+    [navigate],
+  );
+
+  return (
+    <DynamicPage
+      headerArea={
+        <DynamicPageHeader className="py-4 px-8">
+          <Button
+            design="Transparent"
+            tooltip="Click to go to home page"
+            onClick={() => {
+              navigate('/shell-home');
+            }}
+            className="cursor-pointer"
+          >
+            <FlexBox alignItems="Center" className="text-primary gap-2">
+              <Icon name="home" className="text-primary" mode="Interactive" />
+              <Title level="H1" className="text-primary cursor-pointer">
+                Business Objects
+              </Title>
+            </FlexBox>
+          </Button>
+          <BizObjectsFilterBar onFilterChange={setFilter} onSearchChange={setSearch} />
+        </DynamicPageHeader>
+      }
+      className="h-dvh"
+      showFooter={true}
+    >
+      <AnalyticalTable
+        header={
+          <Toolbar className="py-2 px-4 rounded-t-xl">
+            <Title level="H2">Business Objects {totalCount ? `(${totalCount})` : ''}</Title>
+            <ToolbarSpacer />
+            <ToolbarButton design="Transparent" text="New" onClick={() => navigate('/business-objects/create')} />
+            <ToolbarButton
+              design="Transparent"
+              icon="refresh"
+              text="Refresh"
+              onClick={() => {
+                refetch();
+              }}
+            />
+            {/* <ToolbarButton
+              icon="table-view"
+              tooltip="Toggle grid view"
+              disabled={isFetching || attachments.length === 0}
+              onClick={() => setViewMode('grid')}
+            /> */}
+          </Toolbar>
+        }
+        data={bizObjects}
+        columns={columns}
+        sortable
+        groupable
+        loading={isFetching || isFetchingNextPage}
+        rowHeight={36}
+        scaleWidthMode="Smart"
+        visibleRowCountMode="Auto"
+        onRowClick={(event) => {
+          const item = event.detail.row.original;
+          if (item?.BoId) {
+            navigate(`/business-objects/${item.BoId}`);
+          }
+        }}
+      />
+      {hasNextPage && (
+        <Bar>
+          {/* className={cn({ 'rounded-xl mt-4': viewMode === 'grid' })} */}
+          <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} design="Transparent">
+            More [{bizObjects.length}/{totalCount}]
+          </Button>
+        </Bar>
+      )}
+    </DynamicPage>
+  );
+}
+
+// TODO: Grid View
+// TODO: Fix filter by ID
