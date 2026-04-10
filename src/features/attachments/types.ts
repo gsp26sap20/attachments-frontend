@@ -205,3 +205,5 @@ export type GooglePickerDocument = {
   sizeBytes: number;
   parentId: string;
 };
+
+export type LinkedAttachment = AttachmentListItem;

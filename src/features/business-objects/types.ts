@@ -1,3 +1,5 @@
+import type { LinkedAttachment } from '@/features/attachments/types';
+
 export type BizObjectItem = {
   BoId: string;
   BoType: string;
@@ -16,13 +18,6 @@ export type BizObjectItem = {
   __OperationControl: {
     link_attachment: boolean;
   };
-  // SAP__Messages: Array<{
-  //   code: string;
-  //   message: string;
-  //   target?: string;
-  // }>;
-  // '#com.sap.gateway.srvd.zui_bizobj_srv.v0001.link_attachment(file_id)': Record<string, never>;
-  // TODO: Remove
 };
 
 export type BizObjectListParams = {
@@ -46,6 +41,15 @@ export type BizObjectDetailParams = {
   $expand?: string;
 };
 
+export type BizObjectLinkedAttachmentParams = {
+  'sap-client': number;
+  $count?: boolean;
+  $select?: string;
+  $skip?: number;
+  $top?: number;
+  $expand?: string;
+};
+
 export type BizObjectLinkedAttachmentItem = {
   BoId: string;
   FileId: string;
@@ -56,61 +60,12 @@ export type BizObjectLinkedAttachmentItem = {
     Deletable: boolean;
     Updatable: boolean;
   };
-  SAP__Messages: Array<{
-    code: string;
-    message: string;
-    target?: string;
-  }>;
-  _Attach: {
-    FileId: string;
-    Title: string;
-    CurrentVersion: string;
-    IsActive: boolean;
-    Erdat: string | null;
-    Erzet: string | null;
-    Ernam: string;
-    Aedat: string | null;
-    Aezet: string | null;
-    Aenam: string;
-    EditLock: boolean;
-    __EntityControl: {
-      Deletable: boolean;
-      Updatable: boolean;
-    };
-  };
+  _Attach: LinkedAttachment;
 };
 
-export type BizObjectLinkedAttachmentResponse = {
-  '@odata.context': string;
-  '@odata.metadataEtag'?: string;
-  BoId: string;
-  BoType: string;
-  BoTitle: string;
-  Status: string;
-  Erdat: string | null;
-  Erzet: string | null;
-  Ernam: string;
-  Aedat: string | null;
-  Aezet: string | null;
-  Aenam: string;
-  __EntityControl: {
-    Deletable: boolean;
-    Updatable: boolean;
-  };
-  __OperationControl: {
-    link_attachment: boolean;
-  };
-  SAP__Messages: Array<{
-    code: string;
-    message: string;
-    target?: string;
-  }>;
-  _Links: BizObjectLinkedAttachmentItem[];
-};
-
-export type BizObjectLinkedAttachmentParams = {
-  'sap-client': number;
-  $expand: string;
+export type BizObjectLinkedAttachmentsResponse = {
+  '@odata.count': string;
+  value: BizObjectLinkedAttachmentItem[];
 };
 
 export type CreateBizObjectPayload = {
