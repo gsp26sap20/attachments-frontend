@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Link } from 'react-router';
+import '@ui5/webcomponents-icons/delete.js';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -71,7 +72,8 @@ export function BizObjectLinkedAttachments({ boId, disable }: BizObjectLinkedAtt
         Header: 'Actions',
         Cell: (props: AnalyticalTableCellInstance) => (
           <Button
-            design="Negative"
+            design="Transparent"
+            icon="delete"
             className="h-6.5"
             onClick={(e) => {
               e.stopPropagation();
@@ -110,7 +112,7 @@ export function BizObjectLinkedAttachments({ boId, disable }: BizObjectLinkedAtt
       />
       {hasNextPage && (
         <Bar>
-          <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+          <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} design="Transparent">
             More [{linkedAttachments.length}/{totalCount}]
           </Button>
         </Bar>

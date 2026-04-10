@@ -82,8 +82,6 @@ export type UpdateBizObjectPayload = {
   Status: string;
 };
 
-export type DeleteBizObjectResponse = unknown;
-
 export type LinkAttachmentPayload = {
   bo_id: string;
   file_id: string;

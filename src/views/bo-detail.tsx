@@ -1,36 +1,43 @@
+import * as React from 'react';
+import { toast } from '@/libs/toast';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/decline.js';
+import { getError } from '@/libs/error-message';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { useNavigate, useParams } from 'react-router';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Label } from '@ui5/webcomponents-react/Label';
 import { Button } from '@ui5/webcomponents-react/Button';
-import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { API } from '@/features/business-objects/constants';
+import { BusyIndicator } from '@/components/busy-indicator';
 import '@ui5/webcomponents-icons/business-objects-mobile.js';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
-import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
+import { NotFoundIllustrated } from '@/components/not-found-illustrated';
 import { BreadcrumbsItem } from '@ui5/webcomponents-react/BreadcrumbsItem';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
 import { BizObjectLinkedAttachments } from '@/features/business-objects/components';
 import { bizObjectDetailQueryOptions } from '@/features/business-objects/options/query';
+import { deleteBizObjectMutationOptions } from '@/features/business-objects/options/mutation';
 
 export function BoDetailView() {
   const { id } = useParams();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [errorBoxOpen, setErrorBoxOpen] = React.useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [errorBoxMessages, setErrorBoxMessages] = React.useState<string[]>([]);
+
   const {
     data: bizObject,
-    error,
+    error: bizObjectError,
     isFetching: isBizObjectFetching,
-    // refetch: refetchBizObject,
   } = useQuery(
     bizObjectDetailQueryOptions(id!, {
       'sap-client': 324,
@@ -43,6 +50,43 @@ export function BoDetailView() {
       queryKey: ['biz-objects', id],
     });
   };
+
+  const { mutate: deleteBizObject, isPending: isDeleting } = useMutation(
+    deleteBizObjectMutationOptions({
+      boId: id!,
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ['biz-objects'],
+        });
+        toast('Business object deleted successfully');
+        navigate('/business-objects');
+      },
+      onError: (error) => {
+        const messages = getError(error);
+        setErrorBoxMessages((prev) => [...messages, ...prev]);
+        setErrorBoxOpen(true);
+      },
+    }),
+  );
+
+  React.useEffect(() => {
+    if (bizObjectError) {
+      const messages = getError(bizObjectError);
+      setErrorBoxMessages((prev) => [...messages, ...prev]);
+      setErrorBoxOpen(true);
+    }
+  }, [bizObjectError]);
+
+  if (bizObjectError && bizObjectError.status === 404) {
+    return (
+      <NotFoundIllustrated
+        title="Business Object Not Found"
+        subtitle={getError(bizObjectError)[0]}
+        breadcrumbRoute="/business-objects"
+        breadcrumbText="Business Objects"
+      />
+    );
+  }
 
   return (
     <div className="relative">
@@ -82,13 +126,14 @@ export function BoDetailView() {
                   design="Emphasized"
                   text="Edit"
                   onClick={() => {}}
+                  // TODO: Implement edit functionality
                   disabled={!bizObject?.__EntityControl.Updatable}
                 />
                 <ToolbarButton
-                  design="Negative"
+                  design="Default"
                   text="Delete"
-                  onClick={() => {}}
-                  disabled={!bizObject?.__EntityControl.Deletable}
+                  onClick={() => setDeleteDialogOpen(true)}
+                  disabled={!bizObject?.__EntityControl.Deletable || isDeleting}
                 />
               </Toolbar>
             }
@@ -104,11 +149,7 @@ export function BoDetailView() {
           />
         }
       >
-        {isBizObjectFetching && (
-          <FlexBox alignItems="Center" justifyContent="Center" style={{ padding: '1rem', minHeight: '50dvh' }}>
-            <BusyIndicator delay={0} active size="L" />
-          </FlexBox>
-        )}
+        {isBizObjectFetching && <BusyIndicator type="loading" />}
         <ObjectPageSection
           aria-label="General Information"
           id="general"
@@ -179,26 +220,34 @@ export function BoDetailView() {
           />
         </ObjectPageSection>
       </ObjectPage>
-      {/* {isRollbacking && (
-        <FlexBox
-          alignItems="Center"
-          justifyContent="Center"
-          style={{
-            padding: '1rem',
-            minHeight: '50dvh',
-            position: 'absolute',
-            inset: 0,
+      <MessageBox
+        open={deleteDialogOpen}
+        type="Confirm"
+        titleText="Delete Business Object"
+        actions={['Cancel', 'OK']}
+        onClose={(action) => {
+          setDeleteDialogOpen(false);
+          if (action === 'OK' && id) {
+            deleteBizObject();
+          }
+        }}
+      >
+        Are you sure you want to delete this business object? This action cannot be undone.
+      </MessageBox>
+      {isDeleting && <BusyIndicator type="pending" />}
+      {errorBoxOpen && errorBoxMessages.length > 0 && (
+        <MessageBox
+          open
+          title="Error"
+          type="Error"
+          onClose={() => {
+            setErrorBoxOpen(false);
+            setErrorBoxMessages([]);
           }}
         >
-          <BusyIndicator delay={0} active size="L" />
-        </FlexBox>
-      )} */}
-      {error && (
-        <MessageBox open title="Error" type="Error" onClose={() => navigate('/business-objects')}>
-          {error?.response?.data?.error?.message || error.message}
           <ul className="list-disc list-inside">
-            {error?.response?.data?.error?.details?.map((detail, index) => (
-              <li key={index}>{detail.message}</li>
+            {errorBoxMessages.map((message, index) => (
+              <li key={index}>{message}</li>
             ))}
           </ul>
         </MessageBox>
