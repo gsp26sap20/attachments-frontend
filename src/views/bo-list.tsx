@@ -19,20 +19,20 @@ import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { bizObjectsQueryOptions } from '@/features/business-objects/options/query';
+import { displayBoType, displayBoStatus } from '@/features/business-objects/helpers';
 import { BizObjectsFilterBar, BizCreate } from '@/features/business-objects/components';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
 const rawColumns = [
   { Header: 'ID', accessor: 'BoId' },
   { Header: 'Title', accessor: 'BoTitle' },
-  { Header: 'Type', accessor: 'BoType' },
-  { Header: 'Status', accessor: 'Status' },
+  { Header: 'Type', accessor: 'BoType', Cell: (props: AnalyticalTableCellInstance) => displayBoType(props.value) },
+  { Header: 'Status', accessor: 'Status', Cell: (props: AnalyticalTableCellInstance) => displayBoStatus(props.value) },
   { Header: 'Created On', accessor: 'Erdat' },
   { Header: 'Created By', accessor: 'Ernam' },
 ];
-// TODO: Handle display Type and Status with human-readable format
 
-const ROWS_PER_PAGE = 10;
+const ROWS_PER_PAGE = 10; // TODO: Move to constants
 
 export function BoListView() {
   const navigate = useNavigate();

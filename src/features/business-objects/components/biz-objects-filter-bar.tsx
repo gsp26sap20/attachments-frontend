@@ -1,5 +1,9 @@
 import * as React from 'react';
+import { BO_STATUS, BO_TYPES } from '../constants';
 import { Input } from '@ui5/webcomponents-react/Input';
+import { Select } from '@ui5/webcomponents-react/Select';
+import { Option } from '@ui5/webcomponents-react/Option';
+import { displayBoStatus, displayBoType } from '../helpers';
 import { FilterBar } from '@ui5/webcomponents-react/FilterBar';
 import { SearchHelpDialog } from '@/components/search-help-dialog';
 import { FilterGroupItem } from '@ui5/webcomponents-react/FilterGroupItem';
@@ -11,21 +15,17 @@ interface BizObjectsFilterBarProps {
 
 export function BizObjectsFilterBar({ onFilterChange, onSearchChange }: BizObjectsFilterBarProps) {
   const [count, setCount] = React.useState(0);
+  const [boType, setBoType] = React.useState('');
+  const [status, setStatus] = React.useState('');
   const [filterKeys, setFilterKeys] = React.useState<string[]>(['BoId', 'BoType', 'BoTitle', 'Status', 'Ernam']);
   const [boIdFilterString, setBoIdFilterString] = React.useState('');
-  const [boTypeFilterString, setBoTypeFilterString] = React.useState('');
   const [boTitleFilterString, setBoTitleFilterString] = React.useState('');
-  const [statusFilterString, setStatusFilterString] = React.useState('');
   const [createdByFilterString, setCreatedByFilterString] = React.useState('');
 
   const handleOnGo = function () {
-    const filter = [
-      boIdFilterString,
-      boTypeFilterString,
-      boTitleFilterString,
-      statusFilterString,
-      createdByFilterString,
-    ]
+    const boTypeFilter = boType ? `BoType eq '${boType}'` : '';
+    const statusFilter = status ? `Status eq '${status}'` : '';
+    const filter = [boIdFilterString, boTitleFilterString, boTypeFilter, statusFilter, createdByFilterString]
       .filter(Boolean)
       .join(' and ');
     onFilterChange(filter);
@@ -35,10 +35,10 @@ export function BizObjectsFilterBar({ onFilterChange, onSearchChange }: BizObjec
     setCount((prev) => prev + 1);
     setFilterKeys(['BoId', 'BoType', 'BoTitle', 'Status', 'Ernam']);
     setBoIdFilterString('');
-    setBoTypeFilterString('');
     setBoTitleFilterString('');
-    setStatusFilterString('');
     setCreatedByFilterString('');
+    setBoType('');
+    setStatus('');
     onSearchChange('');
     onFilterChange('');
   };
@@ -60,17 +60,32 @@ export function BizObjectsFilterBar({ onFilterChange, onSearchChange }: BizObjec
           label="BO ID"
           field="BoId"
           options={['equal to']}
+          useApostrophe={false}
           afterFilterStringBuild={setBoIdFilterString}
         />
-      </FilterGroupItem>
-      <FilterGroupItem filterKey="BoType" label="Type" hiddenInFilterBar={!filterKeys.includes('BoType')}>
-        <SearchHelpDialog key={count} label="Type" field="BoType" afterFilterStringBuild={setBoTypeFilterString} />
       </FilterGroupItem>
       <FilterGroupItem filterKey="BoTitle" label="Title" hiddenInFilterBar={!filterKeys.includes('BoTitle')}>
         <SearchHelpDialog key={count} label="Title" field="BoTitle" afterFilterStringBuild={setBoTitleFilterString} />
       </FilterGroupItem>
+      <FilterGroupItem filterKey="BoType" label="Type" hiddenInFilterBar={!filterKeys.includes('BoType')}>
+        <Select value={boType} onChange={(event) => setBoType(event.target.value)} className="h-6.5">
+          <Option value="">All</Option>
+          {BO_TYPES.map((type) => (
+            <Option key={type} value={type}>
+              {displayBoType(type)}
+            </Option>
+          ))}
+        </Select>
+      </FilterGroupItem>
       <FilterGroupItem filterKey="Status" label="Status" hiddenInFilterBar={!filterKeys.includes('Status')}>
-        <SearchHelpDialog key={count} label="Status" field="Status" afterFilterStringBuild={setStatusFilterString} />
+        <Select value={status} onChange={(event) => setStatus(event.target.value)} className="h-6.5">
+          <Option value="">All</Option>
+          {BO_STATUS.map((item) => (
+            <Option key={item} value={item}>
+              {displayBoStatus(item)}
+            </Option>
+          ))}
+        </Select>
       </FilterGroupItem>
       <FilterGroupItem filterKey="Ernam" label="Created By" hiddenInFilterBar={!filterKeys.includes('Ernam')}>
         <SearchHelpDialog

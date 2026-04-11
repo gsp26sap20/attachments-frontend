@@ -68,6 +68,7 @@ export function AttachmentsFilterBar(props: AttachmentsFilterBarProps) {
           label="File ID"
           field="FileId"
           options={['equal to']}
+          useApostrophe={false}
           afterFilterStringBuild={setIdFilterString}
         />
       </FilterGroupItem>
