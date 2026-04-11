@@ -113,10 +113,9 @@ function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: Bi
       />
       <Dialog
         open={open}
-        resizable
         draggable
         headerText="Link Attachment"
-        className="relative"
+        className="relative w-full lg:w-4/5"
         footer={
           <Bar
             design="Footer"
