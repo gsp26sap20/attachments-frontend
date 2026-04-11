@@ -10,3 +10,9 @@ export const MUTATION_API = {
   unlinkAttachment: (boId: string, fileId: string) =>
     `/BizObjectAttachmentLink(BoId=${boId},FileId=${fileId})?sap-client=324`,
 };
+
+export const BO_TYPES = ['PORDER', 'SORDER', 'INVOICE'] as const;
+export const BO_STATUS = ['NEW', 'INPR', 'COMP'] as const;
+
+export type BoType = (typeof BO_TYPES)[number];
+export type BoStatus = (typeof BO_STATUS)[number];

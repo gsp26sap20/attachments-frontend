@@ -6,6 +6,7 @@ import { Title } from '@ui5/webcomponents-react/Title';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
+import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { bizObjectLinkedAttachmentsQueryOptions } from '../options/query';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
@@ -21,8 +22,8 @@ const rawColumns = [
     Header: 'Attachment ID',
     accessor: '_Attach.FileId',
     Cell: (props: AnalyticalTableCellInstance) => (
-      <Link to={`/attachments/${props.value}`} className="text-primary hover:underline cursor-pointer">
-        {props.value}
+      <Link to={`/attachments/${props.value}`}>
+        <UI5Link>{props.value}</UI5Link>
       </Link>
     ),
   },
@@ -105,7 +106,7 @@ export function BizObjectLinkedAttachments({ boId, disable }: BizObjectLinkedAtt
             <Title level="H4">Attachments {totalCount ? `(${totalCount})` : ''}</Title>
             <ToolbarSpacer />
             <Button design="Transparent" onClick={() => {}} disabled={!boId || disable} className="h-8">
-              Create new Link
+              Add new Link
             </Button>
           </Toolbar>
         }

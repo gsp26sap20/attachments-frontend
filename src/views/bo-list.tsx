@@ -17,9 +17,9 @@ import { getBackendErrorMessage } from '@/libs/error-message';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
-import { BizObjectsFilterBar } from '@/features/business-objects/components';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { bizObjectsQueryOptions } from '@/features/business-objects/options/query';
+import { BizObjectsFilterBar, BizCreate } from '@/features/business-objects/components';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
 const rawColumns = [
@@ -112,7 +112,8 @@ export function BoListView() {
           <Toolbar className="py-2 px-4 rounded-t-xl">
             <Title level="H2">Business Objects {totalCount ? `(${totalCount})` : ''}</Title>
             <ToolbarSpacer />
-            <ToolbarButton design="Transparent" text="New" onClick={() => navigate('/business-objects/create')} />
+            {/* ToolbarButton - BizCreate */}
+            <BizCreate />
             <ToolbarButton
               design="Transparent"
               icon="refresh"
@@ -158,3 +159,5 @@ export function BoListView() {
 
 // TODO: Grid View
 // TODO: Fix filter by ID
+// TODO: Handle time zone display
+// TODO: Handle default orderby

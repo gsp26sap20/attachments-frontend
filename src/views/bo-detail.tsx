@@ -8,9 +8,9 @@ import { Icon } from '@ui5/webcomponents-react/Icon';
 import { useNavigate, useParams } from 'react-router';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Label } from '@ui5/webcomponents-react/Label';
+import { MutationBar } from '@/components/mutation-bar';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
-import { API } from '@/features/business-objects/constants';
 import { BusyIndicator } from '@/components/busy-indicator';
 import '@ui5/webcomponents-icons/business-objects-mobile.js';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
@@ -23,7 +23,11 @@ import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
 import { BizObjectLinkedAttachments } from '@/features/business-objects/components';
+import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers';
+import { BizForm, type BizFormValues } from '@/features/business-objects/components';
+import { API, type BoType, type BoStatus } from '@/features/business-objects/constants';
 import { bizObjectDetailQueryOptions } from '@/features/business-objects/options/query';
+import { updateBizObjectMutationOptions } from '@/features/business-objects/options/mutation';
 import { deleteBizObjectMutationOptions } from '@/features/business-objects/options/mutation';
 
 export function BoDetailView() {
@@ -33,10 +37,17 @@ export function BoDetailView() {
   const [errorBoxOpen, setErrorBoxOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [errorBoxMessages, setErrorBoxMessages] = React.useState<string[]>([]);
+  const [editMode, setEditMode] = React.useState(false);
+  const [editValues, setEditValues] = React.useState<BizFormValues>({
+    title: '',
+    type: '',
+    status: '',
+  });
 
   const {
     data: bizObject,
     error: bizObjectError,
+    refetch,
     isFetching: isBizObjectFetching,
   } = useQuery(
     bizObjectDetailQueryOptions(id!, {
@@ -68,6 +79,31 @@ export function BoDetailView() {
       },
     }),
   );
+
+  const { mutate: updateBizObject, isPending: isUpdating } = useMutation(
+    updateBizObjectMutationOptions({
+      boId: id!,
+      onSuccess: () => {
+        refetch();
+        toast('Business object updated successfully');
+        setEditMode(false);
+      },
+      onError: (error) => {
+        const messages = getError(error);
+        setErrorBoxMessages((prev) => [...messages, ...prev]);
+        setErrorBoxOpen(true);
+      },
+    }),
+  );
+
+  const handleEditModeOn = function () {
+    setEditMode(true);
+    setEditValues({
+      title: bizObject?.BoTitle || '',
+      type: bizObject?.BoType || '',
+      status: bizObject?.Status || '',
+    });
+  };
 
   React.useEffect(() => {
     if (bizObjectError) {
@@ -120,22 +156,23 @@ export function BoDetailView() {
             }
             subHeader={isBizObjectFetching ? 'Loading...' : bizObject?.BoId || '–'}
             actionsBar={
-              <Toolbar design="Transparent" style={{ height: 'auto' }}>
-                <ToolbarButton design="Default" icon="refresh" text="Refresh" onClick={() => refetchBizObject()} />
-                <ToolbarButton
-                  design="Emphasized"
-                  text="Edit"
-                  onClick={() => {}}
-                  // TODO: Implement edit functionality
-                  disabled={!bizObject?.__EntityControl.Updatable}
-                />
-                <ToolbarButton
-                  design="Default"
-                  text="Delete"
-                  onClick={() => setDeleteDialogOpen(true)}
-                  disabled={!bizObject?.__EntityControl.Deletable || isDeleting}
-                />
-              </Toolbar>
+              !editMode ? (
+                <Toolbar design="Transparent" style={{ height: 'auto' }}>
+                  <ToolbarButton
+                    design="Emphasized"
+                    text="Edit"
+                    onClick={() => handleEditModeOn()}
+                    disabled={!bizObject?.__EntityControl.Updatable}
+                  />
+                  <ToolbarButton
+                    design="Default"
+                    text="Delete"
+                    onClick={() => setDeleteDialogOpen(true)}
+                    disabled={!bizObject?.__EntityControl.Deletable || isDeleting}
+                  />
+                  <ToolbarButton design="Default" icon="refresh" text="Refresh" onClick={() => refetchBizObject()} />
+                </Toolbar>
+              ) : undefined
             }
             navigationBar={
               <Button
@@ -160,18 +197,24 @@ export function BoDetailView() {
           <div className="md:grid md:grid-cols-3 gap-3">
             <div className="space-y-3">
               <Title level="H3">Basic Data</Title>
-              <div className="flex flex-col">
-                <Label showColon>Title</Label>
-                <Text>{bizObject?.BoTitle || '–'}</Text>
-              </div>
-              <div className="flex flex-col">
-                <Label showColon>Type</Label>
-                <Text>{bizObject?.BoType || '–'}</Text>
-              </div>
-              <div className="flex flex-col">
-                <Label showColon>Status</Label>
-                <Text>{bizObject?.Status || '–'}</Text>
-              </div>
+              {editMode ? (
+                <BizForm value={editValues} onChange={setEditValues} />
+              ) : (
+                <React.Fragment>
+                  <div className="flex flex-col">
+                    <Label showColon>Title</Label>
+                    <Text>{bizObject?.BoTitle || '–'}</Text>
+                  </div>
+                  <div className="flex flex-col">
+                    <Label showColon>Type</Label>
+                    <Text>{displayBoType(bizObject?.BoType as BoType) || '–'}</Text>
+                  </div>
+                  <div className="flex flex-col">
+                    <Label showColon>Status</Label>
+                    <Text>{displayBoStatus(bizObject?.Status as BoStatus) || '–'}</Text>
+                  </div>
+                </React.Fragment>
+              )}
             </div>
             <div className="space-y-3 md:col-span-2">
               <Title level="H3">Audit Information</Title>
@@ -219,6 +262,30 @@ export function BoDetailView() {
             disable={!bizObject || !bizObject?.__OperationControl.link_attachment}
           />
         </ObjectPageSection>
+        {editMode && (
+          <MutationBar
+            okText="Save"
+            cancelText="Discard"
+            onOk={() => {
+              updateBizObject({
+                BoTitle: editValues.title,
+                BoType: editValues.type,
+                Status: editValues.status,
+              });
+            }}
+            onCancel={() => {
+              setEditMode(false);
+            }}
+            disabledOk={
+              !editValues.title.trim() ||
+              !editValues.type.trim() ||
+              !editValues.status.trim() ||
+              (editValues.title === bizObject?.BoTitle &&
+                editValues.type === bizObject?.BoType &&
+                editValues.status === bizObject?.Status)
+            }
+          />
+        )}
       </ObjectPage>
       <MessageBox
         open={deleteDialogOpen}
@@ -234,7 +301,7 @@ export function BoDetailView() {
       >
         Are you sure you want to delete this business object? This action cannot be undone.
       </MessageBox>
-      {isDeleting && <BusyIndicator type="pending" />}
+      {(isDeleting || isUpdating) && <BusyIndicator type="pending" />}
       {errorBoxOpen && errorBoxMessages.length > 0 && (
         <MessageBox
           open
@@ -252,6 +319,7 @@ export function BoDetailView() {
           </ul>
         </MessageBox>
       )}
+      {/* TODO: Handle time zone display */}
     </div>
   );
 }

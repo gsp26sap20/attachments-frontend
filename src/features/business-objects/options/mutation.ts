@@ -4,9 +4,8 @@ import { API, MUTATION_API } from '../constants';
 import { axiosInstance } from '@/libs/axios-instance';
 import { mutationOptions } from '@tanstack/react-query';
 import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers';
-import type { LinkAttachmentPayload, LinkAttachmentResponse } from '../types';
+import type { LinkAttachmentPayload, UpdateBizObjectPayload } from '../types';
 import type { CreateBizObjectPayload, CreateBizObjectResponse } from '../types';
-import type { UnlinkAttachmentLinkResponse, UpdateBizObjectPayload } from '../types';
 
 type CreateBizObjectMutationParams = {
   onSuccess?: (data: CreateBizObjectResponse) => void;
@@ -15,7 +14,7 @@ type CreateBizObjectMutationParams = {
 
 type UpdateBizObjectMutationParams = {
   boId: string;
-  onSuccess?: (data: unknown) => void;
+  onSuccess?: () => void;
   onError?: (error: Error) => void;
 };
 
@@ -27,14 +26,14 @@ type DeleteBizObjectMutationParams = {
 
 type LinkAttachmentMutationParams = {
   boId: string;
-  onSuccess?: (data: LinkAttachmentResponse) => void;
+  onSuccess?: () => void;
   onError?: (error: Error) => void;
 };
 
 type UnlinkAttachmentMutationParams = {
   boId: string;
   fileId: string;
-  onSuccess?: (data: UnlinkAttachmentLinkResponse) => void;
+  onSuccess?: () => void;
   onError?: (error: Error) => void;
 };
 
@@ -85,7 +84,6 @@ export function updateBizObjectMutationOptions({ boId, onSuccess, onError }: Upd
           },
         },
       );
-
       return res;
     },
     onSuccess,
@@ -126,7 +124,7 @@ export function linkAttachmentToBoMutationOptions({ boId, onSuccess, onError }: 
         token = getCsrfToken();
       }
 
-      const res = await axiosInstance.post<LinkAttachmentResponse>(
+      const res = await axiosInstance.post(
         `${ODATA_SERVICE.BIZ}${MUTATION_API.linkAttachment(file_id)}`,
         { bo_id: boId },
         {
@@ -157,15 +155,12 @@ export function unlinkAttachmentFromBoMutationOptions({
         await fetchCsrfToken(ODATA_SERVICE.BIZ);
         token = getCsrfToken();
       }
-      const res = await axiosInstance.delete<UnlinkAttachmentLinkResponse>(
-        `${ODATA_SERVICE.BIZ}${MUTATION_API.unlinkAttachment(boId, fileId)}`,
-        {
-          headers: {
-            'accept-language': 'en',
-            ...(token ? { 'x-csrf-token': token } : {}),
-          },
+      const res = await axiosInstance.delete(`${ODATA_SERVICE.BIZ}${MUTATION_API.unlinkAttachment(boId, fileId)}`, {
+        headers: {
+          'accept-language': 'en',
+          ...(token ? { 'x-csrf-token': token } : {}),
         },
-      );
+      });
       return res;
     },
     onSuccess,

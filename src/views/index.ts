@@ -6,7 +6,6 @@ export { UploadVersionView } from './upload-version-view';
 export { VersionDetailView } from './version-detail-view';
 export { AttachmentNewView } from './attachment-new-view';
 export { BoDetailView } from './bo-detail';
-export { BoCreateView } from './bo-create';
 export { UserListView } from './user-list';
 export { UserCreateView } from './user-create';
 export { ConfigFileView } from './config-file-view';

@@ -76,17 +76,9 @@ export type CreateBizObjectPayload = {
 
 export type CreateBizObjectResponse = BizObjectItem;
 
-export type UpdateBizObjectPayload = {
-  BoType: string;
-  BoTitle: string;
-  Status: string;
-};
+export type UpdateBizObjectPayload = CreateBizObjectPayload;
 
 export type LinkAttachmentPayload = {
   bo_id: string;
   file_id: string;
 };
-
-export type LinkAttachmentResponse = unknown;
-
-export type UnlinkAttachmentLinkResponse = unknown;
