@@ -37,7 +37,7 @@ const columns = [
   },
   {
     Header: 'Created At',
-    Cell: (props: AnalyticalTableCellInstance) => `${props.row.original.Erdat} ${props.row.original.Erzet}`,
+    Cell: (props: AnalyticalTableCellInstance) => `${props.row.original.Erdat ?? ''} ${props.row.original.Erzet ?? ''}`,
   },
   {
     Header: 'Created By',
@@ -99,7 +99,7 @@ function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: Bi
     );
   }, [data, linkedAttachmentIds]);
 
-  const totalCount = Number(data?.pages[0]?.['@odata.count'] ?? 0);
+  const totalCount = data?.pages[0]?.['@odata.count'] ?? 0;
   const remainingCount = totalCount - linkedAttachmentIds.length;
 
   return (

@@ -31,7 +31,7 @@ export type BizObjectListParams = {
 };
 
 export type BizObjectListResponse = {
-  '@odata.count': string;
+  '@odata.count': number;
   value: BizObjectItem[];
 };
 
@@ -64,7 +64,7 @@ export type BizObjectLinkedAttachmentItem = {
 };
 
 export type BizObjectLinkedAttachmentsResponse = {
-  '@odata.count': string;
+  '@odata.count': number;
   value: BizObjectLinkedAttachmentItem[];
 };
 

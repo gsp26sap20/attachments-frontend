@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import type { AxiosApiError } from '@/types/common';
 
 type BackendErrorPayload = {
@@ -53,7 +53,7 @@ export function getBackendErrorMessage(error: unknown, fallback = 'Something wen
 }
 
 function isAxiosApiError(error: unknown): error is AxiosApiError {
-  return error instanceof AxiosError;
+  return axios.isAxiosError(error);
 }
 
 export function getError(error: unknown, fallback = 'Something went wrong.'): string[] {

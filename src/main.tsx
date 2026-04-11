@@ -24,13 +24,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/admin" element={<AdminHomeView />} />
             {/*  */}
             <Route path="/business-objects" element={<BoListView />} />
-            <Route path="/BO" element={<Navigate replace to="/business-objects" />} />
-            <Route path="/BizObject" element={<Navigate replace to="/business-objects" />} />
             <Route path="/business-objects/:id" element={<BoDetailView />} />
-            <Route
-              path="/BO/:boId/Attachments"
-              element={<Navigate replace to="/business-objects/:boId/attachments" />}
-            />
             {/*  */}
             <Route path="/users" element={<UserListView />} />
             <Route path="/UserList" element={<Navigate replace to="/users" />} />
