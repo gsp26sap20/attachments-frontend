@@ -9,8 +9,8 @@ import { QueryProvider } from '@/context-providers/query-provider';
 import { HashRouter, Navigate, Route, Routes } from 'react-router';
 import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
 import { AttachmentsView, VersionDetailView, UploadVersionView } from '@/views';
+import { BoDetailView, BoListView, UserCreateView, UserListView } from '@/views';
 import { AttachmentNewView, AttachmentsDetailView, ShellHomeView, AdminHomeView } from '@/views';
-import { BoDetailView, BoListView, BoWListAttachmentView, UserCreateView, UserListView } from '@/views';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -27,7 +27,6 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/BO" element={<Navigate replace to="/business-objects" />} />
             <Route path="/BizObject" element={<Navigate replace to="/business-objects" />} />
             <Route path="/business-objects/:id" element={<BoDetailView />} />
-            <Route path="/business-objects/:boId/attachments" element={<BoWListAttachmentView />} />
             <Route
               path="/BO/:boId/Attachments"
               element={<Navigate replace to="/business-objects/:boId/attachments" />}

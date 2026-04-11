@@ -8,13 +8,14 @@ import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
+import { BizAttachmentLinkCreate } from './biz-attachment-link-create';
 import { bizObjectLinkedAttachmentsQueryOptions } from '../options/query';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
 import type { AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
 type BizObjectLinkedAttachmentsProps = {
   boId: string;
-  disable?: boolean;
+  disabled?: boolean;
 };
 
 const rawColumns = [
@@ -50,7 +51,7 @@ const rawColumns = [
   },
 ];
 
-export function BizObjectLinkedAttachments({ boId, disable }: BizObjectLinkedAttachmentsProps) {
+export function BizObjectLinkedAttachments({ boId, disabled }: BizObjectLinkedAttachmentsProps) {
   const { data, isFetching, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
     bizObjectLinkedAttachmentsQueryOptions(boId, {
       'sap-client': 324,
@@ -64,7 +65,12 @@ export function BizObjectLinkedAttachments({ boId, disable }: BizObjectLinkedAtt
   const linkedAttachments = React.useMemo(() => {
     return data?.pages.flatMap((page) => page.value) ?? [];
   }, [data?.pages]);
-  const totalCount = data?.pages[0]['@odata.count'] ?? 0;
+
+  const linkedAttachmentIds = React.useMemo(() => {
+    return linkedAttachments.map((attachment) => attachment.FileId);
+  }, [linkedAttachments]);
+
+  const totalCount = Number(data?.pages[0]?.['@odata.count'] ?? 0);
 
   const columns = React.useMemo(
     () => [
@@ -105,9 +111,11 @@ export function BizObjectLinkedAttachments({ boId, disable }: BizObjectLinkedAtt
           <Toolbar className="py-2 px-4 rounded-t-xl">
             <Title level="H4">Attachments {totalCount ? `(${totalCount})` : ''}</Title>
             <ToolbarSpacer />
-            <Button design="Transparent" onClick={() => {}} disabled={!boId || disable} className="h-8">
-              Add new Link
-            </Button>
+            <BizAttachmentLinkCreate
+              boId={boId}
+              linkedAttachmentIds={linkedAttachmentIds}
+              disabled={disabled || !boId}
+            />
           </Toolbar>
         }
       />

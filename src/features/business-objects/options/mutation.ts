@@ -116,7 +116,6 @@ export function deleteBizObjectMutationOptions({ boId, onSuccess, onError }: Del
 export function linkAttachmentToBoMutationOptions({ boId, onSuccess, onError }: LinkAttachmentMutationParams) {
   return mutationOptions({
     mutationFn: async (payload: LinkAttachmentPayload) => {
-      const { file_id } = payload;
       let token = getCsrfToken();
 
       if (!token) {
@@ -124,17 +123,12 @@ export function linkAttachmentToBoMutationOptions({ boId, onSuccess, onError }: 
         token = getCsrfToken();
       }
 
-      const res = await axiosInstance.post(
-        `${ODATA_SERVICE.BIZ}${MUTATION_API.linkAttachment(file_id)}`,
-        { bo_id: boId },
-        {
-          headers: {
-            'accept-language': 'en',
-            ...(token ? { 'x-csrf-token': token } : {}),
-          },
+      const res = await axiosInstance.post(`${ODATA_SERVICE.BIZ}${MUTATION_API.linkAttachment(boId)}`, payload, {
+        headers: {
+          'accept-language': 'en',
+          ...(token ? { 'x-csrf-token': token } : {}),
         },
-      );
-
+      });
       return res;
     },
     onSuccess,
@@ -167,3 +161,5 @@ export function unlinkAttachmentFromBoMutationOptions({
     onError,
   });
 }
+
+// TODO: handle csrf token deletion

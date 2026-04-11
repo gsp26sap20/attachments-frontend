@@ -9,5 +9,4 @@ export { BoDetailView } from './bo-detail';
 export { UserListView } from './user-list';
 export { UserCreateView } from './user-create';
 export { ConfigFileView } from './config-file-view';
-export { BoWListAttachmentView } from './bo-link-to-attachment';
 export { AttachmentsDetailView } from './attachments-detail-view';

@@ -259,7 +259,7 @@ export function BoDetailView() {
         >
           <BizObjectLinkedAttachments
             boId={id!}
-            disable={!bizObject || !bizObject?.__OperationControl.link_attachment}
+            disabled={!bizObject || !bizObject?.__OperationControl.link_attachment}
           />
         </ObjectPageSection>
         {editMode && (

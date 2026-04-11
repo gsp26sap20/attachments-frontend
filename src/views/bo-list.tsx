@@ -59,6 +59,7 @@ export function BoListView() {
       return;
     }
     toast(getBackendErrorMessage(error, 'Cannot load Business Objects data.'));
+    // TODO: Handle the error
   }, [error]);
 
   const columns = React.useMemo(

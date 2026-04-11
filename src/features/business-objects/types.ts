@@ -79,6 +79,6 @@ export type CreateBizObjectResponse = BizObjectItem;
 export type UpdateBizObjectPayload = CreateBizObjectPayload;
 
 export type LinkAttachmentPayload = {
-  bo_id: string;
   file_id: string;
+  // TODO: change "file_id" to "FileId" PascalCase
 };
