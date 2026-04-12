@@ -9,9 +9,9 @@ import { ErrorsMessageBox } from '@/components/errors-message-box';
 import { QueryProvider } from '@/context-providers/query-provider';
 import { HashRouter, Navigate, Route, Routes } from 'react-router';
 import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
-import { AttachmentsView, VersionDetailView, UploadVersionView } from '@/views';
+import { AttachmentsDetailView, ShellHomeView, AdminHomeView } from '@/views';
 import { BoDetailView, BoListView, UserCreateView, UserListView } from '@/views';
-import { AttachmentNewView, AttachmentsDetailView, ShellHomeView, AdminHomeView } from '@/views';
+import { AttachmentListView, VersionDetailView, UploadVersionView } from '@/views';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -36,8 +36,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/configuration-files" element={<Navigate replace to="/admin" />} />
             <Route path="/config-files" element={<Navigate replace to="/admin" />} />
             {/* Attachments */}
-            <Route path="/attachments" element={<AttachmentsView />} />
-            <Route path="/attachments/new" element={<AttachmentNewView />} />
+            <Route path="/attachments" element={<AttachmentListView />} />
             <Route path="/attachments/:id" element={<AttachmentsDetailView />} />
             <Route path="/attachments/:id/upload" element={<UploadVersionView />} />
             <Route path="/attachments/:id/versions/:versionNo" element={<VersionDetailView />} />
