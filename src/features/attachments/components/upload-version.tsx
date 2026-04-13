@@ -69,11 +69,6 @@ export function UploadVersion({ fileData, onFileDataChange, className }: UploadV
                   <GoogleDrivePicker
                     disabled={loading}
                     onPick={applySelectedFile}
-                    onImportError={(message) => {
-                      if (message) {
-                        pushErrorMessages([message]);
-                      }
-                    }}
                     onLoadingChange={(nextLoading) => {
                       setLoading(nextLoading);
                       if (nextLoading) {

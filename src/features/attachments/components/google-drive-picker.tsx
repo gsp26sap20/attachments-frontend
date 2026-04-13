@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { toast } from '@/libs/toast';
+import { pushErrorMessages } from '@/libs/errors';
+import { useAuthStore } from '@/stores/auth-store';
 import { GoogleDriveIcon } from '@/components/icons';
 import { GOOGLE_APP_ID, GOOGLE_CLIENT_ID } from '@/app-env';
 import { googleDriveFileToUploadedFileData } from '../upload-file';
@@ -11,12 +13,12 @@ interface GoogleDrivePickerProps {
   disabled?: boolean;
   onPick?: (fileData: UploadedFileData) => void | Promise<void>;
   onLoadingChange?: (loading: boolean) => void;
-  onImportError?: (message: string) => void;
 }
 
-export function GoogleDrivePicker({ disabled, onPick, onLoadingChange, onImportError }: GoogleDrivePickerProps) {
+export function GoogleDrivePicker({ disabled, onPick, onLoadingChange }: GoogleDrivePickerProps) {
   const [open, setOpen] = React.useState(false);
-  const [accessToken, setAccessToken] = React.useState<string>();
+  const googleAccessToken = useAuthStore((state) => state.googleAccessToken);
+  const setGoogleAccessToken = useAuthStore((state) => state.setGoogleAccessToken);
 
   const handleButtonClick: ButtonPropTypes['onClick'] = function (e) {
     e.preventDefault();
@@ -26,24 +28,22 @@ export function GoogleDrivePicker({ disabled, onPick, onLoadingChange, onImportE
   };
 
   const handleOAuthError: DrivePickerEventHandlers['onOauthError'] = function (e) {
-    logEvent(e.detail);
     setOpen(false);
     onLoadingChange?.(false);
-    setAccessToken(undefined);
+    setGoogleAccessToken(null);
 
     const errorType = e.detail.type;
     if (errorType === 'popup_failed_to_open') {
-      toast('Popup failed to open. Please allow popups for this website.');
+      pushErrorMessages(['Popup failed to open. Please allow popups for this website.']);
     } else if (errorType === 'popup_closed') {
       toast('Popup closed by user or browser.');
     } else {
-      toast('An unexpected error occurred. Please try again.');
+      pushErrorMessages(['An unexpected error occurred. Please try again.']);
     }
   };
 
   const handleOAuthResponse: DrivePickerEventHandlers['onOauthResponse'] = function (e) {
-    logEvent(e.detail);
-    setAccessToken(e.detail.access_token);
+    setGoogleAccessToken(e.detail.access_token);
   };
 
   const handleCanceled: DrivePickerEventHandlers['onCanceled'] = function () {
@@ -52,36 +52,29 @@ export function GoogleDrivePicker({ disabled, onPick, onLoadingChange, onImportE
   };
 
   const handleFilePicked: DrivePickerEventHandlers['onPicked'] = async function (e) {
-    logEvent(e.detail);
     setOpen(false);
     const selectedDocument = e.detail.docs?.[0] as GooglePickerDocument | undefined;
 
     if (!selectedDocument?.id) {
-      const message = 'No Google Drive file was selected.';
-      onImportError?.(message);
-      toast(message);
+      pushErrorMessages(['No Google Drive file was selected.']);
       return;
     }
 
-    if (!accessToken) {
-      const message = 'Google Drive authorization is unavailable. Please try again.';
-      onImportError?.(message);
-      toast(message);
+    if (!googleAccessToken) {
+      pushErrorMessages(['Google Drive authorization is unavailable. Please try again.']);
       return;
     }
 
     try {
       onLoadingChange?.(true);
       const fileData = await googleDriveFileToUploadedFileData({
-        accessToken,
+        accessToken: googleAccessToken,
         file: selectedDocument,
       });
-      onImportError?.('');
       await onPick?.(fileData);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Cannot import file from Google Drive.';
-      onImportError?.(message);
-      toast(message);
+      pushErrorMessages([message]);
     } finally {
       onLoadingChange?.(false);
     }
@@ -97,7 +90,7 @@ export function GoogleDrivePicker({ disabled, onPick, onLoadingChange, onImportE
         <DrivePicker
           app-id={GOOGLE_APP_ID}
           client-id={GOOGLE_CLIENT_ID}
-          oauth-token={accessToken}
+          oauth-token={googleAccessToken ?? undefined}
           max-items={1}
           onCanceled={handleCanceled}
           onPicked={handleFilePicked}
@@ -111,11 +104,4 @@ export function GoogleDrivePicker({ disabled, onPick, onLoadingChange, onImportE
       )}
     </React.Fragment>
   );
-}
-
-// TODO: Move accessToken to global state
-
-function logEvent(event: unknown) {
-  // TODO: Remove this
-  console.log(event);
 }

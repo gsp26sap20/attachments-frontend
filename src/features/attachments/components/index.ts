@@ -1,5 +1,4 @@
 export { FilePreview } from './file-preview';
-export { UploadVersion } from './upload-version';
 export { AttachmentCard } from './attachment-card';
 export { AttachmentForm } from './attachment-form';
 export { AttachmentAudit } from './attachment-audit';
