@@ -4,14 +4,14 @@ import '@ui5/webcomponents/dist/Assets.js';
 import { Toaster } from '@/components/toast';
 import { createRoot } from 'react-dom/client';
 import { ToastDemoView } from '@/views/toast-demo';
+import { ShellHomeView, AdminHomeView } from '@/views';
 import '@ui5/webcomponents-react/dist/json-imports/i18n.js';
 import { ErrorsMessageBox } from '@/components/errors-message-box';
 import { QueryProvider } from '@/context-providers/query-provider';
 import { HashRouter, Navigate, Route, Routes } from 'react-router';
 import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
-import { AttachmentsDetailView, ShellHomeView, AdminHomeView } from '@/views';
 import { BoDetailView, BoListView, UserCreateView, UserListView } from '@/views';
-import { AttachmentListView, VersionDetailView, UploadVersionView } from '@/views';
+import { AttachmentListView, AttachmentsDetailView, VersionDetailView } from '@/views';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -38,7 +38,6 @@ createRoot(document.getElementById('root')!).render(
             {/* Attachments */}
             <Route path="/attachments" element={<AttachmentListView />} />
             <Route path="/attachments/:id" element={<AttachmentsDetailView />} />
-            <Route path="/attachments/:id/upload" element={<UploadVersionView />} />
             <Route path="/attachments/:id/versions/:versionNo" element={<VersionDetailView />} />
             <Route path="*" element={<Navigate replace to="/shell-home" />} />
             {/* TODO: Handle 404 page */}

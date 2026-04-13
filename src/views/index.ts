@@ -1,7 +1,6 @@
 export { BoListView } from './bo-list';
 export { ShellHomeView } from './shell-home-view';
 export { AdminHomeView } from './admin-home-view';
-export { UploadVersionView } from './upload-version-view';
 export { VersionDetailView } from './version-detail-view';
 export { BoDetailView } from './bo-detail';
 export { UserListView } from './user-list';

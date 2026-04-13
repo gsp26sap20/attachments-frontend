@@ -1,5 +1,6 @@
 import * as React from 'react';
 import '@ui5/webcomponents-icons/add.js';
+import { FileUpload } from './file-upload';
 import { useNavigate } from 'react-router';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { pushApiErrorMessages } from '@/libs/errors';
@@ -75,15 +76,8 @@ export function AttachmentVersion({ fileId, isActive }: { fileId: string; isActi
           <Toolbar className="py-2 px-4 rounded-t-xl">
             <Title level="H4">Versions {totalCount ? `(${totalCount})` : ''}</Title>
             <ToolbarSpacer />
-            <Button
-              design="Emphasized"
-              icon="add"
-              onClick={() => navigate(`/attachments/${fileId}/upload`)}
-              disabled={!isActive}
-              className="h-8"
-            >
-              Upload
-            </Button>
+            {/* ToolbarButton - FileUpload */}
+            <FileUpload fileId={fileId} disabled={!isActive} />
           </Toolbar>
         }
         data={versions}
@@ -111,3 +105,5 @@ export function AttachmentVersion({ fileId, isActive }: { fileId: string; isActi
     </>
   );
 }
+
+// TODO: Rename to AttachmentVersionList

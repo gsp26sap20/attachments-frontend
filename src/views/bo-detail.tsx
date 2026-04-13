@@ -252,9 +252,9 @@ export function BoDetailView() {
           </div>
         </ObjectPageSection>
         <ObjectPageSection
-          aria-label="Linked Attachments"
-          id="linked-attachments"
-          titleText="Linked Attachments"
+          aria-label="Attachments"
+          id="attachments"
+          titleText="Attachments"
           style={{ display: isBizObjectFetching ? 'none' : 'block' }}
         >
           <BizObjectLinkedAttachments

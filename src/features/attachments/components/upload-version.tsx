@@ -1,42 +1,34 @@
 import * as React from 'react';
 import { cn } from '@/libs/utils';
-import '@ui5/webcomponents-icons/add.js';
 import { FilePreview } from './file-preview';
-import '@ui5/webcomponents-icons/decline.js';
 import { MAX_FILE_SIZE } from '@/app-constant';
 import type { UploadedFileData } from '../types';
+import { pushErrorMessages } from '@/libs/errors';
 import '@ui5/webcomponents-icons/upload-to-cloud.js';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { fileToUploadedFileData } from '../upload-file';
-import { Button } from '@ui5/webcomponents-react/Button';
 import { GoogleDrivePicker } from './google-drive-picker';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
-import { MessageStrip } from '@ui5/webcomponents-react/MessageStrip';
 import { FileUploader, type FileUploaderPropTypes } from '@ui5/webcomponents-react/FileUploader';
 
 interface UploadVersionProps {
+  fileData: UploadedFileData | null;
+  onFileDataChange: (fileData: UploadedFileData | null) => void;
   className?: string;
-  onUpload?: (fileData: UploadedFileData) => void;
-  onCancel?: () => void;
 }
 
-export function UploadVersion({ className, onUpload, onCancel }: UploadVersionProps) {
-  const [fileData, setFileData] = React.useState<UploadedFileData | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
+export function UploadVersion({ fileData, onFileDataChange, className }: UploadVersionProps) {
   const [loading, setLoading] = React.useState(false);
 
   const applySelectedFile = function (nextFileData: UploadedFileData) {
-    setError(null);
-    setFileData(nextFileData);
-    onUpload?.(nextFileData);
+    onFileDataChange(nextFileData);
   };
 
   const handleChange: FileUploaderPropTypes['onChange'] = async function (event) {
     const file: File | undefined = event.target?.files?.[0];
     if (!file) return;
 
-    setError(null);
-    setFileData(null);
+    onFileDataChange(null);
 
     try {
       setLoading(true);
@@ -44,8 +36,12 @@ export function UploadVersion({ className, onUpload, onCancel }: UploadVersionPr
       applySelectedFile(payload);
     } catch (err) {
       console.error(err);
-      setError(err instanceof Error ? err.message : "Can't read file");
+      pushErrorMessages([err instanceof Error ? err.message : "Can't read file"]);
     } finally {
+      // Clear the input so selecting the same file again still fires onChange.
+      if (event.target) {
+        event.target.value = '';
+      }
       setLoading(false);
     }
   };
@@ -58,11 +54,6 @@ export function UploadVersion({ className, onUpload, onCancel }: UploadVersionPr
       style={{ gap: '1rem' }}
       className={cn('w-full', className)}
     >
-      {error && (
-        <MessageStrip design="Negative" hideCloseButton>
-          {error}
-        </MessageStrip>
-      )}
       {!fileData && (
         <FileUploader hideInput onChange={handleChange} className="w-full" disabled={loading}>
           <div className="w-full min-h-[50dvh] rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer p-6">
@@ -79,15 +70,17 @@ export function UploadVersion({ className, onUpload, onCancel }: UploadVersionPr
                     disabled={loading}
                     onPick={applySelectedFile}
                     onImportError={(message) => {
-                      setError(message || null);
+                      if (message) {
+                        pushErrorMessages([message]);
+                      }
                     }}
                     onLoadingChange={(nextLoading) => {
                       setLoading(nextLoading);
                       if (nextLoading) {
-                        setError(null);
-                        setFileData(null);
+                        onFileDataChange(null);
                       }
                     }}
+                    // TODO: re-check this logic
                   />
                 </>
               )}
@@ -97,23 +90,15 @@ export function UploadVersion({ className, onUpload, onCancel }: UploadVersionPr
         </FileUploader>
       )}
       {fileData && (
-        <FlexBox direction="Row" alignItems="Center" justifyContent="SpaceBetween">
-          <Button
-            design="Negative"
-            icon="decline"
-            onClick={() => {
-              setFileData(null);
-              setError(null);
-              onCancel?.();
-            }}
-          >
-            Cancel
-          </Button>
-        </FlexBox>
-      )}
-      {fileData && (
-        <FilePreview mimeType={fileData.MimeType} fileContent={fileData.FileContent} fileName={fileData.FileName} />
+        <FilePreview
+          mimeType={fileData.MimeType}
+          fileContent={fileData.FileContent}
+          fileName={fileData.FileName}
+          className="p-2"
+        />
       )}
     </FlexBox>
   );
 }
+
+// TODO: Rename to FilePicker
