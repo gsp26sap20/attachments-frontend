@@ -43,7 +43,7 @@ export function attachmentsQueryOptions(params: AttachmentListParams) {
 
 export function attachmentDetailQueryOptions(id: string, params: AttachmentDetailParams) {
   return queryOptions({
-    queryKey: ['attachments', id, params],
+    queryKey: ['attachments', id, 'detail', params],
     queryFn: () => {
       const res = axiosInstance.get<AttachmentDetailResponse>(`${ODATA_SERVICE.ATTACHMENT}${API.endpoint}(${id})`, {
         params,

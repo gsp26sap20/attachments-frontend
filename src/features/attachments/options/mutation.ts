@@ -2,12 +2,11 @@ import { MUTATION_API } from '../constants';
 import { ODATA_SERVICE } from '@/app-constant';
 import { pushApiErrorMessages } from '@/libs/errors';
 import { axiosInstance } from '@/libs/axios-instance';
-import type { CreateAttachmentPayload } from '../types';
-import type { UpdateAttachmentPayload } from '../types';
 import { mutationOptions } from '@tanstack/react-query';
 import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers';
 import type { RollbackVersionPayload, UploadVersionResponse } from '../types';
 import type { UploadVersionPayload, CreateAttachmentResponse } from '../types';
+import type { LinkBoPayload, CreateAttachmentPayload, UpdateAttachmentPayload } from '../types';
 
 type Params = {
   fileId: string;
@@ -18,6 +17,11 @@ type Params = {
 type CreateAttachmentParams = {
   onSuccess?: (data: CreateAttachmentResponse) => void;
   onError?: (_error: unknown) => void;
+};
+
+type LinkBoMutationParams = {
+  onSuccess?: () => void;
+  onError?: (_error: Error) => void;
 };
 
 export function rollbackVersionMutationOptions({ fileId, onSuccess, onError }: Params) {
@@ -162,6 +166,32 @@ export function createAttachmentMutationOptions({ onSuccess, onError }: CreateAt
           },
         },
       );
+      return res;
+    },
+    onSuccess,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
+  });
+}
+
+export function linkBoToAttachmentMutationOptions({ onSuccess, onError }: LinkBoMutationParams) {
+  return mutationOptions({
+    mutationFn: async (payload: LinkBoPayload) => {
+      let token = getCsrfToken();
+
+      if (!token) {
+        await fetchCsrfToken(ODATA_SERVICE.ATTACHMENT);
+        token = getCsrfToken();
+      }
+
+      const res = await axiosInstance.post(`${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.linkBo()}`, payload, {
+        headers: {
+          'accept-language': 'en',
+          ...(token ? { 'x-csrf-token': token } : {}),
+        },
+      });
       return res;
     },
     onSuccess,

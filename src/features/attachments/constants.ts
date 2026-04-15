@@ -19,4 +19,6 @@ export const MUTATION_API = {
   updateAttachmentTitle: (fileId: string) => `/Attachments(${fileId})?sap-client=324`,
   createAttachment: '/Attachments?sap-client=324',
   uploadVersion: '/AttachmentVersions?sap-client=324',
+  linkBo: () => `/BizObjectAttachmentLink?sap-client=324`,
+  unlinkBo: (boId: string, fileId: string) => `/BizObjectAttachmentLink(BoId=${boId},FileId=${fileId})?sap-client=324`,
 };

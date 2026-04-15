@@ -21,10 +21,10 @@ import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
 import { validateFileTitle } from '@/features/attachments/validate';
+import { AttachmentBizList } from '@/features/attachments/components';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { pushErrorMessages, pushApiErrorMessages } from '@/libs/errors';
 import { NotFoundIllustrated } from '@/components/not-found-illustrated';
-import { AttachmentBizObjects } from '@/features/attachments/components';
 import { BreadcrumbsItem } from '@ui5/webcomponents-react/BreadcrumbsItem';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -341,7 +341,7 @@ export function AttachmentDetailView() {
           titleText="Linked Objects"
           style={{ display: isFetching ? 'none' : 'block' }}
         >
-          <AttachmentBizObjects fileId={id!} isActive={attachment?.IsActive || false} />
+          <AttachmentBizList fileId={id!} isActive={attachment?.IsActive || false} />
         </ObjectPageSection>
         <ObjectPageSection
           aria-label="Audit Log"

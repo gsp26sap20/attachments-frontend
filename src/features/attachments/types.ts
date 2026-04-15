@@ -218,3 +218,8 @@ export type LinkedAttachment = AttachmentListItem;
 export type AttachmentCurrentVersion = AttachmentTitleResponse;
 
 export type AttachmentCurrentVersionParams = AttachmentTitleParams;
+
+export type LinkBoPayload = {
+  BoId: string;
+  FileId: string;
+};
