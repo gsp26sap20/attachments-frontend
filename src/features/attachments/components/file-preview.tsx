@@ -53,6 +53,7 @@ export function FilePreview({
       <MessageStrip design="Critical" hideCloseButton style={{ width: '100%' }}>
         This {mimeType} file is not supported for preview.
       </MessageStrip>
+      // TODO: Make it a button to download the file
     );
   }
 

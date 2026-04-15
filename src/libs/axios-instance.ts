@@ -1,7 +1,7 @@
 import qs from 'qs';
-import { setCsrfToken } from './helpers';
 import { ODATA_BASE_URL } from '@/app-constant';
 import axios, { type AxiosRequestConfig } from 'axios';
+import { setCsrfToken, clearCsrfToken } from './helpers';
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
@@ -41,9 +41,11 @@ api.interceptors.response.use(
     return response.data;
   },
   async (error) => {
-    if (error.response && error.response.status === 401) {
-      console.warn('Token was expired or invalid!');
-      // TODO: Notify user and handle error
+    if (axios.isAxiosError(error) && error.response?.status === 403) {
+      const message = String(error.response.headers?.['x-csrf-token'] ?? '');
+      if (message.toLowerCase() === 'required') {
+        clearCsrfToken();
+      }
     }
     return Promise.reject(error);
   },

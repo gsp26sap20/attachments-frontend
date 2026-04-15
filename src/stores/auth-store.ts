@@ -8,9 +8,9 @@ export type AuthState = {
 };
 
 export type AuthAction = {
-  setIsAdmin: (_isAdmin: boolean) => void;
-  setCsrfToken: (_csrfToken: string) => void;
-  setGoogleAccessToken: (_googleAccessToken: string | null) => void;
+  setIsAdmin: (isAdmin: boolean) => void;
+  setCsrfToken: (csrfToken: string | null) => void;
+  setGoogleAccessToken: (googleAccessToken: string | null) => void;
 };
 
 export type AuthStore = AuthState & AuthAction;

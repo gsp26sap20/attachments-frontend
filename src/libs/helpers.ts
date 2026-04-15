@@ -9,6 +9,10 @@ export function setCsrfToken(csrfToken: string) {
   useAuthStore.getState().setCsrfToken(csrfToken);
 }
 
+export function clearCsrfToken() {
+  useAuthStore.getState().setCsrfToken(null);
+}
+
 export function fetchCsrfToken(serviceRoot: string) {
   return axiosInstance.get(`${serviceRoot}/$metadata`, {
     headers: {

@@ -41,6 +41,14 @@ function validateFileName(fileName: string) {
   return '';
 }
 
-export { validateFileName };
+function validateFileTitle(value: string) {
+  if (!value.trim()) {
+    return 'Title cannot be empty';
+  }
+
+  return '';
+}
+
+export { validateFileName, validateFileTitle };
 
 // TODO: All validate user input here
