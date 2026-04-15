@@ -15,9 +15,6 @@ export type BizObjectItem = {
     Deletable: boolean;
     Updatable: boolean;
   };
-  __OperationControl: {
-    link_attachment: boolean;
-  };
 };
 
 export type BizObjectListParams = {

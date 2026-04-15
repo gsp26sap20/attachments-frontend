@@ -7,4 +7,4 @@ export { UserListView } from './user-list';
 export { UserCreateView } from './user-create';
 export { ConfigFileView } from './config-file-view';
 export { AttachmentListView } from './attachment-list';
-export { AttachmentsDetailView } from './attachments-detail-view';
+export { AttachmentDetailView } from './attachment-detail';

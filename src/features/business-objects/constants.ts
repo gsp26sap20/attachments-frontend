@@ -8,7 +8,7 @@ export const API = {
 export const MUTATION_API = {
   linkAttachment: (boId: string) =>
     `/BizObject(BoId=${boId})/com.sap.gateway.srvd.zui_bizobj_srv.v0001.link_attachment?sap-client=324`,
-  // TODO: change "link_attachment" to PascalCase "LinkAttachment"
+  // TODO: refactor/ change time when create/delete link
   unlinkAttachment: (boId: string, fileId: string) =>
     `/BizObjectAttachmentLink(BoId=${boId},FileId=${fileId})?sap-client=324`,
 };

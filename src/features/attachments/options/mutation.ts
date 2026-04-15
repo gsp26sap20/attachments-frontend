@@ -3,6 +3,7 @@ import { ODATA_SERVICE } from '@/app-constant';
 import { pushApiErrorMessages } from '@/libs/errors';
 import { axiosInstance } from '@/libs/axios-instance';
 import type { CreateAttachmentPayload } from '../types';
+import type { UpdateAttachmentPayload } from '../types';
 import { mutationOptions } from '@tanstack/react-query';
 import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers';
 import type { RollbackVersionPayload, UploadVersionResponse } from '../types';
@@ -80,7 +81,7 @@ export function deleteAttachmentMutationOptions({ fileId, onSuccess, onError }: 
 
 export function updateAttachmentTitleMutationOptions({ fileId, onSuccess, onError }: Params) {
   return mutationOptions({
-    mutationFn: async (payload: { Title: string }) => {
+    mutationFn: async (payload: UpdateAttachmentPayload) => {
       let token = getCsrfToken();
       if (!token) {
         await fetchCsrfToken(ODATA_SERVICE.ATTACHMENT);

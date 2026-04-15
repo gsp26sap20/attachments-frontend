@@ -40,8 +40,13 @@ export type AttachmentDetailResponse = {
   Title: string;
   CurrentVersion: string;
   IsActive: boolean;
+  EditLock: boolean;
   Erdat: string;
+  Erzet: string;
   Ernam: string;
+  Aedat: string;
+  Aezet: string;
+  Aenam: string;
   __EntityControl: {
     Deletable: boolean;
     Updatable: boolean;
@@ -50,6 +55,7 @@ export type AttachmentDetailResponse = {
     FileName: string;
     MimeType: string;
     FileContent: string;
+    FileExtension: string;
   };
 };
 
@@ -158,6 +164,11 @@ export type UploadVersionResponse = {
 };
 
 export type CreateAttachmentPayload = {
+  Title: string;
+  EditLock: boolean;
+};
+
+export type UpdateAttachmentPayload = {
   Title: string;
   EditLock: boolean;
 };
