@@ -211,6 +211,7 @@ export function AttachmentCreate() {
           mimeType={fileData.MimeType}
           fileContent={fileData.FileContent}
           fileName={fileData.FileName}
+          fileExtension={fileData.FileExtension}
           className="p-2"
         />
         <BusyIndicator type="pending" show={isPending} />

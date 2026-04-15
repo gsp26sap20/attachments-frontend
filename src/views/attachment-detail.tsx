@@ -319,6 +319,7 @@ export function AttachmentDetailView() {
               mimeType={attachment?._CurrentVersion?.MimeType}
               fileContent={attachment?._CurrentVersion?.FileContent}
               fileName={attachment?._CurrentVersion?.FileName}
+              fileExtension={attachment?._CurrentVersion?.FileExtension}
             />
           </div>
         </ObjectPageSection>

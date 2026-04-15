@@ -62,12 +62,11 @@ function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: Bi
 
   const { mutate: linkAttachmentToBo, isPending } = useMutation(
     linkAttachmentToBoMutationOptions({
-      boId,
       onSuccess: () => {
         toast('Attachment linked successfully');
         setSelectedAttachment(null);
         setOpen(false);
-        queryClient.invalidateQueries({ queryKey: ['biz-objects', boId, 'linked-attachments'] });
+        queryClient.invalidateQueries({ queryKey: ['biz-objects', boId] });
       },
       onError: (error) => {
         const messages = getError(error);
@@ -134,7 +133,8 @@ function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: Bi
                   onClick={() => {
                     if (!selectedAttachment) return;
                     linkAttachmentToBo({
-                      file_id: selectedAttachment.id,
+                      BoId: boId,
+                      FileId: selectedAttachment.id,
                     });
                   }}
                   className="h-8"

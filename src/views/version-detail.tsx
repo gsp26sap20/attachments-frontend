@@ -261,7 +261,12 @@ export function VersionDetailView() {
           style={{ display: isFetching ? 'none' : 'block' }}
         >
           <div className="p-2 rounded-lg bg-background">
-            <FilePreview mimeType={version?.MimeType} fileContent={version?.FileContent} fileName={version?.FileName} />
+            <FilePreview
+              mimeType={version?.MimeType}
+              fileContent={version?.FileContent}
+              fileName={version?.FileName}
+              fileExtension={version?.FileExtension}
+            />
           </div>
         </ObjectPageSection>
       </ObjectPage>

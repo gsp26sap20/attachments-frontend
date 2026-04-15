@@ -76,11 +76,11 @@ export type CreateBizObjectResponse = BizObjectItem;
 export type UpdateBizObjectPayload = CreateBizObjectPayload;
 
 export type LinkAttachmentPayload = {
-  file_id: string;
-  // TODO: change "file_id" to "FileId" PascalCase
+  BoId: string;
+  FileId: string;
 };
 
-export type UnlinkAttachmentPayload = {
-  file_id: string;
-  // TODO: change "file_id" to "FileId" PascalCase
+export type UnlinkAttachmentParams = {
+  BoId: string;
+  FileId: string;
 };

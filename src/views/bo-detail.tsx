@@ -323,3 +323,5 @@ export function BoDetailView() {
     </div>
   );
 }
+
+// TODO: Disable unlink when have linked attachments

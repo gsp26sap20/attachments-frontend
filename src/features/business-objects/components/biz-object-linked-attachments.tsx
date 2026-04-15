@@ -78,10 +78,9 @@ export function BizObjectLinkedAttachments({ boId, disabled }: BizObjectLinkedAt
 
   const { mutate: unlinkAttachmentFromBo, isPending } = useMutation(
     unlinkAttachmentFromBoMutationOptions({
-      boId,
       onSuccess: () => {
         toast('Attachment unlinked successfully');
-        queryClient.invalidateQueries({ queryKey: ['biz-objects', boId, 'linked-attachments'] });
+        queryClient.invalidateQueries({ queryKey: ['biz-objects', boId] });
       },
       onError: (error) => {
         const messages = getError(error);
@@ -169,7 +168,8 @@ export function BizObjectLinkedAttachments({ boId, disabled }: BizObjectLinkedAt
           setDeleteDialogOpen(false);
           if (action === 'OK' && attachmentToDelete?.fileId) {
             unlinkAttachmentFromBo({
-              file_id: attachmentToDelete.fileId,
+              FileId: attachmentToDelete.fileId,
+              BoId: boId,
             });
           }
           setAttachmentToDelete(null);
