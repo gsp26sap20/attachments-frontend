@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/document.js';
+import { useAuthStore } from '@/stores/auth-store';
 import { Card } from '@ui5/webcomponents-react/Card';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { List } from '@ui5/webcomponents-react/List';
@@ -22,6 +23,7 @@ type AttachmentCardProps = {
 
 export function AttachmentCard({ data, loading }: AttachmentCardProps) {
   const navigate = useNavigate();
+  const isAdmin = useAuthStore((state) => state.isAdmin);
 
   return (
     <Card
@@ -30,7 +32,7 @@ export function AttachmentCard({ data, loading }: AttachmentCardProps) {
           avatar={<Icon name="document" />}
           titleText={data.Title}
           subtitleText={`Version ${data.CurrentVersion}`}
-          additionalText={data.IsActive ? 'Active' : 'Inactive'}
+          additionalText={isAdmin ? (data.IsActive ? 'Active' : 'Inactive') : undefined}
           interactive={true}
           onClick={() => navigate(`/attachments/${data.FileId}`)}
         />
@@ -38,7 +40,7 @@ export function AttachmentCard({ data, loading }: AttachmentCardProps) {
       loading={loading}
     >
       <List>
-        <ListItemStandard text="Is Active" description={data.IsActive ? 'Yes' : 'No'} />
+        {isAdmin && <ListItemStandard text="Is Active" description={data.IsActive ? 'Yes' : 'No'} />}
         <ListItemStandard text="Created On" description={data.Erdat} />
         <ListItemStandard text="Created By" description={data.Ernam} />
       </List>

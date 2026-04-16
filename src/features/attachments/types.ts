@@ -1,3 +1,5 @@
+import type { BizObjectItem } from '@/features/business-objects/types';
+
 export type AttachmentListItem = {
   FileId: string;
   Title: string;
@@ -31,7 +33,7 @@ export type AttachmentListParams = {
 
 export type AttachmentDetailParams = {
   'sap-client': number;
-  $select: string;
+  $select?: string;
   $expand?: string;
 };
 
@@ -40,16 +42,25 @@ export type AttachmentDetailResponse = {
   Title: string;
   CurrentVersion: string;
   IsActive: boolean;
+  EditLock: boolean;
   Erdat: string;
+  Erzet: string;
   Ernam: string;
+  Aedat: string;
+  Aezet: string;
+  Aenam: string;
   __EntityControl: {
     Deletable: boolean;
     Updatable: boolean;
+  };
+  __OperationControl: {
+    Reactivate: boolean;
   };
   _CurrentVersion?: {
     FileName: string;
     MimeType: string;
     FileContent: string;
+    FileExtension: string;
   };
 };
 
@@ -58,11 +69,8 @@ export type AttachmentVersionItem = {
   VersionNo: string;
   FileName: string;
   Erdat: string;
+  Erzet: string;
   Ernam: string;
-  __EntityControl: {
-    Deletable: boolean;
-    Updatable: boolean;
-  };
 };
 
 export type AttachmentVersionsResponse = {
@@ -109,11 +117,9 @@ export type VersionDetail = {
   MimeType: string;
   FileSize: number;
   FileContent: string;
+  Erdat: string;
+  Erzet: string;
   Ernam: string;
-  __EntityControl: {
-    Deletable: boolean;
-    Updatable: boolean;
-  };
 };
 
 export type VersionDetailParams = {
@@ -162,22 +168,24 @@ export type CreateAttachmentPayload = {
   EditLock: boolean;
 };
 
+export type UpdateAttachmentPayload = {
+  Title: string;
+  EditLock: boolean;
+};
+
 export type CreateAttachmentResponse = {
   FileId: string;
   Title: string;
   EditLock: boolean;
 };
 
-type BizObject = {
-  BoId: string;
-  BoType: string;
-  BoTitle: string;
-};
-
 type AttachmentBizObject = {
   BoId: string;
   FileId: string;
-  _Bo: BizObject;
+  Erdat: string;
+  Erzet: string;
+  Ernam: string;
+  _Bo: BizObjectItem;
 };
 
 export type AttachmentBizObjectsResponse = {
@@ -187,8 +195,11 @@ export type AttachmentBizObjectsResponse = {
 
 export type AttachmentBizObjectsParams = {
   'sap-client': number;
-  $count: boolean;
-  $expand: string;
+  $count?: boolean;
+  $select?: string;
+  $skip?: number;
+  $top?: number;
+  $expand?: string;
 };
 
 export type GooglePickerDocument = {
@@ -208,3 +219,14 @@ export type GooglePickerDocument = {
 };
 
 export type LinkedAttachment = AttachmentListItem;
+
+export type AttachmentCurrentVersion = AttachmentTitleResponse;
+
+export type AttachmentCurrentVersionParams = AttachmentTitleParams;
+
+export type LinkBoPayload = {
+  BoId: string;
+  FileId: string;
+};
+
+export type UnlinkBoPayload = LinkBoPayload;

@@ -60,7 +60,7 @@ export function BizCreate() {
 
   return (
     <React.Fragment>
-      <ToolbarButton design="Transparent" text="New" onClick={() => setOpen(true)} />
+      <ToolbarButton design="Transparent" text="Create" onClick={() => setOpen(true)} />
       <Dialog
         open={open}
         resizable
@@ -75,7 +75,7 @@ export function BizCreate() {
                 <Button design="Emphasized" onClick={handleSubmit} disabled={isOkDisabled} className="h-8">
                   OK
                 </Button>
-                <Button design="Transparent" onClick={() => setOpen(false)} className="h-8">
+                <Button design="Transparent" onClick={() => setOpen(false)} className="h-8" disabled={isPending}>
                   Cancel
                 </Button>
               </React.Fragment>
@@ -84,7 +84,7 @@ export function BizCreate() {
         }
       >
         <BizForm value={values} onChange={setValues} inputClassName="md:w-full" />
-        {isPending && <BusyIndicator type="pending" />}
+        <BusyIndicator type="pending" show={isPending} />
       </Dialog>
       {errorBoxOpen && errorBoxMessages.length > 0 && (
         <MessageBox

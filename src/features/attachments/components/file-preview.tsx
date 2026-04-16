@@ -6,12 +6,14 @@ export function FilePreview({
   mimeType,
   fileContent,
   fileName,
+  fileExtension,
   className,
   onlyImage,
 }: {
   mimeType?: string;
   fileContent?: string;
   fileName?: string;
+  fileExtension?: string;
   className?: string;
   onlyImage?: boolean;
 }) {
@@ -51,10 +53,11 @@ export function FilePreview({
   if (preview.isUnsupported) {
     return (
       <MessageStrip design="Critical" hideCloseButton style={{ width: '100%' }}>
-        This {mimeType} file is not supported for preview.
+        This {fileExtension ? `".${fileExtension}"` : ''} file is not supported for preview.
       </MessageStrip>
     );
   }
+  // TODO: Make it a button to download the file
 
   return (
     <MessageStrip design="Negative" hideCloseButton style={{ width: '100%' }}>

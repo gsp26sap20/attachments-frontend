@@ -1,4 +1,5 @@
 import * as React from 'react';
+import axios from 'axios';
 import { toast } from '@/libs/toast';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/decline.js';
@@ -113,7 +114,9 @@ export function BoDetailView() {
     }
   }, [bizObjectError]);
 
-  if (bizObjectError && bizObjectError.status === 404) {
+  const isBizObjectNotFound = axios.isAxiosError(bizObjectError) && bizObjectError.response?.status === 404;
+
+  if (bizObjectError && isBizObjectNotFound) {
     return (
       <NotFoundIllustrated
         title="Business Object Not Found"
@@ -252,15 +255,12 @@ export function BoDetailView() {
           </div>
         </ObjectPageSection>
         <ObjectPageSection
-          aria-label="Linked Attachments"
-          id="linked-attachments"
-          titleText="Linked Attachments"
+          aria-label="Attachments"
+          id="attachments"
+          titleText="Attachments"
           style={{ display: isBizObjectFetching ? 'none' : 'block' }}
         >
-          <BizObjectLinkedAttachments
-            boId={id!}
-            disabled={!bizObject || !bizObject?.__OperationControl.link_attachment}
-          />
+          <BizObjectLinkedAttachments boId={id!} disabled={!bizObject} />
         </ObjectPageSection>
         {editMode && (
           <MutationBar
@@ -323,3 +323,5 @@ export function BoDetailView() {
     </div>
   );
 }
+
+// TODO: Disable unlink when have linked attachments
