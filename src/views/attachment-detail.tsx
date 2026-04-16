@@ -42,6 +42,7 @@ export function AttachmentDetailView() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isAdmin = useAuthStore((state) => state.isAdmin);
+  const username = useAuthStore((state) => state.username);
   const [isEditMode, setIsEditMode] = React.useState(false);
   const [titleError, setTitleError] = React.useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
@@ -99,6 +100,15 @@ export function AttachmentDetailView() {
     }),
   );
 
+  const isOwner = username === attachment?.Ernam;
+  const canModifyLockedAttachment = !attachment?.EditLock || isOwner;
+  const canEditAttachment = Boolean(
+    attachment?.IsActive && attachment.__EntityControl?.Updatable && canModifyLockedAttachment,
+  );
+  const canDeleteAttachment = Boolean(
+    attachment?.IsActive && attachment.__EntityControl?.Deletable && canModifyLockedAttachment,
+  );
+
   const refetchAttachment = function () {
     queryClient.invalidateQueries({
       queryKey: ['attachments', id],
@@ -106,6 +116,10 @@ export function AttachmentDetailView() {
   };
 
   const handleEditModeOn = function () {
+    if (!canEditAttachment) {
+      return;
+    }
+
     setEditValues({
       title: attachment?.Title || '',
       editLock: attachment?.EditLock ?? false,
@@ -183,12 +197,12 @@ export function AttachmentDetailView() {
             actionsBar={
               !isEditMode ? (
                 <Toolbar design="Transparent" style={{ height: 'auto' }}>
-                  {attachment && attachment.__EntityControl?.Updatable && attachment?.IsActive && (
+                  {attachment && canEditAttachment && (
                     <ToolbarButton
                       design="Emphasized"
                       text="Edit"
                       onClick={() => handleEditModeOn()}
-                      disabled={!attachment?.IsActive || !attachment?.__EntityControl?.Updatable}
+                      disabled={!canEditAttachment}
                     />
                   )}
                   {isAdmin && attachment && !attachment.IsActive && attachment.__OperationControl?.Reactivate && (
@@ -199,12 +213,12 @@ export function AttachmentDetailView() {
                       disabled={attachment.IsActive || isRestoring}
                     />
                   )}
-                  {attachment && attachment.IsActive && attachment.__EntityControl?.Deletable && (
+                  {attachment && canDeleteAttachment && (
                     <ToolbarButton
                       design="Default"
                       text="Delete"
                       onClick={() => setDeleteDialogOpen(true)}
-                      disabled={isDeleting || !attachment?.IsActive || !attachment?.__EntityControl?.Deletable}
+                      disabled={isDeleting || !canDeleteAttachment}
                     />
                   )}
                   <ToolbarButton
@@ -394,8 +408,10 @@ export function AttachmentDetailView() {
         actions={['Cancel', 'OK']}
         onClose={(action) => {
           setDeleteDialogOpen(false);
-          if (action === 'OK' && attachment?.FileId) {
+          if (action === 'OK' && attachment?.FileId && canDeleteAttachment) {
             deleteAttachment();
+          } else if (action === 'OK' && attachment?.FileId && !canDeleteAttachment) {
+            pushErrorMessages(['You do not have permission to delete this attachment']);
           }
         }}
       >
