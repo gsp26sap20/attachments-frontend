@@ -12,6 +12,7 @@ import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
+import type { ConfigFileItem } from '@/features/config-files/types';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
@@ -19,9 +20,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { configFilesQueryOptions } from '@/features/config-files/options/query';
 import { enableConfigFileMutationOptions } from '@/features/config-files/options/mutation';
-import { ConfigFileCreate, ConfigFilesFilterBar } from '@/features/config-files/components';
 import type { AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 import { disableConfigFileMutationOptions } from '@/features/config-files/options/mutation';
+import { ConfigFileCreate, ConfigFileEdit, ConfigFilesFilterBar } from '@/features/config-files/components';
 
 const rawColumns = [
   { Header: 'File Ext', accessor: 'FileExt' },
@@ -39,9 +40,9 @@ const rawColumns = [
     Cell: (props: AnalyticalTableCellInstance) => formatFileSize(props.value),
   },
   {
-    Header: 'Status',
+    Header: 'Is Active',
     accessor: 'IsActive',
-    Cell: (props: AnalyticalTableCellInstance) => (props.value === 'X' || props.value === true ? 'Active' : 'Inactive'),
+    Cell: (props: AnalyticalTableCellInstance) => (props.value === 'X' || props.value === true ? 'Yes' : 'No'),
   },
 ];
 
@@ -50,6 +51,7 @@ export function ConfigFileListView() {
   const isAdmin = useAuthStore((state) => state.isAdmin);
   const queryClient = useQueryClient();
   const [search, setSearch] = React.useState('');
+  const [configFileToEdit, setConfigFileToEdit] = React.useState<ConfigFileItem | null>(null);
   // TODO: BE enable search for config files, users
   const [filter, setFilter] = React.useState('');
   const configFileListParams = React.useMemo(
@@ -95,32 +97,52 @@ export function ConfigFileListView() {
       ...rawColumns,
       {
         Header: 'Actions',
-        Cell: (props: AnalyticalTableCellInstance) =>
-          props.row.original.IsActive === 'X' || props.row.original.IsActive === true ? (
+        Cell: (props: AnalyticalTableCellInstance) => (
+          <FlexBox alignItems="Center" className="gap-2">
             <Button
               design="Transparent"
               className="h-6.5"
               disabled={
-                !props.row.original.__OperationControl?.disable || isEnablingConfigFile || isDisablingConfigFile
+                isEnablingConfigFile ||
+                isDisablingConfigFile ||
+                !props.row.original.__EntityControl?.Updatable ||
+                (props.row.original.IsActive !== 'X' && props.row.original.IsActive !== true)
               }
               onClick={() => {
-                disableConfigFile({ FileExt: props.row.original.FileExt });
+                setConfigFileToEdit(props.row.original);
               }}
             >
-              Disable
+              Edit
             </Button>
-          ) : (
-            <Button
-              design="Transparent"
-              className="h-6.5"
-              disabled={!props.row.original.__OperationControl?.enable || isEnablingConfigFile || isDisablingConfigFile}
-              onClick={() => {
-                enableConfigFile({ FileExt: props.row.original.FileExt });
-              }}
-            >
-              Enable
-            </Button>
-          ),
+            {props.row.original.IsActive === 'X' || props.row.original.IsActive === true ? (
+              <Button
+                design="Transparent"
+                className="h-6.5"
+                disabled={
+                  !props.row.original.__OperationControl?.disable || isEnablingConfigFile || isDisablingConfigFile
+                }
+                onClick={() => {
+                  disableConfigFile({ FileExt: props.row.original.FileExt });
+                }}
+              >
+                Disable
+              </Button>
+            ) : (
+              <Button
+                design="Transparent"
+                className="h-6.5"
+                disabled={
+                  !props.row.original.__OperationControl?.enable || isEnablingConfigFile || isDisablingConfigFile
+                }
+                onClick={() => {
+                  enableConfigFile({ FileExt: props.row.original.FileExt });
+                }}
+              >
+                Enable
+              </Button>
+            )}
+          </FlexBox>
+        ),
       },
     ],
     [disableConfigFile, enableConfigFile, isDisablingConfigFile, isEnablingConfigFile],
@@ -161,6 +183,13 @@ export function ConfigFileListView() {
       className="h-dvh"
       showFooter={true}
     >
+      <ConfigFileEdit
+        open={!!configFileToEdit}
+        configFile={configFileToEdit}
+        onClose={() => {
+          setConfigFileToEdit(null);
+        }}
+      />
       <AnalyticalTable
         header={
           <Toolbar className="py-2 px-4 rounded-t-xl">

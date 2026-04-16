@@ -35,6 +35,16 @@ export type CreateConfigFilePayload = {
 
 export type CreateConfigFileResponse = ConfigFileItem;
 
+export type UpdateConfigFilePayload = {
+  MimeType: string;
+  MaxBytes: number;
+  Description: string;
+  Type: ConfigFileItem['Type'];
+  IsActive: 'X';
+};
+
+export type UpdateConfigFileResponse = unknown;
+
 export type EnableConfigFileParams = {
   FileExt: string;
 };

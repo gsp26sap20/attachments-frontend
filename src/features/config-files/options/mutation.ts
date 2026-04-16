@@ -6,6 +6,7 @@ import { mutationOptions } from '@tanstack/react-query';
 import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers';
 import type { EnableConfigFileParams, EnableConfigFileResponse } from '../types';
 import type { CreateConfigFilePayload, CreateConfigFileResponse } from '../types';
+import type { UpdateConfigFilePayload, UpdateConfigFileResponse } from '../types';
 import type { DisableConfigFileParams, DisableConfigFileResponse } from '../types';
 
 type CreateConfigFileMutationParams = {
@@ -15,6 +16,12 @@ type CreateConfigFileMutationParams = {
 
 type EnableConfigFileMutationParams = {
   onSuccess?: (data: EnableConfigFileResponse) => void;
+  onError?: (error: unknown) => void;
+};
+
+type UpdateConfigFileMutationParams = {
+  fileExt: string;
+  onSuccess?: (data: UpdateConfigFileResponse) => void;
   onError?: (error: unknown) => void;
 };
 
@@ -67,6 +74,37 @@ export function enableConfigFileMutationOptions({ onSuccess, onError }: EnableCo
       const res = await axiosInstance.post<EnableConfigFileResponse>(
         `${ODATA_SERVICE.CONFIG_FILE}${MUTATION_API.enable(params.FileExt)}`,
         undefined,
+        {
+          headers: {
+            'accept-language': 'en',
+            ...(token ? { 'x-csrf-token': token } : {}),
+          },
+        },
+      );
+
+      return res;
+    },
+    onSuccess,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
+  });
+}
+
+export function updateConfigFileMutationOptions({ fileExt, onSuccess, onError }: UpdateConfigFileMutationParams) {
+  return mutationOptions({
+    mutationFn: async (payload: UpdateConfigFilePayload) => {
+      let token = getCsrfToken();
+
+      if (!token) {
+        await fetchCsrfToken(ODATA_SERVICE.CONFIG_FILE);
+        token = getCsrfToken();
+      }
+
+      const res = await axiosInstance.patch<UpdateConfigFileResponse>(
+        `${ODATA_SERVICE.CONFIG_FILE}${MUTATION_API.update(fileExt)}`,
+        payload,
         {
           headers: {
             'accept-language': 'en',
