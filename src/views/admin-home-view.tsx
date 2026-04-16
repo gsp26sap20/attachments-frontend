@@ -2,9 +2,11 @@ import { useNavigate } from 'react-router';
 import { Tab } from '@ui5/webcomponents-react';
 import { TabContainer } from '@ui5/webcomponents-react/TabContainer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
+import '@ui5/webcomponents-icons/bar-chart.js';
 import '@ui5/webcomponents-icons/person-placeholder.js';
 import '@ui5/webcomponents-icons/document.js';
 import '@ui5/webcomponents-icons/log.js';
+import { DashboardView } from './dashboard-view';
 import { UserListView } from './user-list';
 import { ConfigFileListView } from './config-file-list';
 
@@ -23,7 +25,10 @@ export function AdminHomeView() {
             className="min-h-0 flex-1 overflow-hidden rounded-3xl border border-slate-200/80 bg-white/70 shadow-[0_16px_40px_rgba(84,104,130,0.08)] backdrop-blur-sm"
             tabLayout="Standard"
           >
-            <Tab icon="person-placeholder" text="Users" selected>
+            <Tab icon="bar-chart" text="Dashboard" selected>
+              <DashboardView />
+            </Tab>
+            <Tab icon="person-placeholder" text="Users">
               <UserListView />
             </Tab>
             <Tab icon="document" text="Configuration Files">

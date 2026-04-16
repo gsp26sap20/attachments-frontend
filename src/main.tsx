@@ -9,8 +9,8 @@ import { ErrorsMessageBox } from '@/components/errors-message-box';
 import { QueryProvider } from '@/context-providers/query-provider';
 import { HashRouter, Navigate, Route, Routes } from 'react-router';
 import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
-import { BoDetailView, BoListView, UserListView, ShellHomeView, AdminHomeView } from '@/views';
 import { AttachmentListView, AttachmentDetailView, VersionDetailView, ConfigFileListView } from '@/views';
+import { BoDetailView, BoListView, UserListView, ShellHomeView, AdminHomeView, DashboardView } from '@/views';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -24,6 +24,7 @@ createRoot(document.getElementById('root')!).render(
           <Routes>
             <Route path="/shell-home" element={<ShellHomeView />} />
             <Route path="/admin" element={<AdminHomeView />} />
+            <Route path="/dashboard" element={<DashboardView />} />
             {/*  */}
             <Route path="/business-objects" element={<BoListView />} />
             <Route path="/business-objects/:id" element={<BoDetailView />} />
