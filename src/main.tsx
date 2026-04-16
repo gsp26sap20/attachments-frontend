@@ -3,7 +3,6 @@ import { StrictMode } from 'react';
 import '@ui5/webcomponents/dist/Assets.js';
 import { Toaster } from '@/components/toast';
 import { createRoot } from 'react-dom/client';
-import { ToastDemoView } from '@/views/toast-demo';
 import { ShellHomeView, AdminHomeView } from '@/views';
 import '@ui5/webcomponents-react/dist/json-imports/i18n.js';
 import { AuthUserLoader } from '@/features/auth-users/components';
@@ -24,7 +23,6 @@ createRoot(document.getElementById('root')!).render(
         {/* TODO: Move to Layout */}
         <HashRouter>
           <Routes>
-            <Route path="/demo" element={<ToastDemoView />} /> {/* TODO: Remove */}
             <Route path="/shell-home" element={<ShellHomeView />} />
             <Route path="/admin" element={<AdminHomeView />} />
             {/*  */}

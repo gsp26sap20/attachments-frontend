@@ -31,8 +31,7 @@ export function currentUserQueryOptions() {
       });
       return res;
     },
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnWindowFocus: false,
+    staleTime: 10 * 60 * 1000,
+    gcTime: Infinity,
   });
 }
