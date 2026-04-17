@@ -112,6 +112,13 @@ const ADMIN_MAIN_TILES: LaunchpadMainTileConfig[] = [
   },
 ];
 
+const ADMIN_SUB_TILES: LaunchpadSubTileConfig[] = [
+  {
+    title: 'Deleted Attachments',
+    route: '/dashboard/deleted-attachments',
+  },
+];
+
 export function LaunchpadView() {
   const { data: currentAuthUser, isPending: isAuthPending } = useCurrentAuthUser();
   const isAdmin = currentAuthUser?.isAdmin ?? false;
@@ -128,7 +135,9 @@ export function LaunchpadView() {
     <div className="flex-1 relative isolate overflow-x-hidden overflow-y-auto bg-[linear-gradient(180deg,#d9eafb_0%,#dceaf7_44%,#e1ecf6_100%)]">
       <div className="mx-auto flex w-full flex-col gap-10 p-8 pb-20">
         <LaunchpadSection mainTiles={BUSINESS_MAIN_TILES} />
-        {isAdmin && <LaunchpadSection title="System Administration" mainTiles={ADMIN_MAIN_TILES} />}
+        {isAdmin && (
+          <LaunchpadSection title="System Administration" mainTiles={ADMIN_MAIN_TILES} subTiles={ADMIN_SUB_TILES} />
+        )}
       </div>
     </div>
   );
