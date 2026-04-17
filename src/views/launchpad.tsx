@@ -68,7 +68,7 @@ function LaunchpadSection({
       {title && <Title level="H3">{title}</Title>}
       <div className="flex flex-wrap gap-4">
         {mainTiles.map((tile) => (
-          <LaunchpadMainTile {...tile} />
+          <LaunchpadMainTile key={tile.title} {...tile} />
         ))}
       </div>
       {subTiles.length > 0 && (
@@ -153,7 +153,7 @@ export function LaunchpadView() {
   }
 
   return (
-    <main className="relative isolate min-h-screen overflow-hidden bg-[linear-gradient(180deg,#d9eafb_0%,#dceaf7_44%,#e1ecf6_100%)]">
+    <main className="relative isolate overflow-hidden bg-[linear-gradient(180deg,#d9eafb_0%,#dceaf7_44%,#e1ecf6_100%)]">
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.16),transparent_35%),linear-gradient(320deg,rgba(255,255,255,0.14),transparent_42%)] opacity-95" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.08)_0_14%,transparent_14%_100%)]" />
@@ -161,7 +161,7 @@ export function LaunchpadView() {
         <div className="absolute left-1/2 -top-88 h-208 w-208 -translate-x-1/2 rounded-[54%_46%_39%_61%/40%_55%_45%_60%] bg-white/20" />
         <div className="absolute -bottom-8 -right-32 h-136 w-3xl rotate-28 rounded-[60%_40%_47%_53%/38%_48%_52%_62%] bg-white/20" />
       </div>
-      <div className="mx-auto flex w-full flex-col gap-10 p-8 pb-16">
+      <div className="mx-auto flex w-full flex-col gap-10 p-8 pb-20">
         <LaunchpadSection mainTiles={BUSINESS_MAIN_TILES} subTiles={BUSINESS_SUB_TILES} />
         {isAdmin && (
           <LaunchpadSection title="System Administration" mainTiles={ADMIN_MAIN_TILES} subTiles={ADMIN_SUB_TILES} />

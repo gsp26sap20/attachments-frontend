@@ -10,6 +10,11 @@ export const ODATA_SERVICE = {
   DASHBOARD: '/sap/opu/odata4/sap/zui_att_admin_dash/srvd/sap/zui_att_admin_dash/0001',
 };
 
+export const ODATA_PUBLIC_SERVICE = {
+  LOG_OUT_ACTION: '/sap/public/bc/icf/logoff',
+  SAP_CLIENT: '324',
+};
+
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB = 10,485,760 bytes
 
 export const MIME_BY_EXTENSION = {
