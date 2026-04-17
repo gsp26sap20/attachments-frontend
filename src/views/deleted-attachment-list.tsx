@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router';
 import { toast } from '@/libs/toast';
 import '@ui5/webcomponents-icons/refresh.js';
 import { Bar } from '@ui5/webcomponents-react/Bar';
@@ -7,6 +8,7 @@ import { Title } from '@ui5/webcomponents-react/Title';
 import { API } from '@/features/attachments/constants';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
+import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import type { AttachmentListItem } from '@/features/attachments/types';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
@@ -74,6 +76,11 @@ export function DeletedAttachmentListView() {
       {
         Header: 'File ID',
         accessor: 'FileId',
+        Cell: (props: AnalyticalTableCellInstance) => (
+          <Link to={`/attachments/${props.value}`}>
+            <UI5Link>{props.value}</UI5Link>
+          </Link>
+        ),
       },
       {
         Header: 'Title',
