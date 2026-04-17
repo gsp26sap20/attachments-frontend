@@ -119,9 +119,7 @@ export function AttachmentListView() {
           <AttachmentsFilterBar onFilterChange={setFilter} onSearchChange={setSearch} showActiveFilter={isAdmin} />
         </DynamicPageHeader>
       }
-      style={{
-        height: '100dvh',
-      }}
+      className="flex-1"
       showFooter={true}
     >
       {viewMode === 'table' && (
