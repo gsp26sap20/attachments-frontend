@@ -1,8 +1,8 @@
 export { FilePreview } from './file-preview';
-export { UploadVersion } from './upload-version';
 export { AttachmentCard } from './attachment-card';
+export { AttachmentForm } from './attachment-form';
 export { AttachmentAudit } from './attachment-audit';
-export { AttachmentVersion } from './attachment-version';
-export { GoogleDrivePicker } from './google-drive-picker';
-export { AttachmentBizObjects } from './attachment-biz-objects';
+export { AttachmentCreate } from './attachment-create';
+export { AttachmentBizList } from './attachment-biz-list';
 export { AttachmentsFilterBar } from './attachments-filter-bar';
+export { AttachmentVersionList } from './attachment-version-list';

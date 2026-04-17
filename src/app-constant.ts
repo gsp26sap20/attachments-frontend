@@ -1,13 +1,25 @@
 export { ODATA_BASE_URL } from '@/app-env';
 
+export const DEFAULT_VIEW_MODE: 'table' | 'grid' = 'table';
+
 export const ODATA_SERVICE = {
   ATTACHMENT: '/sap/opu/odata4/sap/zui_attach_bind/srvd/sap/zui_attach_srv/0001',
   AUTH: '/sap/opu/odata4/sap/zui_att_auth_bind/srvd/sap/zui_att_auth_srv/0001',
   BIZ: '/sap/opu/odata4/sap/zui_bizobj_bind/srvd/sap/zui_bizobj_srv/0001',
   CONFIG_FILE: '/sap/opu/odata4/sap/zui_att_cfg_ui/srvd/sap/zui_att_cfg/0001',
+  DASHBOARD: '/sap/opu/odata4/sap/zui_att_admin_dash/srvd/sap/zui_att_admin_dash/0001',
 };
 
-export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+export const ODATA_PUBLIC_SERVICE = {
+  LOG_OUT_ACTION: '/sap/public/bc/icf/logoff',
+  USER: "/sap/opu/odata/sap/ESH_SEARCH_SRV/Users('<current>')",
+  SAP_CLIENT: '324',
+};
+
+export const SAP_LOGO_URL =
+  '/sap/bc/ui5_ui5/ui2/ushell/resources/~20240619115500~/sap/ushell/themes/base/img/SAPLogo.svg';
+
+export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB = 10,485,760 bytes
 
 export const MIME_BY_EXTENSION = {
   pdf: ['application/pdf'],
@@ -37,13 +49,12 @@ export const FALLBACK_MIME_TYPE = 'application/octet-stream' as const;
 
 export const FALLBACK_EXTENSION = 'bin' as const;
 
+export const MIME_TYPE_SEPARATOR = ';' as const;
+
 export const EXTENSION_GROUPS = {
   IMAGE: ['jpg', 'jpeg', 'png', 'gif'],
-  DOCUMENT: ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'],
-  PDF: ['pdf'],
-  TEXT: ['txt', 'json', 'xml'],
-  TEXT_DATA: ['csv'],
-} as const satisfies Record<string, readonly Extension[]>; // 5 groups, 15 extensions
+  DOCUMENT: ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'json', 'xml', 'csv'],
+} as const satisfies Record<'IMAGE' | 'DOCUMENT', readonly Extension[]>; // 2 groups, 15 extensions
 
 type Extension = (typeof EXTENSIONS)[number];
 type MimeType = (typeof MIME_TYPES)[number];

@@ -1,0 +1,19 @@
+export const API = {
+  endpoint: '/BizObject',
+  linkAttachmentEndpoint: (boId: string) => `/BizObject(BoId=${boId})/_Links`,
+  select:
+    'BoId,BoType,BoTitle,Status,Erdat,Erzet,Ernam,Aedat,Aezet,Aenam,__EntityControl/Deletable,__EntityControl/Updatable',
+};
+
+export const MUTATION_API = {
+  linkAttachment: () => `/BizObjectAttachmentLink?sap-client=324`,
+  // TODO: refactor/ change time when create/delete link
+  unlinkAttachment: (boId: string, fileId: string) =>
+    `/BizObjectAttachmentLink(BoId=${boId},FileId=${fileId})?sap-client=324`,
+};
+
+export const BO_TYPES = ['PORDER', 'SORDER', 'INVOICE'] as const;
+export const BO_STATUS = ['NEW', 'INPR', 'COMP'] as const;
+
+export type BoType = (typeof BO_TYPES)[number];
+export type BoStatus = (typeof BO_STATUS)[number];

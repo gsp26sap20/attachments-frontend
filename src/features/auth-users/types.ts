@@ -1,3 +1,32 @@
+export type CurrentAuthUserItem = {
+  Uname: string;
+  Role: string;
+};
+
+export type CurrentPublicUserProfile = {
+  Id: string;
+  Name: string;
+  FirstName: string;
+  LastName: string;
+  IsCurrentUser: boolean;
+  IsEnabledForPersonalizedSearch: boolean;
+  ClearPersonalizedSearchHistory: boolean;
+};
+
+export type CurrentPublicUserProfileResponse = {
+  d: CurrentPublicUserProfile;
+};
+
+export type CurrentAuthUserResponse = {
+  value: CurrentAuthUserItem[];
+};
+
+export type CurrentAuthUserState = {
+  currentUser: CurrentAuthUserItem | null;
+  username: string | null;
+  isAdmin: boolean;
+};
+
 export type AuthUserItem = {
   Uname: string;
   Role: string;
@@ -7,42 +36,31 @@ export type AuthUserItem = {
     Deletable: boolean;
     Updatable: boolean;
   };
-  SAP__Messages: Array<{
-    code?: string;
-    message?: string;
-    target?: string;
-  }>;
 };
 
-export type AuthUserListResponse = {
-  '@odata.context': string;
-  '@odata.metadataEtag'?: string;
-  '@odata.count'?: string;
+export type AuthUsersResponse = {
+  '@odata.count'?: number | string;
   value: AuthUserItem[];
 };
 
-export type AuthUserListParams = {
+export type AuthUsersQueryParams = {
   'sap-client': number;
   $count?: boolean;
   $select?: string;
-  $skip?: number;
-  $top?: number;
   $filter?: string;
+  $search?: string;
   $orderby?: string;
 };
 
 export type CreateAuthUserPayload = {
   Uname: string;
-  Role: string;
+  Role: 'ADMIN';
 };
 
 export type CreateAuthUserResponse = AuthUserItem;
 
-export type UpdateAuthUserPayload = {
-  Role: string;
+export type DeleteAuthUserParams = {
+  Uname: string;
 };
 
-export type UpdateAuthUserResponse = AuthUserItem;
-
 export type DeleteAuthUserResponse = unknown;
-

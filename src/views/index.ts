@@ -1,16 +1,11 @@
-export { HomeView } from './home-view';
-export { ShellHomeView } from './shell-home-view';
-export { AdminHomeView } from './admin-home-view';
-export { AttachmentsView } from './attachments-view';
-export { UploadVersionView } from './upload-version-view';
-export { VersionDetailView } from './version-detail-view';
-export { AttachmentNewView } from './attachment-new-view';
-export { AttachmentsDetailView } from './attachments-detail-view';
-export { BoView } from './bo-view';
+export { BoListView } from './bo-list';
+export { NotFoundView } from './not-found';
 export { BoDetailView } from './bo-detail';
-export { BoCreateView } from './bo-create';
-export { BoWListAttachmentView } from './bo-link-to-attachment';
 export { UserListView } from './user-list';
-export { UserCreateView } from './user-create';
-export { ConfigFileView } from './config-file-view';
-
+export { LaunchpadView } from './launchpad';
+export { DashboardView } from './dashboard';
+export { VersionDetailView } from './version-detail';
+export { AttachmentListView } from './attachment-list';
+export { ConfigFileListView } from './config-file-list';
+export { AttachmentDetailView } from './attachment-detail';
+export { DeletedAttachmentListView } from './deleted-attachment-list';

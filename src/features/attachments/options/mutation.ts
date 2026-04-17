@@ -1,22 +1,37 @@
 import { MUTATION_API } from '../constants';
 import { ODATA_SERVICE } from '@/app-constant';
-import type { AxiosApiError } from '@/types/common';
+import { pushApiErrorMessages } from '@/libs/errors';
 import { axiosInstance } from '@/libs/axios-instance';
-import type { CreateAttachmentPayload } from '../types';
 import { mutationOptions } from '@tanstack/react-query';
 import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers';
 import type { RollbackVersionPayload, UploadVersionResponse } from '../types';
 import type { UploadVersionPayload, CreateAttachmentResponse } from '../types';
+import type { LinkBoPayload, UnlinkBoPayload, CreateAttachmentPayload, UpdateAttachmentPayload } from '../types';
 
 type Params = {
   fileId: string;
   onSuccess?: () => void;
-  onError?: (_error: AxiosApiError) => void;
+  onError?: (_error: unknown) => void;
 };
 
 type CreateAttachmentParams = {
   onSuccess?: (data: CreateAttachmentResponse) => void;
-  onError?: (_error: AxiosApiError) => void;
+  onError?: (_error: unknown) => void;
+};
+
+type RestoreAttachmentParams = {
+  onSuccess?: () => void;
+  onError?: (_error: unknown) => void;
+};
+
+type LinkBoMutationParams = {
+  onSuccess?: () => void;
+  onError?: (_error: unknown) => void;
+};
+
+type UnlinkBoMutationParams = {
+  onSuccess?: () => void;
+  onError?: (_error: unknown) => void;
 };
 
 export function rollbackVersionMutationOptions({ fileId, onSuccess, onError }: Params) {
@@ -25,7 +40,7 @@ export function rollbackVersionMutationOptions({ fileId, onSuccess, onError }: P
       let token = getCsrfToken();
 
       if (!token) {
-        await fetchCsrfToken();
+        await fetchCsrfToken(ODATA_SERVICE.ATTACHMENT);
         token = getCsrfToken();
       }
 
@@ -42,7 +57,10 @@ export function rollbackVersionMutationOptions({ fileId, onSuccess, onError }: P
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }
 
@@ -52,7 +70,7 @@ export function deleteAttachmentMutationOptions({ fileId, onSuccess, onError }: 
       let token = getCsrfToken();
 
       if (!token) {
-        await fetchCsrfToken();
+        await fetchCsrfToken(ODATA_SERVICE.ATTACHMENT);
         token = getCsrfToken();
       }
 
@@ -68,16 +86,49 @@ export function deleteAttachmentMutationOptions({ fileId, onSuccess, onError }: 
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
+  });
+}
+
+export function restoreAttachmentMutationOptions({ onSuccess, onError }: RestoreAttachmentParams) {
+  return mutationOptions({
+    mutationFn: async (fileId: string) => {
+      let token = getCsrfToken();
+
+      if (!token) {
+        await fetchCsrfToken(ODATA_SERVICE.ATTACHMENT);
+        token = getCsrfToken();
+      }
+
+      const res = await axiosInstance.post<unknown>(
+        `${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.restoreAttachment(fileId)}`,
+        undefined,
+        {
+          headers: {
+            'accept-language': 'en',
+            ...(token ? { 'x-csrf-token': token } : {}),
+          },
+        },
+      );
+      return res;
+    },
+    onSuccess,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }
 
 export function updateAttachmentTitleMutationOptions({ fileId, onSuccess, onError }: Params) {
   return mutationOptions({
-    mutationFn: async (payload: { Title: string }) => {
+    mutationFn: async (payload: UpdateAttachmentPayload) => {
       let token = getCsrfToken();
       if (!token) {
-        await fetchCsrfToken();
+        await fetchCsrfToken(ODATA_SERVICE.ATTACHMENT);
         token = getCsrfToken();
       }
       const res = await axiosInstance.put<unknown>(
@@ -93,7 +144,10 @@ export function updateAttachmentTitleMutationOptions({ fileId, onSuccess, onErro
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }
 
@@ -108,7 +162,7 @@ export function uploadVersionMutationOptions({
       let token = getCsrfToken();
 
       if (!token) {
-        await fetchCsrfToken();
+        await fetchCsrfToken(ODATA_SERVICE.ATTACHMENT);
         token = getCsrfToken();
       }
 
@@ -125,7 +179,10 @@ export function uploadVersionMutationOptions({
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }
 
@@ -135,7 +192,7 @@ export function createAttachmentMutationOptions({ onSuccess, onError }: CreateAt
       let token = getCsrfToken();
 
       if (!token) {
-        await fetchCsrfToken();
+        await fetchCsrfToken(ODATA_SERVICE.ATTACHMENT);
         token = getCsrfToken();
       }
 
@@ -152,6 +209,62 @@ export function createAttachmentMutationOptions({ onSuccess, onError }: CreateAt
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
+  });
+}
+
+export function linkBoToAttachmentMutationOptions({ onSuccess, onError }: LinkBoMutationParams) {
+  return mutationOptions({
+    mutationFn: async (payload: LinkBoPayload) => {
+      let token = getCsrfToken();
+
+      if (!token) {
+        await fetchCsrfToken(ODATA_SERVICE.ATTACHMENT);
+        token = getCsrfToken();
+      }
+
+      const res = await axiosInstance.post(`${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.linkBo()}`, payload, {
+        headers: {
+          'accept-language': 'en',
+          ...(token ? { 'x-csrf-token': token } : {}),
+        },
+      });
+      return res;
+    },
+    onSuccess,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
+  });
+}
+
+export function unlinkBoFromAttachmentMutationOptions({ onSuccess, onError }: UnlinkBoMutationParams) {
+  return mutationOptions({
+    mutationFn: async (params: UnlinkBoPayload) => {
+      const { FileId, BoId } = params;
+      let token = getCsrfToken();
+
+      if (!token) {
+        await fetchCsrfToken(ODATA_SERVICE.ATTACHMENT);
+        token = getCsrfToken();
+      }
+
+      const res = await axiosInstance.delete(`${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.unlinkBo(BoId, FileId)}`, {
+        headers: {
+          'accept-language': 'en',
+          ...(token ? { 'x-csrf-token': token } : {}),
+        },
+      });
+      return res;
+    },
+    onSuccess,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }

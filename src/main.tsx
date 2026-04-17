@@ -3,52 +3,61 @@ import { StrictMode } from 'react';
 import '@ui5/webcomponents/dist/Assets.js';
 import { Toaster } from '@/components/toast';
 import { createRoot } from 'react-dom/client';
-import { ToastDemoView } from '@/views/toast-demo';
+import { AppLayout } from '@/components/layouts/app-layout';
 import '@ui5/webcomponents-react/dist/json-imports/i18n.js';
+import { AdminLayout } from '@/components/layouts/admin-layout';
+import { PrivateRoute } from '@/components/layouts/private-route';
+import { HashRouter, Route, Routes, Navigate } from 'react-router';
+import { ErrorsMessageBox } from '@/components/errors-message-box';
 import { QueryProvider } from '@/context-providers/query-provider';
-import { HashRouter, Navigate, Route, Routes } from 'react-router';
 import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
-import { AttachmentsView, VersionDetailView, UploadVersionView, HomeView } from '@/views';
-import { AttachmentNewView, AttachmentsDetailView, ShellHomeView, AdminHomeView } from '@/views';
-import { BoCreateView, BoDetailView, BoView, BoWListAttachmentView, UserCreateView, UserListView } from '@/views';
+import { AttachmentListView, AttachmentDetailView, NotFoundView } from '@/views';
+import { VersionDetailView, ConfigFileListView, DeletedAttachmentListView } from '@/views';
+import { BoDetailView, BoListView, UserListView, LaunchpadView, DashboardView } from '@/views';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
       <QueryProvider>
         <Toaster />
+        <ErrorsMessageBox />
         <HashRouter>
           <Routes>
-            <Route path="/demo" element={<ToastDemoView />} />
-            <Route path="/login" element={<HomeView />} />
-            <Route path="/shell-home" element={<ShellHomeView />} />
-            <Route path="/admin" element={<AdminHomeView />} />
-            {/*  */}
-            <Route path="/business-objects" element={<BoView />} />
-            <Route path="/BO" element={<Navigate replace to="/business-objects" />} />
-            <Route path="/BizObject" element={<Navigate replace to="/business-objects" />} />
-            <Route path="/business-objects/:boId" element={<BoDetailView />} />
-            <Route path="/business-objects/:boId/attachments" element={<BoWListAttachmentView />} />
-            <Route
-              path="/BO/:boId/Attachments"
-              element={<Navigate replace to="/business-objects/:boId/attachments" />}
-            />
-            <Route path="/business-objects/create" element={<BoCreateView />} />
-            <Route path="/BO/Create" element={<Navigate replace to="/business-objects/create" />} />
-            {/*  */}
-            <Route path="/users" element={<UserListView />} />
-            <Route path="/UserList" element={<Navigate replace to="/users" />} />
-            <Route path="/users/create" element={<UserCreateView />} />
-            <Route path="/UserCreate" element={<Navigate replace to="/users/create" />} />
-            <Route path="/configuration-files" element={<Navigate replace to="/admin" />} />
-            <Route path="/config-files" element={<Navigate replace to="/admin" />} />
-            {/* Attachments */}
-            <Route path="/attachments" element={<AttachmentsView />} />
-            <Route path="/attachments/new" element={<AttachmentNewView />} />
-            <Route path="/attachments/:id" element={<AttachmentsDetailView />} />
-            <Route path="/attachments/:id/upload" element={<UploadVersionView />} />
-            <Route path="/attachments/:id/versions/:versionNo" element={<VersionDetailView />} />
-            <Route path="*" element={<Navigate replace to="/shell-home" />} />
+            <Route element={<AppLayout />}>
+              {/* Launchpad */}
+              <Route path="/launchpad" element={<LaunchpadView />} />
+              {/* Dashboard */}
+              <Route
+                path="/dashboard"
+                element={
+                  <PrivateRoute>
+                    <AdminLayout />
+                  </PrivateRoute>
+                }
+              >
+                <Route index element={<DashboardView />} />
+                <Route path="users" element={<UserListView />} />
+                <Route path="configurations" element={<ConfigFileListView />} />
+                <Route path="deleted-attachments" element={<DeletedAttachmentListView />} />
+              </Route>
+              {/* Business Objects */}
+              <Route path="/business-objects">
+                <Route index element={<BoListView />} />
+                <Route path=":id" element={<BoDetailView />} />
+              </Route>
+              {/* Attachments */}
+              <Route path="/attachments">
+                <Route index element={<AttachmentListView />} />
+                <Route path=":id">
+                  <Route index element={<AttachmentDetailView />} />
+                  <Route path="versions/:versionNo" element={<VersionDetailView />} />
+                </Route>
+              </Route>
+              {/* Redirect */}
+              <Route path="/" element={<Navigate to="/launchpad" replace />} />
+              {/* Not Found */}
+              <Route path="*" element={<NotFoundView />} />
+            </Route>
           </Routes>
         </HashRouter>
       </QueryProvider>
