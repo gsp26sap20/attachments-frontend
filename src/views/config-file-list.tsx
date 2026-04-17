@@ -42,7 +42,7 @@ const rawColumns = [
   {
     Header: 'Is Active',
     accessor: 'IsActive',
-    Cell: (props: AnalyticalTableCellInstance) => (props.value === 'X' || props.value === true ? 'Yes' : 'No'),
+    Cell: (props: AnalyticalTableCellInstance) => (props.value ? 'Yes' : 'No'),
   },
 ];
 
@@ -106,7 +106,7 @@ export function ConfigFileListView() {
                 isEnablingConfigFile ||
                 isDisablingConfigFile ||
                 !props.row.original.__EntityControl?.Updatable ||
-                (props.row.original.IsActive !== 'X' && props.row.original.IsActive !== true)
+                !props.row.original.IsActive
               }
               onClick={() => {
                 setConfigFileToEdit(props.row.original);
@@ -114,7 +114,7 @@ export function ConfigFileListView() {
             >
               Edit
             </Button>
-            {props.row.original.IsActive === 'X' || props.row.original.IsActive === true ? (
+            {props.row.original.IsActive ? (
               <Button
                 design="Transparent"
                 className="h-6.5"

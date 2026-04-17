@@ -29,10 +29,6 @@ function normalizeMimeType(value?: string) {
   return value.split(';', 1)[0]?.trim().toLowerCase() ?? '';
 }
 
-function isActiveConfig(config: Pick<ConfigFileItem, 'IsActive'>) {
-  return config.IsActive === true || config.IsActive === 'X';
-}
-
 function normalizeConfigType(value?: ConfigFileItem['Type']): UploadConfigType {
   return value === 'IMAGE' ? 'IMAGE' : 'DOCUMENT';
 }
@@ -58,7 +54,7 @@ export function getActiveUploadConfigs(configFiles?: ConfigFileItem[]): ActiveUp
     const fileExt = normalizeExtension(config.FileExt);
     const mimeType = normalizeMimeType(config.MimeType);
 
-    if (!isActiveConfig(config) || !fileExt || !mimeType) {
+    if (!config.IsActive || !fileExt || !mimeType) {
       return [];
     }
 

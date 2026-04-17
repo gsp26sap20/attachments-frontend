@@ -60,7 +60,7 @@ export function ConfigFileEdit({ configFile, open, onClose }: ConfigFileEditProp
       MaxBytes: maxBytes,
       Description: normalizedDescription,
       Type: values.type,
-      IsActive: 'X', // TODO: check this
+      IsActive: configFile.IsActive,
     });
   };
 

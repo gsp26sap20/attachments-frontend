@@ -48,7 +48,7 @@ export function ConfigFileCreate() {
       FileExt: normalizedFileExt,
       MimeType: normalizedMimeType,
       MaxBytes: maxBytes,
-      IsActive: 'X',
+      IsActive: true,
       Description: normalizedDescription,
       Type: values.type,
     });
