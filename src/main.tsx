@@ -23,15 +23,9 @@ createRoot(document.getElementById('root')!).render(
         <HashRouter>
           <Routes>
             <Route element={<AppLayout />}>
+              {/* Launchpad */}
               <Route path="/launchpad" element={<LaunchpadView />} />
-              <Route
-                path="/admin"
-                element={
-                  <PrivateRoute>
-                    <Navigate replace to="/dashboard" />
-                  </PrivateRoute>
-                }
-              />
+              {/* Dashboard */}
               <Route
                 path="/dashboard"
                 element={
@@ -44,17 +38,20 @@ createRoot(document.getElementById('root')!).render(
                 <Route path="users" element={<UserListView />} />
                 <Route path="configurations" element={<ConfigFileListView />} />
               </Route>
-              {/*  */}
-              <Route path="/business-objects" element={<BoListView />} />
-              <Route path="/business-objects/:id" element={<BoDetailView />} />
-              {/*  */}
-              <Route path="/users" element={<Navigate replace to="/dashboard/users" />} />
-              <Route path="/configurations" element={<Navigate replace to="/dashboard/configurations" />} />
+              {/* Business Objects */}
+              <Route path="/business-objects">
+                <Route index element={<BoListView />} />
+                <Route path=":id" element={<BoDetailView />} />
+              </Route>
               {/* Attachments */}
-              <Route path="/attachments" element={<AttachmentListView />} />
-              <Route path="/attachments/:id" element={<AttachmentDetailView />} />
-              <Route path="/attachments/:id/versions/:versionNo" element={<VersionDetailView />} />
-              {/* TODO: Handle 404 page */}
+              <Route path="/attachments">
+                <Route index element={<AttachmentListView />} />
+                <Route path=":id">
+                  <Route index element={<AttachmentDetailView />} />
+                  <Route path="versions/:versionNo" element={<VersionDetailView />} />
+                </Route>
+              </Route>
+              {/* Redirects */}
               <Route path="*" element={<Navigate replace to="/launchpad" />} />
             </Route>
           </Routes>

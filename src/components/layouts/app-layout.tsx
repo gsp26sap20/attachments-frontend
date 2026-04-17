@@ -26,10 +26,6 @@ function getHeaderTitle(pathname: string) {
     return 'Dashboard';
   }
 
-  if (pathname.startsWith('/admin')) {
-    return 'Administration';
-  }
-
   return 'Corporate Portal';
 }
 
