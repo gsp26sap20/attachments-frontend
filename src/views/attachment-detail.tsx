@@ -344,7 +344,7 @@ export function AttachmentDetailView() {
         >
           <AttachmentVersionList
             fileId={id!}
-            isActive={attachment?.IsActive || false}
+            disabled={!canEditAttachment}
             currentVersionNo={attachment?.CurrentVersion || '0'}
             currentExtension={attachment?._CurrentVersion?.FileExtension || ''}
           />
@@ -355,7 +355,7 @@ export function AttachmentDetailView() {
           titleText="Linked Objects"
           style={{ display: isFetching ? 'none' : 'block' }}
         >
-          <AttachmentBizList fileId={id!} isActive={attachment?.IsActive || false} />
+          <AttachmentBizList fileId={id!} disabled={!canEditAttachment} />
         </ObjectPageSection>
         <ObjectPageSection
           aria-label="Audit Log"

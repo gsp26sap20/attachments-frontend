@@ -15,14 +15,14 @@ import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcompo
 
 interface AttachmentVersionListProps {
   fileId: string;
-  isActive: boolean;
+  disabled: boolean;
   currentVersionNo: string;
   currentExtension: string;
 }
 
 export function AttachmentVersionList({
   fileId,
-  isActive,
+  disabled,
   currentVersionNo,
   currentExtension,
 }: AttachmentVersionListProps) {
@@ -93,7 +93,7 @@ export function AttachmentVersionList({
             <Title level="H4">Versions {totalCount ? `(${totalCount})` : ''}</Title>
             <ToolbarSpacer />
             {/* ToolbarButton - FileUpload */}
-            <FileUpload fileId={fileId} currentExtension={currentExtension} disabled={!isActive} />
+            <FileUpload fileId={fileId} currentExtension={currentExtension} disabled={disabled} />
           </Toolbar>
         }
         data={versions}

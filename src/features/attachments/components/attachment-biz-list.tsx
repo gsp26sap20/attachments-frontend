@@ -17,7 +17,7 @@ import { displayBoStatus, displayBoType } from '@/features/business-objects/help
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
-export function AttachmentBizList({ fileId, isActive }: { fileId: string; isActive: boolean }) {
+export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabled: boolean }) {
   const queryClient = useQueryClient();
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [bizObjectToDelete, setBizObjectToDelete] = React.useState<{
@@ -132,7 +132,7 @@ export function AttachmentBizList({ fileId, isActive }: { fileId: string; isActi
             <AttachmentBizLinkCreate
               fileId={fileId}
               linkedBizObjectIds={bizObjects.map((bo) => bo.BoId)}
-              disabled={!isActive}
+              disabled={disabled}
             />
           </Toolbar>
         }
