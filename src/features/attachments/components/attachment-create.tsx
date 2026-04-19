@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { toast } from '@/libs/toast';
 import { useNavigate } from 'react-router';
 import { FilePicker } from './file-picker';
+import { toast } from '@/libs/helpers/toast';
 import { FilePreview } from './file-preview';
 import { formatFileSize } from '@/libs/utils';
 import type { UploadedFileData } from '../types';

@@ -2,8 +2,8 @@ import { API } from '../constants';
 import { ODATA_SERVICE } from '@/app-constant';
 import { axiosInstance } from '@/libs/axios-instance';
 import { mutationOptions } from '@tanstack/react-query';
-import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
+import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers/csrf-token';
 import type { DeleteAuthUserParams, DeleteAuthUserResponse } from '../types';
 import type { CreateAuthUserPayload, CreateAuthUserResponse } from '../types';
 

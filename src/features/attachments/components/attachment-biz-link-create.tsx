@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { toast } from '@/libs/toast';
+import { toast } from '@/libs/helpers/toast';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';

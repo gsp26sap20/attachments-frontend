@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { toast } from '@/libs/toast';
+import { toast } from '@/libs/helpers/toast';
 import { useNavigate } from 'react-router';
 import { FilePicker } from './file-picker';
 import { FilePreview } from './file-preview';

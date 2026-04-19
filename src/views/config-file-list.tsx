@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { toast } from '@/libs/toast';
+import { toast } from '@/libs/helpers/toast';
 import '@ui5/webcomponents-icons/refresh.js';
 import { formatFileSize } from '@/libs/utils';
 import { Title } from '@ui5/webcomponents-react/Title';

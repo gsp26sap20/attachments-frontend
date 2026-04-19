@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { toast } from '@/libs/toast';
+import { toast } from '@/libs/helpers/toast';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/auth-store';
 import { GOOGLE_APP_ID, GOOGLE_CLIENT_ID } from '@/app-env';

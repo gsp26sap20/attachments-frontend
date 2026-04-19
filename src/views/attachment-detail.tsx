@@ -1,6 +1,6 @@
 import * as React from 'react';
 import axios from 'axios';
-import { toast } from '@/libs/toast';
+import { toast } from '@/libs/helpers/toast';
 import '@ui5/webcomponents-icons/decline.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/attachment.js';

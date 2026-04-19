@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Link } from 'react-router';
-import { toast } from '@/libs/toast';
 import '@ui5/webcomponents-icons/delete.js';
+import { toast } from '@/libs/helpers/toast';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';

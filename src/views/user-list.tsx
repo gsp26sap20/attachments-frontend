@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { toast } from '@/libs/toast';
 import '@ui5/webcomponents-icons/delete.js';
 import '@ui5/webcomponents-icons/refresh.js';
+import { toast } from '@/libs/helpers/toast';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';

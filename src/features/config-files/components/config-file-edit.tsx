@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { toast } from '@/libs/toast';
+import { toast } from '@/libs/helpers/toast';
 import type { ConfigFileItem } from '../types';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { ConfigFileForm } from './config-file-form';

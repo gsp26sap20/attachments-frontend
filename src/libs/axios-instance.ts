@@ -1,7 +1,7 @@
 import qs from 'qs';
 import axios, { type AxiosRequestConfig } from 'axios';
-import { setCsrfToken, clearCsrfToken } from './helpers';
 import { ODATA_BASE_URL, ODATA_SAP_CLIENT } from '@/app-constant';
+import { setCsrfToken, clearCsrfToken } from './helpers/csrf-token';
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
