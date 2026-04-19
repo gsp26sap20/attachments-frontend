@@ -264,6 +264,7 @@ export function AttachmentDetailView() {
                   onChange={handleEditFormChange}
                   titleError={titleError}
                   inputClassName="md:w-full"
+                  canChangeLockEdit={isAdmin || isOwner}
                 />
               ) : (
                 <React.Fragment>

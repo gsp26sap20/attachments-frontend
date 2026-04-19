@@ -51,8 +51,8 @@ export function AppHeader({ primaryTitle = 'Corporate Portal', secondaryTitle, u
     publicUserProfile?.Name?.trim() ||
     publicUserProfile?.Id?.trim() ||
     username?.trim() ||
-    'Current User';
-  const accountSubtitle = publicUserProfile?.Id?.trim() || username?.trim() || 'Current User';
+    'User';
+  const accountSubtitle = publicUserProfile?.Id?.trim() || username?.trim() || 'User';
   const avatarInitials = React.useMemo(() => getAvatarInitials(displayName), [displayName]);
   const shouldShowBackButton = location.pathname !== '/launchpad';
 

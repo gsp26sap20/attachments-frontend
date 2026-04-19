@@ -180,6 +180,7 @@ export function AttachmentCreate() {
           titleLabel="File Title"
           className="mb-4 flex flex-wrap gap-8"
           inputClassName="w-4/5 md:w-lg h-8"
+          canChangeLockEdit={true}
         />
         <FlexBox direction="Column" className="gap-1 mb-4">
           <Label showColon required>
