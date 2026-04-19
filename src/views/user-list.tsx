@@ -38,7 +38,6 @@ export function UserListView() {
 
   const { data, isFetching, error, refetch } = useQuery(
     authUsersQueryOptions({
-      'sap-client': 324,
       $count: true,
       $filter: filter || undefined,
       $search: search || undefined,

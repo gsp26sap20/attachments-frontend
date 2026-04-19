@@ -25,7 +25,6 @@ export type AttachmentListResponse = {
 };
 
 export type AttachmentListParams = {
-  'sap-client': number;
   $count: boolean;
   $select: string;
   $skip: number;
@@ -36,7 +35,6 @@ export type AttachmentListParams = {
 };
 
 export type AttachmentDetailParams = {
-  'sap-client': number;
   $select?: string;
   $expand?: string;
 };
@@ -83,7 +81,6 @@ export type AttachmentVersionsResponse = {
 };
 
 export type AttachmentVersionsParams = {
-  'sap-client': number;
   $count: boolean;
   $select: string;
   $skip: number;
@@ -106,7 +103,6 @@ export type AttachmentAuditsResponse = {
 };
 
 export type AttachmentAuditsParams = {
-  'sap-client': number;
   $count: boolean;
   $select: string;
   $skip: number;
@@ -128,16 +124,11 @@ export type VersionDetail = {
 };
 
 export type VersionDetailParams = {
-  'sap-client': number;
   $select: string;
 };
 
 export type AttachmentTitleResponse = {
   value: string;
-};
-
-export type AttachmentTitleParams = {
-  'sap-client': number;
 };
 
 export type RollbackVersionPayload = {
@@ -199,7 +190,6 @@ export type AttachmentBizObjectsResponse = {
 };
 
 export type AttachmentBizObjectsParams = {
-  'sap-client': number;
   $count?: boolean;
   $select?: string;
   $skip?: number;
@@ -227,8 +217,6 @@ export type GooglePickerDocument = {
 export type LinkedAttachment = AttachmentListItem;
 
 export type AttachmentCurrentVersion = AttachmentTitleResponse;
-
-export type AttachmentCurrentVersionParams = AttachmentTitleParams;
 
 export type LinkBoPayload = {
   BoId: string;

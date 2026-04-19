@@ -35,7 +35,6 @@ export function AttachmentVersionList({
     error,
   } = useInfiniteQuery(
     attachmentVersionsQueryOptions(fileId, {
-      'sap-client': 324,
       $count: true,
       $select: 'Erdat,Ernam,Erzet,FileId,FileName,VersionNo',
       $skip: 0,

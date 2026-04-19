@@ -44,16 +44,12 @@ export function createBizObjectMutationOptions({ onSuccess, onError }: CreateBiz
         token = getCsrfToken();
       }
 
-      const res = await axiosInstance.post<CreateBizObjectResponse>(
-        `${ODATA_SERVICE.BIZ}${API.endpoint}?sap-client=324`,
-        payload,
-        {
-          headers: {
-            'accept-language': 'en',
-            ...(token ? { 'x-csrf-token': token } : {}),
-          },
+      const res = await axiosInstance.post<CreateBizObjectResponse>(`${ODATA_SERVICE.BIZ}${API.endpoint}`, payload, {
+        headers: {
+          'accept-language': 'en',
+          ...(token ? { 'x-csrf-token': token } : {}),
         },
-      );
+      });
       return res;
     },
     onSuccess,
@@ -74,16 +70,12 @@ export function updateBizObjectMutationOptions({ boId, onSuccess, onError }: Upd
         token = getCsrfToken();
       }
 
-      const res = await axiosInstance.put<unknown>(
-        `${ODATA_SERVICE.BIZ}${API.endpoint}(BoId=${boId})?sap-client=324`,
-        payload,
-        {
-          headers: {
-            'accept-language': 'en',
-            ...(token ? { 'x-csrf-token': token } : {}),
-          },
+      const res = await axiosInstance.put<unknown>(`${ODATA_SERVICE.BIZ}${API.endpoint}(BoId=${boId})`, payload, {
+        headers: {
+          'accept-language': 'en',
+          ...(token ? { 'x-csrf-token': token } : {}),
         },
-      );
+      });
       return res;
     },
     onSuccess,
@@ -103,7 +95,7 @@ export function deleteBizObjectMutationOptions({ boId, onSuccess, onError }: Del
         await fetchCsrfToken(ODATA_SERVICE.BIZ);
         token = getCsrfToken();
       }
-      const res = await axiosInstance.delete(`${ODATA_SERVICE.BIZ}${API.endpoint}(BoId=${boId})?sap-client=324`, {
+      const res = await axiosInstance.delete(`${ODATA_SERVICE.BIZ}${API.endpoint}(BoId=${boId})`, {
         headers: {
           'accept-language': 'en',
           ...(token ? { 'x-csrf-token': token } : {}),

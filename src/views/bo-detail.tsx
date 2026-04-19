@@ -49,7 +49,6 @@ export function BoDetailView() {
     isFetching: isBizObjectFetching,
   } = useQuery(
     bizObjectDetailQueryOptions(id!, {
-      'sap-client': 324,
       $select: API.select,
     }),
   );

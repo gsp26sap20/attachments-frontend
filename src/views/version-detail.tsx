@@ -41,28 +41,15 @@ export function VersionDetailView() {
     error: dataError,
   } = useQuery(
     attachmentVersionDetailQueryOptions(id!, versionNo!, {
-      'sap-client': 324,
       $select: API.versionDetailSelect,
     }),
   );
-  const {
-    data: title,
-    isFetching: isTitleFetching,
-    error: titleError,
-  } = useQuery(
-    attachmentTitleQueryOptions(id!, {
-      'sap-client': 324,
-    }),
-  );
+  const { data: title, isFetching: isTitleFetching, error: titleError } = useQuery(attachmentTitleQueryOptions(id!));
   const {
     data: currentVersion,
     isFetching: isCurrentVersionFetching,
     error: currentVersionError,
-  } = useQuery(
-    attachmentCurrentVersionQueryOptions(id!, {
-      'sap-client': 324,
-    }),
-  );
+  } = useQuery(attachmentCurrentVersionQueryOptions(id!));
 
   const { mutate: rollbackVersion, isPending: isRollbacking } = useMutation(
     rollbackVersionMutationOptions({

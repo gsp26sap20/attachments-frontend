@@ -3,6 +3,7 @@ const env = import.meta.env;
 export const IS_DEV = env.DEV;
 export const IS_PROD = env.PROD;
 export const VITE_MODE = env.MODE;
+export const ODATA_SAP_CLIENT = env.VITE_ODATA_SAP_CLIENT;
 
 const ODATA_ORIGIN = env.VITE_ODATA_ORIGIN;
 const GOOGLE_APP_ID = env.VITE_GOOGLE_APP_ID;
@@ -18,6 +19,10 @@ if (!GOOGLE_APP_ID) {
 
 if (!GOOGLE_CLIENT_ID) {
   throw new Error('VITE_GOOGLE_CLIENT_ID is not defined in .env file');
+}
+
+if (!ODATA_SAP_CLIENT) {
+  throw new Error('VITE_ODATA_SAP_CLIENT is not defined in .env file');
 }
 
 export const ODATA_BASE_URL = IS_DEV ? '/api' : ODATA_ORIGIN;

@@ -57,7 +57,6 @@ export function BoListView() {
 
   const { data, isFetching, isFetchingNextPage, error, refetch, hasNextPage, fetchNextPage } = useInfiniteQuery(
     bizObjectsQueryOptions({
-      'sap-client': 324,
       $skip: 0,
       $top: ROWS_PER_PAGE,
       $count: true,

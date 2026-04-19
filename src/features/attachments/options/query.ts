@@ -1,15 +1,14 @@
 import { API } from '../constants';
 import { ODATA_SERVICE } from '@/app-constant';
 import { axiosInstance } from '@/libs/axios-instance';
-import { infiniteQueryOptions, keepPreviousData, queryOptions } from '@tanstack/react-query';
 import type { VersionDetail, AttachmentAuditsResponse } from '../types';
 import type { AttachmentListParams, AttachmentListResponse } from '../types';
 import type { AttachmentAuditsParams, AttachmentDetailParams } from '../types';
-import type { AttachmentTitleParams, AttachmentTitleResponse } from '../types';
 import type { AttachmentVersionsResponse, VersionDetailParams } from '../types';
+import type { AttachmentCurrentVersion, AttachmentTitleResponse } from '../types';
 import type { AttachmentDetailResponse, AttachmentVersionsParams } from '../types';
 import type { AttachmentBizObjectsResponse, AttachmentBizObjectsParams } from '../types';
-import type { AttachmentCurrentVersion, AttachmentCurrentVersionParams } from '../types';
+import { infiniteQueryOptions, keepPreviousData, queryOptions } from '@tanstack/react-query';
 
 export function attachmentsQueryOptions(params: AttachmentListParams) {
   return infiniteQueryOptions({
@@ -146,15 +145,12 @@ export function attachmentVersionDetailQueryOptions(fileId: string, versionNo: s
   });
 }
 
-export function attachmentTitleQueryOptions(id: string, params: AttachmentTitleParams) {
+export function attachmentTitleQueryOptions(id: string) {
   return queryOptions({
-    queryKey: ['attachments', id, 'title', params],
+    queryKey: ['attachments', id, 'title'],
     queryFn: () => {
       const res = axiosInstance.get<AttachmentTitleResponse>(
         `${ODATA_SERVICE.ATTACHMENT}${API.attachmentTitleEndpoint(id)}`,
-        {
-          params,
-        },
       );
       return res;
     },
@@ -165,15 +161,12 @@ export function attachmentTitleQueryOptions(id: string, params: AttachmentTitleP
   });
 }
 
-export function attachmentCurrentVersionQueryOptions(id: string, params: AttachmentCurrentVersionParams) {
+export function attachmentCurrentVersionQueryOptions(id: string) {
   return queryOptions({
-    queryKey: ['attachments', id, 'current-version', params],
+    queryKey: ['attachments', id, 'current-version'],
     queryFn: () => {
       const res = axiosInstance.get<AttachmentCurrentVersion>(
         `${ODATA_SERVICE.ATTACHMENT}${API.attachmentCurrentVersionEndpoint(id)}`,
-        {
-          params,
-        },
       );
       return res;
     },

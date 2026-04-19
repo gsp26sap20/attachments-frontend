@@ -5,11 +5,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useLocation, useNavigate } from 'react-router';
 import { Avatar } from '@ui5/webcomponents-react/Avatar';
 import { Button } from '@ui5/webcomponents-react/Button';
-import { ODATA_PUBLIC_SERVICE, SAP_LOGO_URL } from '@/app-constant';
 import { UserMenuAccount } from '@ui5/webcomponents-react/UserMenuAccount';
 import { UserMenu, type UserMenuDomRef } from '@ui5/webcomponents-react/UserMenu';
 import { currentAuthUserQueryOptions } from '@/features/auth-users/options/query';
 import { ShellBar, type ShellBarPropTypes } from '@ui5/webcomponents-react/ShellBar';
+import { ODATA_PUBLIC_SERVICE, SAP_LOGO_URL, ODATA_SAP_CLIENT } from '@/app-constant';
 import { currentPublicUserProfileQueryOptions } from '@/features/auth-users/options/query';
 
 interface AppHeaderProps {
@@ -33,9 +33,7 @@ function getAvatarInitials(username: string) {
 }
 
 function logout() {
-  window.location.replace(
-    `${ODATA_BASE_URL}${ODATA_PUBLIC_SERVICE.LOG_OUT_ACTION}?sap-client=${ODATA_PUBLIC_SERVICE.SAP_CLIENT}`,
-  );
+  window.location.replace(`${ODATA_BASE_URL}${ODATA_PUBLIC_SERVICE.LOG_OUT_ACTION}?sap-client=${ODATA_SAP_CLIENT}`);
 }
 
 export function AppHeader({ primaryTitle = 'Corporate Portal', secondaryTitle, username }: AppHeaderProps) {

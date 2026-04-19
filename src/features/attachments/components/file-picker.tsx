@@ -25,11 +25,7 @@ interface FilePickerProps {
 
 export function FilePicker({ disabled, onPick, onGoogleBtnClick, requiredType, className }: FilePickerProps) {
   const [loading, setLoading] = React.useState(false);
-  const { data: configFilesData } = useQuery(
-    configFilesQueryOptions({
-      'sap-client': 324,
-    }),
-  );
+  const { data: configFilesData } = useQuery(configFilesQueryOptions({}));
   const filteredConfigFiles = React.useMemo<ConfigFileItem[] | undefined>(() => {
     if (!configFilesData?.value) {
       return undefined;

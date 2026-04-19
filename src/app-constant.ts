@@ -1,4 +1,4 @@
-export { ODATA_BASE_URL } from '@/app-env';
+export { ODATA_BASE_URL, ODATA_SAP_CLIENT } from '@/app-env';
 
 export const DEFAULT_VIEW_MODE: 'table' | 'grid' = 'table';
 
@@ -13,7 +13,6 @@ export const ODATA_SERVICE = {
 export const ODATA_PUBLIC_SERVICE = {
   LOG_OUT_ACTION: '/sap/public/bc/icf/logoff',
   USER: "/sap/opu/odata/sap/ESH_SEARCH_SRV/Users('<current>')",
-  SAP_CLIENT: '324',
 };
 
 export const SAP_LOGO_URL =

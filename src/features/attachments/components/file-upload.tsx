@@ -41,11 +41,7 @@ function FileUploadImpl({ fileId, currentExtension, disabled }: FileUploadProps)
   const [fileData, setFileData] = React.useState<UploadedFileData | null>(null);
   const [fileNameDraft, setFileNameDraft] = React.useState('');
   const [fileNameError, setFileNameError] = React.useState('');
-  const { data: configFilesData } = useQuery(
-    configFilesQueryOptions({
-      'sap-client': 324,
-    }),
-  );
+  const { data: configFilesData } = useQuery(configFilesQueryOptions({}));
   const requiredType = React.useMemo(
     () => resolveUploadTypeByExtension(currentExtension, configFilesData?.value),
     [configFilesData?.value, currentExtension],

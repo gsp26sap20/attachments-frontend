@@ -6,10 +6,9 @@ export const API = {
 };
 
 export const MUTATION_API = {
-  linkAttachment: () => `/BizObjectAttachmentLink?sap-client=324`,
+  linkAttachment: () => `/BizObjectAttachmentLink`,
   // TODO: refactor/ change time when create/delete link
-  unlinkAttachment: (boId: string, fileId: string) =>
-    `/BizObjectAttachmentLink(BoId=${boId},FileId=${fileId})?sap-client=324`,
+  unlinkAttachment: (boId: string, fileId: string) => `/BizObjectAttachmentLink(BoId=${boId},FileId=${fileId})`,
 };
 
 export const BO_TYPES = ['PORDER', 'SORDER', 'INVOICE'] as const;

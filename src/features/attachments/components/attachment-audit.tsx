@@ -41,7 +41,6 @@ export function AttachmentAudit({ fileId }: { fileId: string }) {
     error,
   } = useInfiniteQuery(
     attachmentAuditsQueryOptions(fileId, {
-      'sap-client': 324,
       $count: true,
       $select: 'Action,Erdat,Ernam,Erzet,FileId,Note,Uname',
       $orderby: 'Erdat desc,Erzet desc',

@@ -33,7 +33,6 @@ export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabl
     error,
   } = useInfiniteQuery(
     attachmentBOsQueryOptions(fileId, {
-      'sap-client': 324,
       $count: true,
       $skip: 0,
       $top: 5,

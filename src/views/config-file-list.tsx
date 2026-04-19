@@ -50,7 +50,6 @@ export function ConfigFileListView() {
   const [filter, setFilter] = React.useState('');
   const configFileListParams = React.useMemo(
     () => ({
-      'sap-client': 324,
       $count: true,
       $filter: filter || undefined,
       $search: search || undefined,

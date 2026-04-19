@@ -71,7 +71,6 @@ function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: Bi
 
   const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage, error } = useInfiniteQuery({
     ...attachmentsQueryOptions({
-      'sap-client': 324,
       $skip: 0,
       $top: 10,
       $count: true,

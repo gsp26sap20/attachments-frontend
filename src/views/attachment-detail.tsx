@@ -52,7 +52,6 @@ export function AttachmentDetailView() {
     error: attachmentError,
   } = useQuery(
     attachmentDetailQueryOptions(id!, {
-      'sap-client': 324,
       $expand: API.detailExpand,
     }),
   );

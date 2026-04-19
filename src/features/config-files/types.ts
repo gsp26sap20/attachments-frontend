@@ -20,7 +20,6 @@ export type ConfigFileListResponse = {
 };
 
 export type ConfigFileListParams = {
-  'sap-client': number;
   $count?: boolean;
   $filter?: string;
   $search?: string;

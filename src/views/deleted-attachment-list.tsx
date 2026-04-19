@@ -50,7 +50,6 @@ export function DeletedAttachmentListView() {
 
   const attachmentListParams = React.useMemo(
     () => ({
-      'sap-client': 324,
       $skip: 0,
       $top: 10,
       $count: true,
