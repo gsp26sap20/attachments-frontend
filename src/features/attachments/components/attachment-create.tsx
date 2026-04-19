@@ -14,14 +14,14 @@ import { Button } from '@ui5/webcomponents-react/Button';
 import { GoogleDrivePicker } from './google-drive-picker';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { BusyIndicator } from '@/components/busy-indicator';
-import { buildFileName, getEditableFileName } from '../helpers';
 import { pushErrorMessages } from '@/libs/helpers/error-messages';
-import { validateFileTitle, validateFileName } from '../validate';
 import { uploadVersionMutationOptions } from '../options/mutation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createAttachmentMutationOptions } from '../options/mutation';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
+import { buildFileName, getEditableFileName } from '../helpers/file-name';
 import { AttachmentForm, type AttachmentFormValues } from './attachment-form';
+import { validateFileTitle, validateFileName } from '../helpers/input-validate';
 
 export function AttachmentCreate() {
   const navigate = useNavigate();

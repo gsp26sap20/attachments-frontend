@@ -1,5 +1,5 @@
 import { formatFileSize } from '@/libs/utils';
-import { getFileExtension } from './upload-file';
+import { getFileExtension } from '../helpers/upload-file';
 import type { ConfigFileItem } from '@/features/config-files/types';
 import { parseMimeTypes } from '@/features/config-files/helpers/mime-types';
 
@@ -34,7 +34,7 @@ function normalizeConfigType(value?: ConfigFileItem['Type']): UploadConfigType {
   return value === 'IMAGE' ? 'IMAGE' : 'DOCUMENT';
 }
 
-export function resolveUploadTypeByExtension(
+function resolveUploadTypeByExtension(
   fileExtension?: string,
   configFiles?: ConfigFileItem[],
   fallbackType: UploadConfigType = 'DOCUMENT',
@@ -50,7 +50,7 @@ export function resolveUploadTypeByExtension(
   return config ? normalizeConfigType(config.Type) : fallbackType;
 }
 
-export function getActiveUploadConfigs(configFiles?: ConfigFileItem[]): ActiveUploadConfig[] {
+function getActiveUploadConfigs(configFiles?: ConfigFileItem[]): ActiveUploadConfig[] {
   return (configFiles ?? []).flatMap((config) => {
     const fileExt = normalizeExtension(config.FileExt);
     const mimeTypes = parseMimeTypes(config.MimeType).map(normalizeMimeType);
@@ -69,15 +69,15 @@ export function getActiveUploadConfigs(configFiles?: ConfigFileItem[]): ActiveUp
   });
 }
 
-export function getAllowedUploadExtensions(configFiles?: ConfigFileItem[]) {
+function getAllowedUploadExtensions(configFiles?: ConfigFileItem[]) {
   return [...new Set(getActiveUploadConfigs(configFiles).map((config) => `.${config.FileExt}`))];
 }
 
-export function buildUploadAcceptValue(configFiles?: ConfigFileItem[]) {
+function buildUploadAcceptValue(configFiles?: ConfigFileItem[]) {
   return getAllowedUploadExtensions(configFiles).join(',');
 }
 
-export function findMatchingUploadConfig(input: UploadValidationInput, configFiles?: ConfigFileItem[]) {
+function findMatchingUploadConfig(input: UploadValidationInput, configFiles?: ConfigFileItem[]) {
   const fileExtension = normalizeExtension(input.fileExtension || getFileExtension(input.fileName || ''));
   const mimeType = normalizeMimeType(input.mimeType);
 
@@ -92,7 +92,7 @@ export function findMatchingUploadConfig(input: UploadValidationInput, configFil
   );
 }
 
-export function validateUploadFileData(input: UploadValidationInput, configFiles?: ConfigFileItem[]) {
+function validateUploadFileData(input: UploadValidationInput, configFiles?: ConfigFileItem[]) {
   if (!configFiles) {
     return 'Upload configuration is unavailable. Please try again.';
   }
@@ -119,9 +119,11 @@ export function validateUploadFileData(input: UploadValidationInput, configFiles
   );
 
   if (!matchedConfig) {
-    const mimeTypesForExtension = [...new Set(
-      activeConfigs.filter((config) => config.FileExt === fileExtension).flatMap((config) => config.MimeTypes),
-    )];
+    const mimeTypesForExtension = [
+      ...new Set(
+        activeConfigs.filter((config) => config.FileExt === fileExtension).flatMap((config) => config.MimeTypes),
+      ),
+    ];
     const hasActiveExtension = mimeTypesForExtension.length > 0;
 
     if (hasActiveExtension) {
@@ -142,3 +144,11 @@ export function validateUploadFileData(input: UploadValidationInput, configFiles
 
   return '';
 }
+
+export {
+  resolveUploadTypeByExtension,
+  getAllowedUploadExtensions,
+  buildUploadAcceptValue,
+  findMatchingUploadConfig,
+  validateUploadFileData,
+};

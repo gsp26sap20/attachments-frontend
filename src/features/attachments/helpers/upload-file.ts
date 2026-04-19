@@ -1,5 +1,5 @@
 import type { GoogleWorkspaceMimeType } from '@/types/common';
-import type { UploadedFileData, GooglePickerDocument } from './types';
+import type { UploadedFileData, GooglePickerDocument } from '../types';
 import { FALLBACK_EXTENSION, FALLBACK_MIME_TYPE, GOOGLE_WORKSPACE_EXPORTS } from '@/app-constant';
 
 type GoogleDriveImportOptions = {
@@ -14,7 +14,7 @@ type BlobToUploadFileOptions = {
   mimeType?: string;
 };
 
-export function getFileExtension(fileName: string) {
+function getFileExtension(fileName: string) {
   const lastDot = fileName.lastIndexOf('.');
 
   if (lastDot === -1) return '';
@@ -47,7 +47,7 @@ function isGoogleWorkspaceMimeType(mimeType: string): mimeType is GoogleWorkspac
   return mimeType in GOOGLE_WORKSPACE_EXPORTS;
 }
 
-export function getGoogleDriveUploadMetadata(file: Pick<GooglePickerDocument, 'mimeType' | 'name'>) {
+function getGoogleDriveUploadMetadata(file: Pick<GooglePickerDocument, 'mimeType' | 'name'>) {
   if (isGoogleWorkspaceMimeType(file.mimeType)) {
     const exportConfig = GOOGLE_WORKSPACE_EXPORTS[file.mimeType];
 
@@ -111,7 +111,7 @@ async function fetchGoogleDriveBlob(url: string, accessToken: string, fallbackMe
   return response.blob();
 }
 
-export async function blobToUploadedFileData({
+async function blobToUploadedFileData({
   blob,
   fileName,
   mimeType,
@@ -127,7 +127,7 @@ export async function blobToUploadedFileData({
   };
 }
 
-export async function fileToUploadedFileData(file: File, maxFileSize?: number) {
+async function fileToUploadedFileData(file: File, maxFileSize?: number) {
   assertFileSize(file.size, maxFileSize);
 
   return blobToUploadedFileData({
@@ -137,11 +137,7 @@ export async function fileToUploadedFileData(file: File, maxFileSize?: number) {
   });
 }
 
-export async function googleDriveFileToUploadedFileData({
-  accessToken,
-  file,
-  maxFileSize,
-}: GoogleDriveImportOptions) {
+async function googleDriveFileToUploadedFileData({ accessToken, file, maxFileSize }: GoogleDriveImportOptions) {
   if (!file?.id || !file?.name || !file?.mimeType) {
     throw new Error('Selected Google Drive file is missing required metadata.');
   }
@@ -157,7 +153,7 @@ export async function googleDriveFileToUploadedFileData({
   if (isGoogleWorkspaceMimeType(file.mimeType)) {
     const exportConfig = GOOGLE_WORKSPACE_EXPORTS[file.mimeType];
     const exportUrl = `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(file.id)}/export?mimeType=${encodeURIComponent(exportConfig.exportMimeType)}`;
-    const blob = await fetchGoogleDriveBlob(exportUrl, accessToken, 'Cannot export this Google Workspace file.');
+    const blob = await fetchGoogleDriveBlob(exportUrl, accessToken, 'Cannot  this Google Workspace file.');
 
     assertFileSize(blob.size, maxFileSize);
 
@@ -183,3 +179,5 @@ export async function googleDriveFileToUploadedFileData({
     mimeType: blob.type || file.mimeType,
   });
 }
+
+export { fileToUploadedFileData, googleDriveFileToUploadedFileData, getGoogleDriveUploadMetadata, getFileExtension };

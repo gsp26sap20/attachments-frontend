@@ -7,8 +7,8 @@ import { pushErrorMessages } from '@/libs/helpers/error-messages';
 import type { ConfigFileItem } from '@/features/config-files/types';
 import type { UploadedFileData, GooglePickerDocument } from '../types';
 import { configFilesQueryOptions } from '@/features/config-files/options/query';
-import { getGoogleDriveUploadMetadata, googleDriveFileToUploadedFileData } from '../upload-file';
-import { findMatchingUploadConfig, type UploadConfigType, validateUploadFileData } from '../upload-config';
+import { getGoogleDriveUploadMetadata, googleDriveFileToUploadedFileData } from '../helpers/upload-file';
+import { findMatchingUploadConfig, type UploadConfigType, validateUploadFileData } from '../helpers/upload-config';
 import { DrivePicker, DrivePickerDocsView, type DrivePickerEventHandlers } from '@googleworkspace/drive-picker-react';
 
 interface GoogleDrivePickerProps {
