@@ -102,7 +102,7 @@ export function AttachmentVersionList({
         selectionMode="None"
         visibleRows={10}
         sortable
-        groupable
+        groupable={false}
         scaleWidthMode="Smart"
       />
       {hasNextPage && (

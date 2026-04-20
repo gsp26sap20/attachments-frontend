@@ -200,7 +200,7 @@ export function ConfigFileListView() {
         data={configFiles}
         columns={columns}
         sortable
-        groupable
+        groupable={false}
         loading={isFetching || isEnablingConfigFile || isDisablingConfigFile}
         noDataText={
           filter || search ? 'No configuration files match the current filters.' : 'No configuration files found.'

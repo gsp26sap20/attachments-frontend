@@ -131,7 +131,7 @@ export function UserListView() {
         data={users}
         columns={columns}
         sortable
-        groupable
+        groupable={false}
         loading={isFetching || isDeletingUser}
         noDataText={filter ? 'No users match the current filters.' : 'No users found.'}
         rowHeight={36}

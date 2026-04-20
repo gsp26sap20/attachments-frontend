@@ -150,7 +150,7 @@ export function AttachmentListView() {
           data={attachments}
           columns={columns}
           sortable
-          groupable
+          groupable={false}
           loading={isFetching || isFetchingNextPage}
           rowHeight={36}
           scaleWidthMode="Smart"

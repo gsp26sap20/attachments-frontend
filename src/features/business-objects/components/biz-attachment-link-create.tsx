@@ -160,7 +160,7 @@ function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: Bi
           data={attachments}
           columns={columns}
           sortable
-          groupable
+          groupable={false}
           loading={isFetching || isFetchingNextPage}
           rowHeight={36}
           scaleWidthMode="Smart"

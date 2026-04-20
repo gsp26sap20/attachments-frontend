@@ -75,7 +75,7 @@ export function AttachmentAudit({ fileId }: { fileId: string }) {
         selectionMode="None"
         visibleRows={10}
         sortable
-        groupable
+        groupable={false}
         scaleWidthMode="Smart"
       />
       {hasNextPage && (

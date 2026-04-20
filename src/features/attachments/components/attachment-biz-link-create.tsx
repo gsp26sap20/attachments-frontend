@@ -167,7 +167,7 @@ function AttachmentBizLinkCreateImpl({ fileId, linkedBizObjectIds, disabled }: A
           data={bizObjects}
           columns={columns}
           sortable
-          groupable
+          groupable={false}
           loading={isFetching || isFetchingNextPage}
           rowHeight={36}
           scaleWidthMode="Smart"

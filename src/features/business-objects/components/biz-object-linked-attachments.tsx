@@ -137,7 +137,7 @@ export function BizObjectLinkedAttachments({ boId, disabled }: BizObjectLinkedAt
         selectionMode="None"
         visibleRows={10}
         sortable
-        groupable
+        groupable={false}
         scaleWidthMode="Smart"
         header={
           <Toolbar className="py-2 px-4 rounded-t-xl">
