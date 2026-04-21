@@ -1,14 +1,16 @@
 import * as React from 'react';
-import { toast } from '@/libs/toast';
+import { toast } from '@/libs/helpers/toast';
 import '@ui5/webcomponents-icons/refresh.js';
 import { formatFileSize } from '@/libs/utils';
-import { pushApiErrorMessages } from '@/libs/errors';
+import { useViewStore } from '@/stores/view-store';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
+import { ViewSettings } from '@/components/view-settings';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import type { ConfigFileItem } from '@/features/config-files/types';
+import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
@@ -20,37 +22,50 @@ import { ConfigFileView, ConfigFilesFilterBar } from '@/features/config-files/co
 import { enableConfigFileMutationOptions } from '@/features/config-files/options/mutation';
 import type { AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 import { disableConfigFileMutationOptions } from '@/features/config-files/options/mutation';
+import { CONFIG_FILE_LIST_FIELDS, type ConfigFileListFieldId } from '@/features/config-files/view-config';
 
-const rawColumns = [
-  { Header: 'File Ext', accessor: 'FileExt' },
+type ConfigFileListColumn = {
+  id: ConfigFileListFieldId;
+} & Record<string, unknown>;
+
+const ALL_COLUMNS = [
+  { Header: 'Extension', accessor: 'FileExt', id: 'FileExt' },
   {
     Header: 'Type',
     accessor: 'Type',
+    id: 'Type',
     Cell: (props: AnalyticalTableCellInstance) =>
       props.value === 'IMAGE' ? 'Image' : props.value === 'DOCUMENT' ? 'Document' : `"${props.value}"`,
   },
-  { Header: 'Description', accessor: 'Description' },
+  { Header: 'Description', accessor: 'Description', id: 'Description' },
   {
     Header: 'Max Size',
     accessor: 'MaxBytes',
+    id: 'MaxBytes',
     Cell: (props: AnalyticalTableCellInstance) => formatFileSize(props.value),
   },
   {
     Header: 'Is Active',
     accessor: 'IsActive',
+    id: 'IsActive',
     Cell: (props: AnalyticalTableCellInstance) => (props.value ? 'Yes' : 'No'),
   },
-];
+] as const satisfies readonly ConfigFileListColumn[];
 
 export function ConfigFileListView() {
   const queryClient = useQueryClient();
+  const selectedFieldIds = useViewStore((state) => state.configFileListVisibleFieldIds);
+  const setSelectedFieldIds = useViewStore((state) => state.setConfigFileListVisibleFieldIds);
   const [search, setSearch] = React.useState('');
   const [configFileToEdit, setConfigFileToEdit] = React.useState<ConfigFileItem | null>(null);
   const [configFileToView, setConfigFileToView] = React.useState<ConfigFileItem | null>(null);
   const [filter, setFilter] = React.useState('');
+  const visibleColumns = React.useMemo(
+    () => ALL_COLUMNS.filter((col) => selectedFieldIds.includes(col.id)),
+    [selectedFieldIds],
+  );
   const configFileListParams = React.useMemo(
     () => ({
-      'sap-client': 324,
       $count: true,
       $filter: filter || undefined,
       $search: search || undefined,
@@ -88,7 +103,7 @@ export function ConfigFileListView() {
 
   const columns = React.useMemo(
     () => [
-      ...rawColumns,
+      ...visibleColumns,
       {
         Header: 'Actions',
         width: 212,
@@ -149,7 +164,7 @@ export function ConfigFileListView() {
         ),
       },
     ],
-    [disableConfigFile, enableConfigFile, isDisablingConfigFile, isEnablingConfigFile],
+    [disableConfigFile, enableConfigFile, isDisablingConfigFile, isEnablingConfigFile, visibleColumns],
   );
 
   React.useEffect(() => {
@@ -196,15 +211,24 @@ export function ConfigFileListView() {
                 refetch();
               }}
             />
+            <ViewSettings
+              fields={CONFIG_FILE_LIST_FIELDS}
+              selectedIds={selectedFieldIds}
+              setSelectedIds={setSelectedFieldIds}
+            />
           </Toolbar>
         }
-        data={configFiles}
-        columns={columns}
+        data={selectedFieldIds.length > 0 ? configFiles : []}
+        columns={selectedFieldIds.length > 0 ? columns : []}
         sortable
-        groupable
+        groupable={false}
         loading={isFetching || isEnablingConfigFile || isDisablingConfigFile}
         noDataText={
-          filter || search ? 'No configuration files match the current filters.' : 'No configuration files found.'
+          selectedFieldIds.length === 0
+            ? 'There are no visible columns in the table right now. Please select the columns you need in the table settings.'
+            : filter || search
+              ? 'No configuration files match the current filters.'
+              : 'No configuration files found.'
         }
         rowHeight={36}
         scaleWidthMode="Smart"

@@ -1,7 +1,5 @@
 export const API = {
   endpoint: '/Attachments',
-  select:
-    'CurrentVersion,Erdat,Erzet,Ernam,FileId,IsActive,Title,__EntityControl/Deletable,__EntityControl/Updatable,__OperationControl/Reactivate',
   detailExpand: '_CurrentVersion($select=FileContent,FileId,FileName,FileExtension,MimeType,VersionNo)',
   versionDetailSelect: 'Erdat,Ernam,Erzet,FileContent,FileExtension,FileId,FileName,FileSize,MimeType,VersionNo',
   versionsEndpoint: (fileId: string) => `/Attachments(${fileId})/_Versions`,
@@ -14,13 +12,13 @@ export const API = {
 };
 
 export const MUTATION_API = {
-  deleteAttachment: (fileId: string) => `/Attachments(FileId=${fileId})?sap-client=324`,
+  deleteAttachment: (fileId: string) => `/Attachments(FileId=${fileId})`,
   restoreAttachment: (fileId: string) =>
-    `/Attachments(FileId=${fileId})/com.sap.gateway.srvd.zui_attach_srv.v0001.Reactivate?sap-client=324`,
-  rollbackVersion: (fileId: string) => `/Attachments(${fileId})?sap-client=324`,
-  updateAttachmentTitle: (fileId: string) => `/Attachments(${fileId})?sap-client=324`,
-  createAttachment: '/Attachments?sap-client=324',
-  uploadVersion: '/AttachmentVersions?sap-client=324',
-  linkBo: () => `/BizObjectAttachmentLink?sap-client=324`,
-  unlinkBo: (boId: string, fileId: string) => `/BizObjectAttachmentLink(BoId=${boId},FileId=${fileId})?sap-client=324`,
+    `/Attachments(FileId=${fileId})/com.sap.gateway.srvd.zsd_attach.v0001.Reactivate`,
+  rollbackVersion: (fileId: string) => `/Attachments(${fileId})`,
+  updateAttachmentTitle: (fileId: string) => `/Attachments(${fileId})`,
+  createAttachment: '/Attachments',
+  uploadVersion: '/AttachmentVersions',
+  linkBo: () => `/BusinessObjectAttachmentLinks`,
+  unlinkBo: (boId: string, fileId: string) => `/BusinessObjectAttachmentLinks(BoId=${boId},FileId=${fileId})`,
 };

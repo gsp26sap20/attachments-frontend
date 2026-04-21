@@ -1,9 +1,9 @@
 import { API } from '../constants';
 import { ODATA_SERVICE } from '@/app-constant';
-import { pushApiErrorMessages } from '@/libs/errors';
 import { axiosInstance } from '@/libs/axios-instance';
 import { mutationOptions } from '@tanstack/react-query';
-import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers';
+import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
+import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers/csrf-token';
 import type { DeleteAuthUserParams, DeleteAuthUserResponse } from '../types';
 import type { CreateAuthUserPayload, CreateAuthUserResponse } from '../types';
 
@@ -27,16 +27,12 @@ export function createAuthUserMutationOptions({ onSuccess, onError }: CreateAuth
         token = getCsrfToken();
       }
 
-      const res = axiosInstance.post<CreateAuthUserResponse>(
-        `${ODATA_SERVICE.AUTH}${API.endpoint}?sap-client=324`,
-        payload,
-        {
-          headers: {
-            'accept-language': 'en',
-            ...(token ? { 'x-csrf-token': token } : {}),
-          },
+      const res = axiosInstance.post<CreateAuthUserResponse>(`${ODATA_SERVICE.AUTH}${API.endpoint}`, payload, {
+        headers: {
+          'accept-language': 'en',
+          ...(token ? { 'x-csrf-token': token } : {}),
         },
-      );
+      });
 
       return res;
     },
@@ -59,7 +55,7 @@ export function deleteAuthUserMutationOptions({ onSuccess, onError }: DeleteAuth
       }
 
       const res = await axiosInstance.delete<DeleteAuthUserResponse>(
-        `${ODATA_SERVICE.AUTH}${API.endpoint}(Uname='${params.Uname}')?sap-client=324`,
+        `${ODATA_SERVICE.AUTH}${API.endpoint}(Uname='${params.Uname}')`,
         {
           headers: {
             'accept-language': 'en',

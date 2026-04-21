@@ -1,24 +1,83 @@
 import * as React from 'react';
-import { toast } from '@/libs/toast';
-import { Link } from 'react-router';
 import '@ui5/webcomponents-icons/delete.js';
+import { toast } from '@/libs/helpers/toast';
+import { Link, useNavigate } from 'react-router';
 import { Bar } from '@ui5/webcomponents-react/Bar';
-import { pushApiErrorMessages } from '@/libs/errors';
+import { useViewStore } from '@/stores/view-store';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
+import { ViewSettings } from '@/components/view-settings';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
-import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
+import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import { attachmentBOsQueryOptions } from '../options/query';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
+import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
+import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { AttachmentBizLinkCreate } from './attachment-biz-link-create';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { unlinkBoFromAttachmentMutationOptions } from '../options/mutation';
-import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers';
+import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ATTACHMENT_BIZ_LIST_FIELDS, type AttachmentBizListFieldId } from '../view-config';
+import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers/formatter';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
+type AttachmentBizListColumn = {
+  id: AttachmentBizListFieldId;
+} & Record<string, unknown>;
+
+const ALL_COLUMNS = [
+  {
+    Header: 'BO ID',
+    accessor: 'BoId',
+    id: 'BoId',
+    Cell: (props: AnalyticalTableCellInstance) => (
+      <Link to={`/business-objects/${props.value}`}>
+        <UI5Link>{props.value}</UI5Link>
+      </Link>
+    ),
+  },
+  {
+    Header: 'BO Title',
+    accessor: '_Bo.BoTitle',
+    id: 'BoTitle',
+  },
+  {
+    Header: 'BO Type',
+    accessor: '_Bo.BoType',
+    id: 'BoType',
+    Cell: (props: AnalyticalTableCellInstance) => displayBoType(props.value),
+  },
+  {
+    Header: 'BO Status',
+    accessor: '_Bo.Status',
+    id: 'Status',
+    Cell: (props: AnalyticalTableCellInstance) => displayBoStatus(props.value),
+  },
+  {
+    Header: 'Linked On',
+    accessor: 'Erdat',
+    id: 'LinkErdat',
+    Cell: (props: AnalyticalTableCellInstance) => displayListDate(props.row.original.Erdat, props.row.original.Erzet),
+  },
+  {
+    Header: 'Linked At',
+    accessor: 'Erzet',
+    id: 'LinkErzet',
+    Cell: (props: AnalyticalTableCellInstance) => displayListTime(props.row.original.Erdat, props.row.original.Erzet),
+  },
+  {
+    Header: 'Link By',
+    accessor: 'Ernam',
+    id: 'LinkErnam',
+  },
+] as const satisfies readonly AttachmentBizListColumn[];
+
 export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabled: boolean }) {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const selectedFieldIds = useViewStore((state) => state.attachmentBizListVisibleFieldIds);
+  const setSelectedFieldIds = useViewStore((state) => state.setAttachmentBizListVisibleFieldIds);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [bizObjectToDelete, setBizObjectToDelete] = React.useState<{
     boId: string;
@@ -33,7 +92,6 @@ export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabl
     error,
   } = useInfiniteQuery(
     attachmentBOsQueryOptions(fileId, {
-      'sap-client': 324,
       $count: true,
       $skip: 0,
       $top: 5,
@@ -56,6 +114,10 @@ export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabl
 
   const bizObjects = bizObjectsData?.pages.flatMap((page) => page.value) ?? [];
   const totalCount = bizObjectsData?.pages[0]['@odata.count'] ?? 0;
+  const visibleColumns = React.useMemo(
+    () => ALL_COLUMNS.filter((col) => selectedFieldIds.includes(col.id)),
+    [selectedFieldIds],
+  );
 
   React.useEffect(() => {
     if (error) {
@@ -65,38 +127,7 @@ export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabl
 
   const columns = React.useMemo(
     () => [
-      {
-        Header: 'Object ID',
-        accessor: 'BoId',
-        Cell: (props: AnalyticalTableCellInstance) => (
-          <Link to={`/business-objects/${props.value}`}>
-            <UI5Link>{props.value}</UI5Link>
-          </Link>
-        ),
-      },
-      {
-        Header: 'Object Title',
-        accessor: '_Bo.BoTitle',
-      },
-      {
-        Header: 'Object Type',
-        accessor: '_Bo.BoType',
-        Cell: (props: AnalyticalTableCellInstance) => displayBoType(props.value),
-      },
-      {
-        Header: 'Object Status',
-        accessor: '_Bo.Status',
-        Cell: (props: AnalyticalTableCellInstance) => displayBoStatus(props.value),
-      },
-      {
-        Header: 'Linked At',
-        id: 'linked-at',
-        Cell: (props: AnalyticalTableCellInstance) => `${props.row.original.Erdat} ${props.row.original.Erzet}`,
-      },
-      {
-        Header: 'Linked By',
-        accessor: 'Ernam',
-      },
+      ...visibleColumns,
       {
         Header: 'Actions',
         id: 'actions',
@@ -119,8 +150,20 @@ export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabl
           </Button>
         ),
       },
+      {
+        Header: '',
+        id: 'navigation',
+        width: 60,
+        Cell: (props: AnalyticalTableCellInstance) => (
+          <Button
+            design="Transparent"
+            icon="navigation-right-arrow"
+            onClick={() => navigate(`/business-objects/${props.row.original.BoId}`)}
+          />
+        ),
+      },
     ],
-    [isPending],
+    [isPending, navigate, visibleColumns],
   );
 
   return (
@@ -135,19 +178,29 @@ export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabl
               linkedBizObjectIds={bizObjects.map((bo) => bo.BoId)}
               disabled={disabled}
             />
+            <ViewSettings
+              fields={ATTACHMENT_BIZ_LIST_FIELDS}
+              selectedIds={selectedFieldIds}
+              setSelectedIds={setSelectedFieldIds}
+            />
           </Toolbar>
         }
-        data={bizObjects}
-        columns={columns}
+        data={selectedFieldIds.length > 0 ? bizObjects : []}
+        columns={selectedFieldIds.length > 0 ? columns : []}
         loading={isFetching || isFetchingNextPage || isPending}
+        noDataText={
+          selectedFieldIds.length === 0
+            ? 'There are no visible columns in the table right now. Please select the columns you need in the table settings.'
+            : 'No linked business objects found.'
+        }
         rowHeight={36}
         selectionMode="None"
         visibleRows={10}
         sortable
-        groupable
+        groupable={false}
         scaleWidthMode="Smart"
       />
-      {hasNextPage && (
+      {hasNextPage && selectedFieldIds.length > 0 && (
         <Bar>
           <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} design="Transparent">
             More [{bizObjects.length}/{totalCount}]

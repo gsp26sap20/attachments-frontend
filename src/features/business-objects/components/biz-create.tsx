@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { toast } from '@/libs/toast';
 import { useNavigate } from 'react-router';
+import { toast } from '@/libs/helpers/toast';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { BizForm, type BizFormValues } from './biz-form';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';

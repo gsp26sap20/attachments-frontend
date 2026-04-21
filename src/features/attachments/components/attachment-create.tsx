@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { toast } from '@/libs/toast';
 import { useNavigate } from 'react-router';
 import { FilePicker } from './file-picker';
+import { toast } from '@/libs/helpers/toast';
 import { FilePreview } from './file-preview';
 import { formatFileSize } from '@/libs/utils';
 import type { UploadedFileData } from '../types';
-import { pushErrorMessages } from '@/libs/errors';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { Input } from '@ui5/webcomponents-react/Input';
@@ -15,13 +14,14 @@ import { Button } from '@ui5/webcomponents-react/Button';
 import { GoogleDrivePicker } from './google-drive-picker';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { BusyIndicator } from '@/components/busy-indicator';
-import { buildFileName, getEditableFileName } from '../helpers';
-import { validateFileTitle, validateFileName } from '../validate';
+import { pushErrorMessages } from '@/libs/helpers/error-messages';
 import { uploadVersionMutationOptions } from '../options/mutation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createAttachmentMutationOptions } from '../options/mutation';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
+import { buildFileName, getEditableFileName } from '../helpers/file-name';
 import { AttachmentForm, type AttachmentFormValues } from './attachment-form';
+import { validateFileTitle, validateFileName } from '../helpers/input-validate';
 
 export function AttachmentCreate() {
   const navigate = useNavigate();
@@ -180,6 +180,7 @@ export function AttachmentCreate() {
           titleLabel="File Title"
           className="mb-4 flex flex-wrap gap-8"
           inputClassName="w-4/5 md:w-lg h-8"
+          canChangeLockEdit={true}
         />
         <FlexBox direction="Column" className="gap-1 mb-4">
           <Label showColon required>

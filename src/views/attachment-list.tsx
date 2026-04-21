@@ -1,57 +1,120 @@
 import * as React from 'react';
-import { cn } from '@/libs/utils';
-import { Link } from 'react-router';
 import '@ui5/webcomponents-icons/list.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/table-view.js';
+import { Link, useNavigate } from 'react-router';
 import { useAppStore } from '@/stores/app-store';
-import { API } from '@/features/attachments/constants';
-import { Bar } from '@ui5/webcomponents-react/Bar';
-import { pushApiErrorMessages } from '@/libs/errors';
+import { useViewStore } from '@/stores/view-store';
 import { Grid } from '@ui5/webcomponents-react/Grid';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { useInfiniteQuery } from '@tanstack/react-query';
+import { ViewSettings } from '@/components/view-settings';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
-import { BusyIndicator } from '@/components/busy-indicator';
+import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
-import { useCurrentAuthUser } from '@/features/auth-users/hooks';
+import { LoadMoreTrigger } from '@/components/load-more-trigger';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
+import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
+import { displayVersion } from '@/features/attachments/helpers/formatter';
+import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
+import { buildSelectWithDateTimeFields } from '@/libs/helpers/odata-select';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
+import { ATTACHMENT_LIST_FIELDS, type AttachmentListFieldId } from '@/features/attachments/view-config';
 import { AttachmentsFilterBar, AttachmentCard, AttachmentCreate } from '@/features/attachments/components';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
+type AttachmentListColumn = {
+  id: AttachmentListFieldId;
+} & Record<string, unknown>;
+
+const ALL_COLUMNS = [
+  {
+    Header: 'File ID',
+    accessor: 'FileId',
+    id: 'FileId',
+    Cell: (props: AnalyticalTableCellInstance) => (
+      <Link to={`/attachments/${props.value}`}>
+        <UI5Link>{props.value}</UI5Link>
+      </Link>
+    ),
+  },
+  { Header: 'Title', accessor: 'Title', id: 'Title' },
+  {
+    Header: 'Version',
+    accessor: 'CurrentVersion',
+    id: 'CurrentVersion',
+    Cell: (props: AnalyticalTableCellInstance) => displayVersion(props.value),
+  },
+  {
+    Header: 'Created On',
+    accessor: 'Erdat',
+    id: 'Erdat',
+    Cell: (props: AnalyticalTableCellInstance) => displayListDate(props.row.original.Erdat, props.row.original.Erzet),
+  },
+  {
+    Header: 'Created At',
+    accessor: 'Erzet',
+    id: 'Erzet',
+    Cell: (props: AnalyticalTableCellInstance) => displayListTime(props.row.original.Erdat, props.row.original.Erzet),
+  },
+  { Header: 'Created By', accessor: 'Ernam', id: 'Ernam' },
+  {
+    Header: 'Changed On',
+    accessor: 'Aedat',
+    id: 'Aedat',
+    Cell: (props: AnalyticalTableCellInstance) => displayListDate(props.row.original.Aedat, props.row.original.Aezet),
+  },
+  {
+    Header: 'Changed At',
+    accessor: 'Aezet',
+    id: 'Aezet',
+    Cell: (props: AnalyticalTableCellInstance) => displayListTime(props.row.original.Aedat, props.row.original.Aezet),
+  },
+  { Header: 'Changed By', accessor: 'Aenam', id: 'Aenam' },
+  {
+    Header: 'Edit Lock',
+    accessor: 'EditLock',
+    id: 'EditLock',
+    Cell: (props: AnalyticalTableCellInstance) => (props.value ? 'Enabled' : 'Disabled'),
+  },
+] as const satisfies readonly AttachmentListColumn[];
+
 export function AttachmentListView() {
+  const navigate = useNavigate();
   const viewMode = useAppStore((state) => state.viewMode);
   const setViewMode = useAppStore((state) => state.setViewMode);
-  const { data: currentAuthUser, isPending: isAuthPending } = useCurrentAuthUser();
+  const selectedFieldIds = useViewStore((state) => state.attachmentListVisibleFieldIds);
+  const setSelectedFieldIds = useViewStore((state) => state.setAttachmentListVisibleFieldIds);
   const [search, setSearch] = React.useState<string>('');
   const [filter, setFilter] = React.useState<string>('');
-  const isAdmin = currentAuthUser?.isAdmin ?? false;
+  const attachmentListSelect = React.useMemo(() => buildSelectWithDateTimeFields(selectedFieldIds), [selectedFieldIds]);
+  const visibleColumns = React.useMemo(
+    () => ALL_COLUMNS.filter((col) => selectedFieldIds.includes(col.id)),
+    [selectedFieldIds],
+  );
   const attachmentListParams = React.useMemo(
     () => ({
-      'sap-client': 324,
       $skip: 0,
-      $top: 10,
+      $top: 20,
       $count: true,
-      $select: API.select,
+      $select: attachmentListSelect,
       $orderby: 'Erdat desc,Erzet desc',
-      // If user is admin, show all attachments, otherwise show only active attachments
-      $filter: isAdmin ? filter || undefined : filter ? `IsActive eq true and ${filter}` : 'IsActive eq true',
+      $filter: filter ? `IsActive eq true and ${filter}` : 'IsActive eq true',
       $search: search || undefined,
     }),
-    [filter, isAdmin, search],
+    [attachmentListSelect, filter, search],
   );
   const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage, refetch, error } = useInfiniteQuery({
     ...attachmentsQueryOptions(attachmentListParams),
-    enabled: !isAuthPending,
+    enabled: selectedFieldIds.length > 0,
   });
 
   const attachments = data?.pages.flatMap((page) => page.value) ?? [];
@@ -60,44 +123,21 @@ export function AttachmentListView() {
 
   const columns = React.useMemo(
     () => [
+      ...visibleColumns,
       {
-        Header: 'File ID',
-        accessor: 'FileId',
+        Header: '',
+        id: 'navigation',
+        width: 60,
         Cell: (props: AnalyticalTableCellInstance) => (
-          <Link to={`/attachments/${props.value}`}>
-            <UI5Link>{props.value}</UI5Link>
-          </Link>
+          <Button
+            design="Transparent"
+            icon="navigation-right-arrow"
+            onClick={() => navigate(`/attachments/${props.row.original.FileId}`)}
+          />
         ),
       },
-      // TODO: Apply to BO
-      {
-        Header: 'Title',
-        accessor: 'Title',
-      },
-      {
-        Header: 'Version',
-        accessor: 'CurrentVersion',
-      },
-      ...(isAdmin
-        ? [
-            {
-              Header: 'Is Active',
-              accessor: 'IsActive',
-              Cell: (props: AnalyticalTableCellInstance) => (props.value ? 'Yes' : 'No'),
-            },
-          ]
-        : []),
-      {
-        Header: 'Created At',
-        id: 'createdAt',
-        Cell: (props: AnalyticalTableCellInstance) => `${props.row.original.Erdat} ${props.row.original.Erzet}`,
-      },
-      {
-        Header: 'Created By',
-        accessor: 'Ernam',
-      },
     ],
-    [isAdmin],
+    [navigate, visibleColumns],
   );
 
   React.useEffect(() => {
@@ -106,19 +146,11 @@ export function AttachmentListView() {
     }
   }, [error]);
 
-  if (isAuthPending) {
-    return (
-      <div className="flex h-dvh w-full items-center justify-center">
-        <BusyIndicator type="loading" />
-      </div>
-    );
-  }
-
   return (
     <DynamicPage
       headerArea={
         <DynamicPageHeader className="px-8 py-4">
-          <AttachmentsFilterBar onFilterChange={setFilter} onSearchChange={setSearch} showActiveFilter={isAdmin} />
+          <AttachmentsFilterBar onFilterChange={setFilter} onSearchChange={setSearch} />
         </DynamicPageHeader>
       }
       className="flex-1"
@@ -142,16 +174,26 @@ export function AttachmentListView() {
               />
               <ToolbarButton
                 icon="table-view"
+                design="Transparent"
                 tooltip="Toggle grid view"
-                disabled={isFetching || attachments.length === 0}
                 onClick={() => setViewMode('grid')}
+              />
+              <ViewSettings
+                fields={ATTACHMENT_LIST_FIELDS}
+                selectedIds={selectedFieldIds}
+                setSelectedIds={setSelectedFieldIds}
               />
             </Toolbar>
           }
-          data={attachments}
-          columns={columns}
+          data={selectedFieldIds.length > 0 ? attachments : []}
+          columns={selectedFieldIds.length > 0 ? columns : []}
+          noDataText={
+            selectedFieldIds.length === 0
+              ? 'There are no visible columns in the table right now. Please select the columns you need in the table settings.'
+              : 'No data'
+          }
           sortable
-          groupable
+          groupable={false}
           loading={isFetching || isFetchingNextPage}
           rowHeight={36}
           scaleWidthMode="Smart"
@@ -175,31 +217,37 @@ export function AttachmentListView() {
             />
             <ToolbarButton
               icon="list"
+              design="Transparent"
               tooltip="Toggle list view"
               onClick={() => setViewMode('table')}
-              disabled={isFetching || attachments.length === 0}
+            />
+            <ViewSettings
+              fields={ATTACHMENT_LIST_FIELDS}
+              selectedIds={selectedFieldIds}
+              setSelectedIds={setSelectedFieldIds}
             />
           </Toolbar>
-          {attachments.length === 0 && <IllustratedMessage name="NoData" />}
+          {attachments.length === 0 && selectedFieldIds.length > 0 && <IllustratedMessage name="NoData" />}
+          {selectedFieldIds.length === 0 && (
+            <h4 className="text-center">
+              There are no visible fields in the table right now. Please select the fields you need in the table
+              settings.
+            </h4>
+          )}
           <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
-            {attachments.map((attachment) => (
-              <AttachmentCard
-                key={attachment.FileId}
-                data={attachment}
-                isAdmin={isAdmin}
-                loading={isFetching || isFetchingNextPage}
-              />
-            ))}
+            {selectedFieldIds.length > 0 &&
+              attachments.map((attachment) => (
+                <AttachmentCard key={attachment.FileId} data={attachment} loading={isFetching || isFetchingNextPage} />
+              ))}
           </Grid>
         </FlexBox>
       )}
-      {hasNextPage && (
-        <Bar className={cn({ 'rounded-xl mt-4': viewMode === 'grid' })}>
-          <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} design="Transparent">
-            More [{attachments.length}/{totalCount}]
-          </Button>
-        </Bar>
-      )}
+      <LoadMoreTrigger
+        hasMore={hasNextPage}
+        isLoading={isFetching || isFetchingNextPage}
+        enabled={selectedFieldIds.length > 0}
+        onLoadMore={() => fetchNextPage()}
+      />
     </DynamicPage>
   );
 }

@@ -5,10 +5,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useLocation, useNavigate } from 'react-router';
 import { Avatar } from '@ui5/webcomponents-react/Avatar';
 import { Button } from '@ui5/webcomponents-react/Button';
-import { ODATA_PUBLIC_SERVICE, SAP_LOGO_URL } from '@/app-constant';
 import { UserMenuAccount } from '@ui5/webcomponents-react/UserMenuAccount';
 import { UserMenu, type UserMenuDomRef } from '@ui5/webcomponents-react/UserMenu';
+import { currentAuthUserQueryOptions } from '@/features/auth-users/options/query';
 import { ShellBar, type ShellBarPropTypes } from '@ui5/webcomponents-react/ShellBar';
+import { ODATA_PUBLIC_SERVICE, SAP_LOGO_URL, ODATA_SAP_CLIENT } from '@/app-constant';
 import { currentPublicUserProfileQueryOptions } from '@/features/auth-users/options/query';
 
 interface AppHeaderProps {
@@ -32,9 +33,7 @@ function getAvatarInitials(username: string) {
 }
 
 function logout() {
-  window.location.replace(
-    `${ODATA_BASE_URL}${ODATA_PUBLIC_SERVICE.LOG_OUT_ACTION}?sap-client=${ODATA_PUBLIC_SERVICE.SAP_CLIENT}`,
-  );
+  window.location.replace(`${ODATA_BASE_URL}${ODATA_PUBLIC_SERVICE.LOG_OUT_ACTION}?sap-client=${ODATA_SAP_CLIENT}`);
 }
 
 export function AppHeader({ primaryTitle = 'Corporate Portal', secondaryTitle, username }: AppHeaderProps) {
@@ -44,6 +43,7 @@ export function AppHeader({ primaryTitle = 'Corporate Portal', secondaryTitle, u
   const userMenuRef = React.useRef<UserMenuDomRef>(null);
   const [headerHeight, setHeaderHeight] = React.useState(0);
   const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
+  const { data: authUser } = useQuery(currentAuthUserQueryOptions());
   const { data: publicUserProfile } = useQuery(currentPublicUserProfileQueryOptions());
 
   const displayName =
@@ -51,8 +51,8 @@ export function AppHeader({ primaryTitle = 'Corporate Portal', secondaryTitle, u
     publicUserProfile?.Name?.trim() ||
     publicUserProfile?.Id?.trim() ||
     username?.trim() ||
-    'Current User';
-  const accountSubtitle = publicUserProfile?.Id?.trim() || username?.trim() || 'Current User';
+    'User';
+  const accountSubtitle = publicUserProfile?.Id?.trim() || username?.trim() || '';
   const avatarInitials = React.useMemo(() => getAvatarInitials(displayName), [displayName]);
   const shouldShowBackButton = location.pathname !== '/launchpad';
 
@@ -143,7 +143,12 @@ export function AppHeader({ primaryTitle = 'Corporate Portal', secondaryTitle, u
       <UserMenu
         ref={userMenuRef}
         accounts={
-          <UserMenuAccount avatarInitials={avatarInitials} subtitleText={accountSubtitle} titleText={displayName} />
+          <UserMenuAccount
+            avatarInitials={avatarInitials}
+            subtitleText={accountSubtitle || undefined}
+            titleText={displayName + (authUser?.value[0]?.Role === 'ADMIN' ? ' (Administrator)' : '')}
+            description={navigator.language ? 'Device Language: ' + navigator.language : ''}
+          />
         }
         onClose={() => {
           setIsUserMenuOpen(false);

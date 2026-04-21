@@ -18,6 +18,7 @@ interface AttachmentFormProps {
   inputClassName?: string;
   titleError?: string;
   titleLabel?: string;
+  canChangeLockEdit?: boolean;
 }
 
 export function AttachmentForm({
@@ -28,6 +29,7 @@ export function AttachmentForm({
   inputClassName,
   titleError,
   titleLabel = 'Title',
+  canChangeLockEdit = false,
 }: AttachmentFormProps) {
   const id = React.useId();
 
@@ -60,6 +62,7 @@ export function AttachmentForm({
           id={`${id}-edit-lock`}
           checked={value.editLock}
           text="Prevent others from editing"
+          disabled={!canChangeLockEdit}
           onChange={(event) =>
             onChange({
               ...value,

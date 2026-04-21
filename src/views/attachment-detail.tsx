@@ -1,10 +1,9 @@
 import * as React from 'react';
 import axios from 'axios';
-import { toast } from '@/libs/toast';
+import { toast } from '@/libs/helpers/toast';
 import '@ui5/webcomponents-icons/decline.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/attachment.js';
-import { getError } from '@/libs/error-message';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { useParams, useNavigate } from 'react-router';
@@ -15,22 +14,24 @@ import { MutationBar } from '@/components/mutation-bar';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { BusyIndicator } from '@/components/busy-indicator';
-import { downloadFile } from '@/features/attachments/helpers';
 import { useCurrentAuthUser } from '@/features/auth-users/hooks';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
-import { validateFileTitle } from '@/features/attachments/validate';
 import { AttachmentBizList } from '@/features/attachments/components';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
-import { pushErrorMessages, pushApiErrorMessages } from '@/libs/errors';
 import { NotFoundIllustrated } from '@/components/not-found-illustrated';
+import { displayVersion } from '@/features/attachments/helpers/formatter';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
+import { downloadFile } from '@/features/attachments/helpers/download-file';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
+import { displayDetailDate, displayDetailTime } from '@/libs/helpers/date-time';
+import { validateFileTitle } from '@/features/attachments/helpers/input-validate';
 import { attachmentDetailQueryOptions } from '@/features/attachments/options/query';
 import { deleteAttachmentMutationOptions } from '@/features/attachments/options/mutation';
 import { restoreAttachmentMutationOptions } from '@/features/attachments/options/mutation';
 import { updateAttachmentTitleMutationOptions } from '@/features/attachments/options/mutation';
+import { pushErrorMessages, pushApiErrorMessages, getError } from '@/libs/helpers/error-messages';
 import { AttachmentVersionList, AttachmentAudit, FilePreview } from '@/features/attachments/components';
 import { AttachmentForm, type AttachmentFormValues } from '@/features/attachments/components/attachment-form';
 
@@ -52,7 +53,6 @@ export function AttachmentDetailView() {
     error: attachmentError,
   } = useQuery(
     attachmentDetailQueryOptions(id!, {
-      'sap-client': 324,
       $expand: API.detailExpand,
     }),
   );
@@ -264,6 +264,7 @@ export function AttachmentDetailView() {
                   onChange={handleEditFormChange}
                   titleError={titleError}
                   inputClassName="md:w-full"
+                  canChangeLockEdit={isAdmin || isOwner}
                 />
               ) : (
                 <React.Fragment>
@@ -277,7 +278,7 @@ export function AttachmentDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Current Version</Label>
-                    <Text>{attachment?.CurrentVersion || '-'}</Text>
+                    <Text>{displayVersion(attachment?.CurrentVersion, '-')}</Text>
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Is Active</Label>
@@ -296,11 +297,11 @@ export function AttachmentDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Created On</Label>
-                    <Text>{attachment?.Erdat || '-'}</Text>
+                    <Text>{displayDetailDate(attachment?.Erdat, attachment?.Erzet)}</Text>
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Created At</Label>
-                    <Text>{attachment?.Erzet || '-'}</Text>
+                    <Text>{displayDetailTime(attachment?.Erdat, attachment?.Erzet)}</Text>
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -310,11 +311,11 @@ export function AttachmentDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Last Changed On</Label>
-                    <Text>{attachment?.Aedat || '-'}</Text>
+                    <Text>{displayDetailDate(attachment?.Aedat, attachment?.Aezet)}</Text>
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Last Changed At</Label>
-                    <Text>{attachment?.Aezet || '-'}</Text>
+                    <Text>{displayDetailTime(attachment?.Aedat, attachment?.Aezet)}</Text>
                   </div>
                 </div>
               </div>

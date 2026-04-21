@@ -1,10 +1,8 @@
 import * as React from 'react';
 import axios from 'axios';
-import { toast } from '@/libs/toast';
+import { toast } from '@/libs/helpers/toast';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/decline.js';
-import { getError } from '@/libs/error-message';
-import { pushApiErrorMessages } from '@/libs/errors';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { useNavigate, useParams } from 'react-router';
@@ -21,14 +19,16 @@ import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { NotFoundIllustrated } from '@/components/not-found-illustrated';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import { getError, pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
-import { BizObjectLinkedAttachments } from '@/features/business-objects/components';
-import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers';
+import { displayDetailDate, displayDetailTime } from '@/libs/helpers/date-time';
+import { BizObjectAttachmentList } from '@/features/business-objects/components';
+import { type BoType, type BoStatus } from '@/features/business-objects/constants';
 import { BizForm, type BizFormValues } from '@/features/business-objects/components';
-import { API, type BoType, type BoStatus } from '@/features/business-objects/constants';
 import { bizObjectDetailQueryOptions } from '@/features/business-objects/options/query';
 import { updateBizObjectMutationOptions } from '@/features/business-objects/options/mutation';
 import { deleteBizObjectMutationOptions } from '@/features/business-objects/options/mutation';
+import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers/formatter';
 
 export function BoDetailView() {
   const { id } = useParams();
@@ -47,12 +47,7 @@ export function BoDetailView() {
     error: bizObjectError,
     refetch,
     isFetching: isBizObjectFetching,
-  } = useQuery(
-    bizObjectDetailQueryOptions(id!, {
-      'sap-client': 324,
-      $select: API.select,
-    }),
-  );
+  } = useQuery(bizObjectDetailQueryOptions(id!, {}));
 
   const refetchBizObject = function () {
     queryClient.invalidateQueries({
@@ -199,11 +194,11 @@ export function BoDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Created On</Label>
-                    <Text>{bizObject?.Erdat || '–'}</Text>
+                    <Text>{displayDetailDate(bizObject?.Erdat, bizObject?.Erzet)}</Text>
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Created At</Label>
-                    <Text>{bizObject?.Erzet || '–'}</Text>
+                    <Text>{displayDetailTime(bizObject?.Erdat, bizObject?.Erzet)}</Text>
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -213,11 +208,11 @@ export function BoDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Last Changed On</Label>
-                    <Text>{bizObject?.Aedat || '–'}</Text>
+                    <Text>{displayDetailDate(bizObject?.Aedat, bizObject?.Aezet)}</Text>
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Last Changed At</Label>
-                    <Text>{bizObject?.Aezet || '–'}</Text>
+                    <Text>{displayDetailTime(bizObject?.Aedat, bizObject?.Aezet)}</Text>
                   </div>
                 </div>
               </div>
@@ -230,7 +225,7 @@ export function BoDetailView() {
           titleText="Attachments"
           style={{ display: isBizObjectFetching ? 'none' : 'block' }}
         >
-          <BizObjectLinkedAttachments boId={id!} disabled={!bizObject} />
+          <BizObjectAttachmentList boId={id!} disabled={!bizObject} />
         </ObjectPageSection>
         {editMode && (
           <MutationBar

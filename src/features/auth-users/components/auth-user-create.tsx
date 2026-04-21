@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { toast } from '@/libs/toast';
+import { toast } from '@/libs/helpers/toast';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { DEFAULT_AUTH_USER_ROLE } from '../constants';

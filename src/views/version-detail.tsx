@@ -1,14 +1,13 @@
 import * as React from 'react';
 import axios from 'axios';
-import { toast } from '@/libs/toast';
 import { useParams } from 'react-router';
 import '@ui5/webcomponents-icons/share.js';
 import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/decline.js';
 import '@ui5/webcomponents-icons/refresh.js';
+import { toast } from '@/libs/helpers/toast';
 import { formatFileSize } from '@/libs/utils';
 import '@ui5/webcomponents-icons/document.js';
-import { getError } from '@/libs/error-message';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { API } from '@/features/attachments/constants';
@@ -17,19 +16,21 @@ import { Label } from '@ui5/webcomponents-react/Label';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { BusyIndicator } from '@/components/busy-indicator';
-import { downloadFile } from '@/features/attachments/helpers';
 import { FilePreview } from '@/features/attachments/components';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
-import { pushErrorMessages, pushApiErrorMessages } from '@/libs/errors';
 import { NotFoundIllustrated } from '@/components/not-found-illustrated';
+import { displayVersion } from '@/features/attachments/helpers/formatter';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
+import { downloadFile } from '@/features/attachments/helpers/download-file';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
+import { displayDetailDate, displayDetailTime } from '@/libs/helpers/date-time';
 import { attachmentTitleQueryOptions } from '@/features/attachments/options/query';
 import { rollbackVersionMutationOptions } from '@/features/attachments/options/mutation';
 import { attachmentVersionDetailQueryOptions } from '@/features/attachments/options/query';
 import { attachmentCurrentVersionQueryOptions } from '@/features/attachments/options/query';
+import { pushErrorMessages, pushApiErrorMessages, getError } from '@/libs/helpers/error-messages';
 
 export function VersionDetailView() {
   const { id, versionNo } = useParams();
@@ -41,28 +42,15 @@ export function VersionDetailView() {
     error: dataError,
   } = useQuery(
     attachmentVersionDetailQueryOptions(id!, versionNo!, {
-      'sap-client': 324,
       $select: API.versionDetailSelect,
     }),
   );
-  const {
-    data: title,
-    isFetching: isTitleFetching,
-    error: titleError,
-  } = useQuery(
-    attachmentTitleQueryOptions(id!, {
-      'sap-client': 324,
-    }),
-  );
+  const { data: title, isFetching: isTitleFetching, error: titleError } = useQuery(attachmentTitleQueryOptions(id!));
   const {
     data: currentVersion,
     isFetching: isCurrentVersionFetching,
     error: currentVersionError,
-  } = useQuery(
-    attachmentCurrentVersionQueryOptions(id!, {
-      'sap-client': 324,
-    }),
-  );
+  } = useQuery(attachmentCurrentVersionQueryOptions(id!));
 
   const { mutate: rollbackVersion, isPending: isRollbacking } = useMutation(
     rollbackVersionMutationOptions({
@@ -71,7 +59,7 @@ export function VersionDetailView() {
         queryClient.invalidateQueries({
           queryKey: ['attachments', id],
         });
-        toast(`Version ${versionNo} is now current`);
+        toast(`Version ${displayVersion(versionNo, 'N/A')} is now current`);
       },
     }),
   );
@@ -163,7 +151,7 @@ export function VersionDetailView() {
               </Toolbar>
             }
             header={<Title level="H2">{isFetching ? 'Loading...' : version?.FileName || 'Unnamed Object'}</Title>}
-            subHeader={isFetching ? 'Loading...' : `Version ${version?.VersionNo || versionNo || '-'}`}
+            subHeader={isFetching ? 'Loading...' : `Version ${displayVersion(version?.VersionNo || versionNo, 'N/A')}`}
             navigationBar={
               <Button
                 accessibleName="Close"
@@ -227,11 +215,11 @@ export function VersionDetailView() {
                 </div>
                 <div className="flex flex-col">
                   <Label showColon>Created On</Label>
-                  <Text>{version?.Erdat || '-'}</Text>
+                  <Text>{displayDetailDate(version?.Erdat, version?.Erzet)}</Text>
                 </div>
                 <div className="flex flex-col">
                   <Label showColon>Created At</Label>
-                  <Text>{version?.Erzet || '-'}</Text>
+                  <Text>{displayDetailTime(version?.Erdat, version?.Erzet)}</Text>
                 </div>
               </div>
             </div>
