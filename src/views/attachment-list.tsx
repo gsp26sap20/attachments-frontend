@@ -24,6 +24,7 @@ import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { displayVersion } from '@/features/attachments/helpers/formatter';
 import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
+import { buildSelectWithDateTimeFields } from '@/libs/helpers/odata-select';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
@@ -95,7 +96,7 @@ export function AttachmentListView() {
   const setSelectedFieldIds = useViewStore((state) => state.setAttachmentListVisibleFieldIds);
   const [search, setSearch] = React.useState<string>('');
   const [filter, setFilter] = React.useState<string>('');
-  const attachmentListSelect = React.useMemo(() => selectedFieldIds.join(','), [selectedFieldIds]);
+  const attachmentListSelect = React.useMemo(() => buildSelectWithDateTimeFields(selectedFieldIds), [selectedFieldIds]);
   const visibleColumns = React.useMemo(
     () => ALL_COLUMNS.filter((col) => selectedFieldIds.includes(col.id)),
     [selectedFieldIds],

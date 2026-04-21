@@ -7,6 +7,7 @@ import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { ViewSettings } from '@/components/view-settings';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
+import { displayListDate } from '@/libs/helpers/date-time';
 import type { AuthUserItem } from '@/features/auth-users/types';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { useCurrentAuthUser } from '@/features/auth-users/hooks';
@@ -30,7 +31,12 @@ type AuthUserListColumn = {
 const ALL_COLUMNS = [
   { Header: 'User Name', accessor: 'Uname', id: 'Uname' },
   { Header: 'Role', accessor: 'Role', id: 'Role' },
-  { Header: 'Created On', accessor: 'Erdat', id: 'Erdat' },
+  {
+    Header: 'Created On',
+    accessor: 'Erdat',
+    id: 'Erdat',
+    Cell: (props: AnalyticalTableCellInstance) => displayListDate(props.row.original.Erdat, '00:00:00'),
+  },
   { Header: 'Created By', accessor: 'Ernam', id: 'Ernam' },
 ] as const satisfies readonly AuthUserListColumn[];
 
