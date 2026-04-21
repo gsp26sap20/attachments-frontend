@@ -1,4 +1,4 @@
-import type { AttachmentItem, AttachmentVersionItem } from './types';
+import type { AttachmentAuditItem, AttachmentItem, AttachmentVersionItem } from './types';
 
 type AttachmentListFieldKey = keyof Pick<
   AttachmentItem,
@@ -63,5 +63,63 @@ export const VERSION_LIST_SELECTED_FIELD_IDS: AttachmentVersionListFieldId[] = [
   'FileName',
   'Erdat',
   'Erzet',
+  'Ernam',
+];
+
+//====================================================================================================
+
+type AttachmentAuditFieldKey = keyof Pick<
+  AttachmentAuditItem,
+  'Action' | 'Note' | 'Erdat' | 'Erzet' | 'Uname' | 'Ernam'
+>;
+
+export type AttachmentAuditFieldOption = {
+  id: AttachmentAuditFieldKey;
+  label: string;
+};
+
+export const ATTACHMENT_AUDIT_FIELDS = [
+  { id: 'Action', label: 'Action' },
+  { id: 'Note', label: 'Note' },
+  { id: 'Erdat', label: 'Performed On' },
+  { id: 'Erzet', label: 'Performed At' },
+  { id: 'Ernam', label: 'Performed By' },
+] as const satisfies readonly AttachmentAuditFieldOption[];
+
+export type AttachmentAuditFieldId = (typeof ATTACHMENT_AUDIT_FIELDS)[number]['id'];
+
+export const ATTACHMENT_AUDIT_SELECTED_FIELD_IDS: AttachmentAuditFieldId[] = [
+  'Action',
+  'Note',
+  'Erdat',
+  'Erzet',
+  'Ernam',
+];
+
+//====================================================================================================
+
+export type AttachmentBizListFieldOption = {
+  id: 'BoId' | 'BoTitle' | 'BoType' | 'Status' | 'Erdat' | 'Erzet' | 'Ernam';
+  label: string;
+};
+
+export const ATTACHMENT_BIZ_LIST_FIELDS = [
+  { id: 'BoId', label: 'BO ID' },
+  { id: 'BoTitle', label: 'BO Title' },
+  { id: 'BoType', label: 'BO Type' },
+  { id: 'Status', label: 'BO Status' },
+  { id: 'Erdat', label: 'Linked On' },
+  { id: 'Erzet', label: 'Linked At' },
+  { id: 'Ernam', label: 'Link By' },
+] as const satisfies readonly AttachmentBizListFieldOption[];
+
+export type AttachmentBizListFieldId = (typeof ATTACHMENT_BIZ_LIST_FIELDS)[number]['id'];
+
+export const ATTACHMENT_BIZ_LIST_SELECTED_FIELD_IDS: AttachmentBizListFieldId[] = [
+  'BoId',
+  'BoTitle',
+  'BoType',
+  'Status',
+  'Erdat',
   'Ernam',
 ];
