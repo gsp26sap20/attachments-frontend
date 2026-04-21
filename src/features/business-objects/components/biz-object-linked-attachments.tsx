@@ -1,13 +1,14 @@
 import * as React from 'react';
-import { Link } from 'react-router';
 import '@ui5/webcomponents-icons/delete.js';
 import { toast } from '@/libs/helpers/toast';
+import { Link, useNavigate } from 'react-router';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { useViewStore } from '@/stores/view-store';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { ViewSettings } from '@/components/view-settings';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
+import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
@@ -17,8 +18,8 @@ import { bizObjectLinkedAttachmentsQueryOptions } from '../options/query';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
 import { unlinkAttachmentFromBoMutationOptions } from '../options/mutation';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { BIZ_OBJECT_LINKED_ATTACHMENT_FIELDS, type BizObjectLinkedAttachmentFieldId } from '../view-config';
 import type { AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
+import { BIZ_OBJECT_LINKED_ATTACHMENT_FIELDS, type BizObjectLinkedAttachmentFieldId } from '../view-config';
 
 type BizObjectLinkedAttachmentsProps = {
   boId: string;
@@ -74,6 +75,7 @@ const ALL_COLUMNS = [
 ] as const satisfies readonly BizObjectLinkedAttachmentColumn[];
 
 export function BizObjectLinkedAttachments({ boId, disabled }: BizObjectLinkedAttachmentsProps) {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const selectedFieldIds = useViewStore((state) => state.bizObjectLinkedAttachmentVisibleFieldIds);
   const setSelectedFieldIds = useViewStore((state) => state.setBizObjectLinkedAttachmentVisibleFieldIds);
@@ -121,6 +123,7 @@ export function BizObjectLinkedAttachments({ boId, disabled }: BizObjectLinkedAt
       ...visibleColumns,
       {
         Header: 'Actions',
+        id: 'actions',
         Cell: (props: AnalyticalTableCellInstance) => (
           <Button
             design="Transparent"
@@ -140,8 +143,20 @@ export function BizObjectLinkedAttachments({ boId, disabled }: BizObjectLinkedAt
           </Button>
         ),
       },
+      {
+        Header: '',
+        id: 'navigation',
+        width: 60,
+        Cell: (props: AnalyticalTableCellInstance) => (
+          <Button
+            design="Transparent"
+            icon="navigation-right-arrow"
+            onClick={() => navigate(`/attachments/${props.row.original.FileId}`)}
+          />
+        ),
+      },
     ],
-    [isPending, visibleColumns],
+    [isPending, navigate, visibleColumns],
   );
 
   React.useEffect(() => {

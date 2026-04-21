@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Link } from 'react-router';
 import { FileUpload } from './file-upload';
 import { formatFileSize } from '@/libs/utils';
+import { Link, useNavigate } from 'react-router';
 import { useViewStore } from '@/stores/view-store';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Title } from '@ui5/webcomponents-react/Title';
@@ -78,6 +78,7 @@ export function AttachmentVersionList({
   currentVersionNo,
   currentExtension,
 }: AttachmentVersionListProps) {
+  const navigate = useNavigate();
   const selectedFieldIds = useViewStore((state) => state.versionListVisibleFieldIds);
   const setSelectedFieldIds = useViewStore((state) => state.setVersionListVisibleFieldIds);
   const attachmentVersionListSelect = React.useMemo(
@@ -141,8 +142,20 @@ export function AttachmentVersionList({
 
         return column;
       }),
+      {
+        Header: '',
+        id: 'navigation',
+        width: 60,
+        Cell: (props: AnalyticalTableCellInstance) => (
+          <Button
+            design="Transparent"
+            icon="navigation-right-arrow"
+            onClick={() => navigate(`/attachments/${fileId}/versions/${props.row.original.VersionNo}`)}
+          />
+        ),
+      },
     ],
-    [currentVersionNo, fileId, visibleColumns],
+    [currentVersionNo, fileId, navigate, visibleColumns],
   );
 
   return (

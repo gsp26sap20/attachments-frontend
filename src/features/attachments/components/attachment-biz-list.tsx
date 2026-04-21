@@ -1,13 +1,14 @@
 import * as React from 'react';
-import { Link } from 'react-router';
 import '@ui5/webcomponents-icons/delete.js';
 import { toast } from '@/libs/helpers/toast';
+import { Link, useNavigate } from 'react-router';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { useViewStore } from '@/stores/view-store';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { ViewSettings } from '@/components/view-settings';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
+import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import { attachmentBOsQueryOptions } from '../options/query';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
@@ -70,6 +71,7 @@ const ALL_COLUMNS = [
 ] as const satisfies readonly AttachmentBizListColumn[];
 
 export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabled: boolean }) {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const selectedFieldIds = useViewStore((state) => state.attachmentBizListVisibleFieldIds);
   const setSelectedFieldIds = useViewStore((state) => state.setAttachmentBizListVisibleFieldIds);
@@ -145,8 +147,20 @@ export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabl
           </Button>
         ),
       },
+      {
+        Header: '',
+        id: 'navigation',
+        width: 60,
+        Cell: (props: AnalyticalTableCellInstance) => (
+          <Button
+            design="Transparent"
+            icon="navigation-right-arrow"
+            onClick={() => navigate(`/business-objects/${props.row.original.BoId}`)}
+          />
+        ),
+      },
     ],
-    [isPending, visibleColumns],
+    [isPending, navigate, visibleColumns],
   );
 
   return (
