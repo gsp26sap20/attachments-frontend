@@ -1,32 +1,39 @@
 import type { BizObjectItem } from '@/features/business-objects/types';
 
-export type AttachmentListItem = {
+export type AttachmentItem = {
   FileId: string;
   Title: string;
   CurrentVersion: string;
   IsActive: boolean;
   Erdat: string;
-  Erzet?: string;
+  Erzet: string;
   Ernam: string;
+  Aedat: string;
+  Aezet: string;
+  Aenam: string;
+  EditLock: boolean;
+  __CreateByAssociationControl: {
+    _Versions: boolean;
+  };
   __EntityControl: {
     Deletable: boolean;
     Updatable: boolean;
   };
-  __OperationControl?: {
+  __OperationControl: {
     Reactivate: boolean;
   };
 };
 
-export type AttachmentSearchParams = AttachmentListParams;
+export type CreateAttachmentResponse = AttachmentItem;
+export type LinkedAttachment = AttachmentItem;
 
 export type AttachmentListResponse = {
-  value: AttachmentListItem[];
+  value: AttachmentItem[];
   '@odata.count': number;
 };
 
 export type AttachmentListParams = {
   $count: boolean;
-  $select: string;
   $skip: number;
   $top: number;
   $filter?: string;
@@ -39,25 +46,7 @@ export type AttachmentDetailParams = {
   $expand?: string;
 };
 
-export type AttachmentDetailResponse = {
-  FileId: string;
-  Title: string;
-  CurrentVersion: string;
-  IsActive: boolean;
-  EditLock: boolean;
-  Erdat: string;
-  Erzet: string;
-  Ernam: string;
-  Aedat: string;
-  Aezet: string;
-  Aenam: string;
-  __EntityControl: {
-    Deletable: boolean;
-    Updatable: boolean;
-  };
-  __OperationControl: {
-    Reactivate: boolean;
-  };
+export type AttachmentDetailResponse = AttachmentItem & {
   _CurrentVersion?: {
     FileName: string;
     MimeType: string;
@@ -70,9 +59,17 @@ export type AttachmentVersionItem = {
   FileId: string;
   VersionNo: string;
   FileName: string;
+  FileExtension: string;
+  MimeType: string;
+  FileSize: number;
+  FileContent: string;
   Erdat: string;
   Erzet: string;
   Ernam: string;
+  __EntityControl: {
+    Deletable: boolean;
+    Updatable: boolean;
+  };
 };
 
 export type AttachmentVersionsResponse = {
@@ -91,10 +88,10 @@ export type AttachmentAuditItem = {
   FileId: string;
   Erdat: string;
   Erzet: string;
+  Ernam: string;
   Uname: string;
   Action: string;
   Note: string;
-  Ernam: string;
 };
 
 export type AttachmentAuditsResponse = {
@@ -110,18 +107,7 @@ export type AttachmentAuditsParams = {
   $orderby?: string;
 };
 
-export type VersionDetail = {
-  FileId: string;
-  VersionNo: string;
-  FileName: string;
-  FileExtension: string;
-  MimeType: string;
-  FileSize: number;
-  FileContent: string;
-  Erdat: string;
-  Erzet: string;
-  Ernam: string;
-};
+export type VersionDetail = AttachmentVersionItem;
 
 export type VersionDetailParams = {
   $select: string;
@@ -147,17 +133,7 @@ export type UploadVersionPayload = UploadedFileData & {
   FileId: string;
 };
 
-export type UploadVersionResponse = {
-  FileId: string;
-  VersionNo: string;
-  FileName: string;
-  FileExtension: string;
-  MimeType: string;
-  FileSize: number;
-  Erdat: string;
-  Erzet: string;
-  Ernam: string;
-};
+export type UploadVersionResponse = AttachmentVersionItem;
 
 export type CreateAttachmentPayload = {
   Title: string;
@@ -165,12 +141,6 @@ export type CreateAttachmentPayload = {
 };
 
 export type UpdateAttachmentPayload = {
-  Title: string;
-  EditLock: boolean;
-};
-
-export type CreateAttachmentResponse = {
-  FileId: string;
   Title: string;
   EditLock: boolean;
 };
@@ -213,8 +183,6 @@ export type GooglePickerDocument = {
   sizeBytes: number;
   parentId: string;
 };
-
-export type LinkedAttachment = AttachmentListItem;
 
 export type AttachmentCurrentVersion = AttachmentTitleResponse;
 

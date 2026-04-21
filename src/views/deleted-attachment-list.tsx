@@ -4,13 +4,12 @@ import { toast } from '@/libs/helpers/toast';
 import '@ui5/webcomponents-icons/refresh.js';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Title } from '@ui5/webcomponents-react/Title';
-import { API } from '@/features/attachments/constants';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
+import type { AttachmentItem } from '@/features/attachments/types';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
-import type { AttachmentListItem } from '@/features/attachments/types';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { AttachmentsFilterBar } from '@/features/attachments/components';
@@ -25,7 +24,7 @@ function RestoreAttachmentButton({
   disabled,
   onRestore,
 }: {
-  attachment: AttachmentListItem;
+  attachment: AttachmentItem;
   disabled: boolean;
   onRestore: (_fileId: string) => void;
 }) {
@@ -53,7 +52,6 @@ export function DeletedAttachmentListView() {
       $skip: 0,
       $top: 10,
       $count: true,
-      $select: API.select,
       $orderby: 'Erdat desc,Erzet desc',
       $filter: filter ? `IsActive eq false and ${filter}` : 'IsActive eq false',
       $search: search || undefined,
@@ -118,7 +116,7 @@ export function DeletedAttachmentListView() {
       {
         Header: 'Actions',
         Cell: (props: AnalyticalTableCellInstance) => {
-          const attachment = props.row.original as AttachmentListItem;
+          const attachment = props.row.original;
 
           return (
             <RestoreAttachmentButton
@@ -167,7 +165,7 @@ export function DeletedAttachmentListView() {
         data={attachments}
         columns={columns}
         sortable
-        groupable
+        groupable={false}
         loading={isFetching || isFetchingNextPage || isRestoring}
         noDataText={
           filter || search ? 'No deleted attachments match the current filters.' : 'No deleted attachments found.'

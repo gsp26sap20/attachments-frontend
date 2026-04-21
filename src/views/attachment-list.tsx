@@ -1,27 +1,28 @@
 import * as React from 'react';
 import { cn } from '@/libs/utils';
-import { Link } from 'react-router';
 import '@ui5/webcomponents-icons/list.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/table-view.js';
+import { Link, useNavigate } from 'react-router';
 import { useAppStore } from '@/stores/app-store';
+import { useViewStore } from '@/stores/view-store';
 import { Bar } from '@ui5/webcomponents-react/Bar';
+import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Grid } from '@ui5/webcomponents-react/Grid';
-import { API } from '@/features/attachments/constants';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
-import { BusyIndicator } from '@/components/busy-indicator';
+import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
-import { useCurrentAuthUser } from '@/features/auth-users/hooks';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
+import { AttachmentViewSettings } from '@/features/attachments/components';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
@@ -29,28 +30,29 @@ import { AttachmentsFilterBar, AttachmentCard, AttachmentCreate } from '@/featur
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
 export function AttachmentListView() {
+  const navigate = useNavigate();
   const viewMode = useAppStore((state) => state.viewMode);
   const setViewMode = useAppStore((state) => state.setViewMode);
-  const { data: currentAuthUser, isPending: isAuthPending } = useCurrentAuthUser();
+  const selectedFieldIds = useViewStore((state) => state.attachmentListVisibleFieldIds);
   const [search, setSearch] = React.useState<string>('');
   const [filter, setFilter] = React.useState<string>('');
-  const isAdmin = currentAuthUser?.isAdmin ?? false;
+  const selectedFieldIdSet = React.useMemo(() => new Set(selectedFieldIds), [selectedFieldIds]);
+  const attachmentListSelect = React.useMemo(() => selectedFieldIds.join(','), [selectedFieldIds]);
   const attachmentListParams = React.useMemo(
     () => ({
       $skip: 0,
       $top: 10,
       $count: true,
-      $select: API.select,
+      $select: attachmentListSelect,
       $orderby: 'Erdat desc,Erzet desc',
-      // If user is admin, show all attachments, otherwise show only active attachments
-      $filter: isAdmin ? filter || undefined : filter ? `IsActive eq true and ${filter}` : 'IsActive eq true',
+      $filter: filter ? `IsActive eq true and ${filter}` : 'IsActive eq true',
       $search: search || undefined,
     }),
-    [filter, isAdmin, search],
+    [attachmentListSelect, filter, search],
   );
   const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage, refetch, error } = useInfiniteQuery({
     ...attachmentsQueryOptions(attachmentListParams),
-    enabled: !isAuthPending,
+    enabled: selectedFieldIds.length > 0,
   });
 
   const attachments = data?.pages.flatMap((page) => page.value) ?? [];
@@ -59,44 +61,102 @@ export function AttachmentListView() {
 
   const columns = React.useMemo(
     () => [
-      {
-        Header: 'File ID',
-        accessor: 'FileId',
-        Cell: (props: AnalyticalTableCellInstance) => (
-          <Link to={`/attachments/${props.value}`}>
-            <UI5Link>{props.value}</UI5Link>
-          </Link>
-        ),
-      },
-      // TODO: Apply to BO
-      {
-        Header: 'Title',
-        accessor: 'Title',
-      },
-      {
-        Header: 'Version',
-        accessor: 'CurrentVersion',
-      },
-      ...(isAdmin
+      ...(selectedFieldIdSet.has('FileId')
         ? [
             {
-              Header: 'Is Active',
-              accessor: 'IsActive',
-              Cell: (props: AnalyticalTableCellInstance) => (props.value ? 'Yes' : 'No'),
+              Header: 'File ID',
+              accessor: 'FileId',
+              Cell: (props: AnalyticalTableCellInstance) => (
+                <Link to={`/attachments/${props.value}`}>
+                  <UI5Link>{props.value}</UI5Link>
+                </Link>
+              ),
+            },
+          ]
+        : []),
+      ...(selectedFieldIdSet.has('Title')
+        ? [
+            {
+              Header: 'Title',
+              accessor: 'Title',
+            },
+          ]
+        : []),
+      ...(selectedFieldIdSet.has('CurrentVersion')
+        ? [
+            {
+              Header: 'Version',
+              accessor: 'CurrentVersion',
+            },
+          ]
+        : []),
+      ...(selectedFieldIdSet.has('Erdat')
+        ? [
+            {
+              Header: 'Created On',
+              accessor: 'Erdat',
+            },
+          ]
+        : []),
+      ...(selectedFieldIdSet.has('Erzet')
+        ? [
+            {
+              Header: 'Created At',
+              accessor: 'Erzet',
+            },
+          ]
+        : []),
+      ...(selectedFieldIdSet.has('Ernam')
+        ? [
+            {
+              Header: 'Created By',
+              accessor: 'Ernam',
+            },
+          ]
+        : []),
+      ...(selectedFieldIdSet.has('Aedat')
+        ? [
+            {
+              Header: 'Changed On',
+              accessor: 'Aedat',
+            },
+          ]
+        : []),
+      ...(selectedFieldIdSet.has('Aezet')
+        ? [
+            {
+              Header: 'Changed At',
+              accessor: 'Aezet',
+            },
+          ]
+        : []),
+      ...(selectedFieldIdSet.has('Aenam')
+        ? [
+            {
+              Header: 'Changed By',
+              accessor: 'Aenam',
+            },
+          ]
+        : []),
+      ...(selectedFieldIdSet.has('EditLock')
+        ? [
+            {
+              Header: 'Edit Lock',
+              accessor: 'EditLock',
+              Cell: (props: AnalyticalTableCellInstance) => (props.value ? 'Enabled' : 'Disabled'),
             },
           ]
         : []),
       {
-        Header: 'Created At',
-        id: 'createdAt',
-        Cell: (props: AnalyticalTableCellInstance) => `${props.row.original.Erdat} ${props.row.original.Erzet}`,
-      },
-      {
-        Header: 'Created By',
-        accessor: 'Ernam',
+        Header: '',
+        id: 'navigation',
+        width: 60,
+        Cell: (props: AnalyticalTableCellInstance) => (
+          <Icon name="navigation-right-arrow" onClick={() => navigate(`/attachments/${props.row.original.FileId}`)} />
+        ),
       },
     ],
-    [isAdmin],
+    [selectedFieldIdSet, navigate],
   );
 
   React.useEffect(() => {
@@ -105,19 +165,11 @@ export function AttachmentListView() {
     }
   }, [error]);
 
-  if (isAuthPending) {
-    return (
-      <div className="flex h-dvh w-full items-center justify-center">
-        <BusyIndicator type="loading" />
-      </div>
-    );
-  }
-
   return (
     <DynamicPage
       headerArea={
         <DynamicPageHeader className="px-8 py-4">
-          <AttachmentsFilterBar onFilterChange={setFilter} onSearchChange={setSearch} showActiveFilter={isAdmin} />
+          <AttachmentsFilterBar onFilterChange={setFilter} onSearchChange={setSearch} showActiveFilter={false} />
         </DynamicPageHeader>
       }
       className="flex-1"
@@ -141,10 +193,12 @@ export function AttachmentListView() {
               />
               <ToolbarButton
                 icon="table-view"
+                design="Transparent"
                 tooltip="Toggle grid view"
                 disabled={isFetching || attachments.length === 0}
                 onClick={() => setViewMode('grid')}
               />
+              <AttachmentViewSettings />
             </Toolbar>
           }
           data={attachments}
@@ -174,6 +228,7 @@ export function AttachmentListView() {
             />
             <ToolbarButton
               icon="list"
+              design="Transparent"
               tooltip="Toggle list view"
               onClick={() => setViewMode('table')}
               disabled={isFetching || attachments.length === 0}
@@ -182,12 +237,7 @@ export function AttachmentListView() {
           {attachments.length === 0 && <IllustratedMessage name="NoData" />}
           <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
             {attachments.map((attachment) => (
-              <AttachmentCard
-                key={attachment.FileId}
-                data={attachment}
-                isAdmin={isAdmin}
-                loading={isFetching || isFetchingNextPage}
-              />
+              <AttachmentCard key={attachment.FileId} data={attachment} loading={isFetching || isFetchingNextPage} />
             ))}
           </Grid>
         </FlexBox>

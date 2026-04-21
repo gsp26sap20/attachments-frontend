@@ -17,11 +17,10 @@ type Attachment = {
 
 type AttachmentCardProps = {
   data: Attachment;
-  isAdmin: boolean;
   loading?: boolean;
 };
 
-export function AttachmentCard({ data, isAdmin, loading }: AttachmentCardProps) {
+export function AttachmentCard({ data, loading }: AttachmentCardProps) {
   const navigate = useNavigate();
 
   return (
@@ -31,7 +30,6 @@ export function AttachmentCard({ data, isAdmin, loading }: AttachmentCardProps) 
           avatar={<Icon name="document" />}
           titleText={data.Title}
           subtitleText={`Version ${data.CurrentVersion}`}
-          additionalText={isAdmin ? (data.IsActive ? 'Active' : 'Inactive') : undefined}
           interactive={true}
           onClick={() => navigate(`/attachments/${data.FileId}`)}
         />
@@ -39,7 +37,6 @@ export function AttachmentCard({ data, isAdmin, loading }: AttachmentCardProps) 
       loading={loading}
     >
       <List>
-        {isAdmin && <ListItemStandard text="Is Active" description={data.IsActive ? 'Yes' : 'No'} />}
         <ListItemStandard text="Created On" description={data.Erdat} />
         <ListItemStandard text="Created By" description={data.Ernam} />
       </List>
