@@ -99,7 +99,7 @@ export const ATTACHMENT_AUDIT_SELECTED_FIELD_IDS: AttachmentAuditFieldId[] = [
 //====================================================================================================
 
 export type AttachmentBizListFieldOption = {
-  id: 'BoId' | 'BoTitle' | 'BoType' | 'Status' | 'Erdat' | 'Erzet' | 'Ernam';
+  id: 'BoId' | 'BoTitle' | 'BoType' | 'Status' | 'LinkErdat' | 'LinkErzet' | 'LinkErnam';
   label: string;
 };
 
@@ -108,9 +108,9 @@ export const ATTACHMENT_BIZ_LIST_FIELDS = [
   { id: 'BoTitle', label: 'BO Title' },
   { id: 'BoType', label: 'BO Type' },
   { id: 'Status', label: 'BO Status' },
-  { id: 'Erdat', label: 'Linked On' },
-  { id: 'Erzet', label: 'Linked At' },
-  { id: 'Ernam', label: 'Link By' },
+  { id: 'LinkErdat', label: 'Linked On' },
+  { id: 'LinkErzet', label: 'Linked At' },
+  { id: 'LinkErnam', label: 'Link By' },
 ] as const satisfies readonly AttachmentBizListFieldOption[];
 
 export type AttachmentBizListFieldId = (typeof ATTACHMENT_BIZ_LIST_FIELDS)[number]['id'];
@@ -120,6 +120,6 @@ export const ATTACHMENT_BIZ_LIST_SELECTED_FIELD_IDS: AttachmentBizListFieldId[] 
   'BoTitle',
   'BoType',
   'Status',
-  'Erdat',
-  'Ernam',
+  'LinkErdat',
+  'LinkErnam',
 ];

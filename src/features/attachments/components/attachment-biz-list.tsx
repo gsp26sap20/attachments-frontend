@@ -55,17 +55,17 @@ const ALL_COLUMNS = [
   {
     Header: 'Linked On',
     accessor: 'Erdat',
-    id: 'Erdat',
+    id: 'LinkErdat',
   },
   {
     Header: 'Linked At',
     accessor: 'Erzet',
-    id: 'Erzet',
+    id: 'LinkErzet',
   },
   {
     Header: 'Link By',
     accessor: 'Ernam',
-    id: 'Ernam',
+    id: 'LinkErnam',
   },
 ] as const satisfies readonly AttachmentBizListColumn[];
 

@@ -26,3 +26,30 @@ export const BO_LIST_FIELDS = [
 export type BoListFieldId = (typeof BO_LIST_FIELDS)[number]['id'];
 
 export const BO_LIST_SELECTED_FIELD_IDS: BoListFieldId[] = ['BoId', 'BoTitle', 'BoType', 'Status', 'Erdat', 'Ernam'];
+
+//====================================================================================================
+
+export type BizObjectLinkedAttachmentFieldOption = {
+  id: 'FileId' | 'Title' | 'CurrentVersion' | 'IsActive' | 'EditLock' | 'LinkErdat' | 'LinkErzet' | 'LinkErnam';
+  label: string;
+};
+
+export const BIZ_OBJECT_LINKED_ATTACHMENT_FIELDS = [
+  { id: 'FileId', label: 'File ID' },
+  { id: 'Title', label: 'Title' },
+  { id: 'CurrentVersion', label: 'Version' },
+  { id: 'EditLock', label: 'Edit Lock' },
+  { id: 'LinkErdat', label: 'Linked On' },
+  { id: 'LinkErzet', label: 'Linked At' },
+  { id: 'LinkErnam', label: 'Linked By' },
+] as const satisfies readonly BizObjectLinkedAttachmentFieldOption[];
+
+export type BizObjectLinkedAttachmentFieldId = (typeof BIZ_OBJECT_LINKED_ATTACHMENT_FIELDS)[number]['id'];
+
+export const BIZ_OBJECT_LINKED_ATTACHMENT_SELECTED_FIELD_IDS: BizObjectLinkedAttachmentFieldId[] = [
+  'FileId',
+  'Title',
+  'CurrentVersion',
+  'LinkErdat',
+  'LinkErnam',
+];
