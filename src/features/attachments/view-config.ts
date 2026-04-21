@@ -1,4 +1,4 @@
-import type { AttachmentItem } from './types';
+import type { AttachmentItem, AttachmentVersionItem } from './types';
 
 type AttachmentListFieldKey = keyof Pick<
   AttachmentItem,
@@ -30,5 +30,38 @@ export const ATT_LIST_SELECTED_FIELD_IDS: AttachmentListFieldId[] = [
   'Title',
   'CurrentVersion',
   'Erdat',
+  'Ernam',
+];
+
+//====================================================================================================
+
+type AttachmentVersionListFieldKey = keyof Pick<
+  AttachmentVersionItem,
+  'VersionNo' | 'FileName' | 'FileExtension' | 'MimeType' | 'FileSize' | 'Erdat' | 'Erzet' | 'Ernam'
+>;
+
+export type AttachmentVersionListFieldOption = {
+  id: AttachmentVersionListFieldKey;
+  label: string;
+};
+
+export const VERSION_LIST_FIELDS = [
+  { id: 'VersionNo', label: 'Version' },
+  { id: 'FileName', label: 'File Name' },
+  { id: 'FileExtension', label: 'File Extension' },
+  { id: 'MimeType', label: 'MIME Type' },
+  { id: 'FileSize', label: 'File Size' },
+  { id: 'Erdat', label: 'Created On' },
+  { id: 'Erzet', label: 'Created At' },
+  { id: 'Ernam', label: 'Created By' },
+] as const satisfies readonly AttachmentVersionListFieldOption[];
+
+export type AttachmentVersionListFieldId = (typeof VERSION_LIST_FIELDS)[number]['id'];
+
+export const VERSION_LIST_SELECTED_FIELD_IDS: AttachmentVersionListFieldId[] = [
+  'VersionNo',
+  'FileName',
+  'Erdat',
+  'Erzet',
   'Ernam',
 ];

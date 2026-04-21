@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Link } from 'react-router';
 import { FileUpload } from './file-upload';
+import { formatFileSize } from '@/libs/utils';
+import { useViewStore } from '@/stores/view-store';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -9,8 +11,10 @@ import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { attachmentVersionsQueryOptions } from '../options/query';
+import type { AttachmentVersionListFieldId } from '../view-config';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
+import { AttachmentVersionViewSettings } from './attachment-version-view-settings';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
 interface AttachmentVersionListProps {
@@ -20,12 +24,69 @@ interface AttachmentVersionListProps {
   currentExtension: string;
 }
 
+type AttachmentVersionListColumn = {
+  id: AttachmentVersionListFieldId;
+} & Record<string, unknown>;
+
+const ALL_COLUMNS = [
+  {
+    Header: 'Version',
+    accessor: 'VersionNo',
+    id: 'VersionNo',
+  },
+  {
+    Header: 'File Name',
+    accessor: 'FileName',
+    id: 'FileName',
+  },
+  {
+    Header: 'File Extension',
+    accessor: 'FileExtension',
+    id: 'FileExtension',
+  },
+  {
+    Header: 'MIME Type',
+    accessor: 'MimeType',
+    id: 'MimeType',
+  },
+  {
+    Header: 'File Size',
+    accessor: 'FileSize',
+    id: 'FileSize',
+    Cell: (props: AnalyticalTableCellInstance) => formatFileSize(props.value),
+  },
+  {
+    Header: 'Created On',
+    accessor: 'Erdat',
+    id: 'Erdat',
+  },
+  {
+    Header: 'Created At',
+    accessor: 'Erzet',
+    id: 'Erzet',
+  },
+  {
+    Header: 'Created By',
+    accessor: 'Ernam',
+    id: 'Ernam',
+  },
+] as const satisfies readonly AttachmentVersionListColumn[];
+
 export function AttachmentVersionList({
   fileId,
   disabled,
   currentVersionNo,
   currentExtension,
 }: AttachmentVersionListProps) {
+  const selectedFieldIds = useViewStore((state) => state.versionListVisibleFieldIds);
+  const attachmentVersionListSelect = React.useMemo(
+    () => Array.from(new Set([...selectedFieldIds, 'VersionNo'])).join(','),
+    [selectedFieldIds],
+  );
+  const visibleColumns = React.useMemo(
+    () => ALL_COLUMNS.filter((col) => selectedFieldIds.includes(col.id)),
+    [selectedFieldIds],
+  );
   const {
     data: versionsData,
     isFetching,
@@ -33,14 +94,15 @@ export function AttachmentVersionList({
     hasNextPage,
     isFetchingNextPage,
     error,
-  } = useInfiniteQuery(
-    attachmentVersionsQueryOptions(fileId, {
+  } = useInfiniteQuery({
+    ...attachmentVersionsQueryOptions(fileId, {
       $count: true,
-      $select: 'Erdat,Ernam,Erzet,FileId,FileName,VersionNo',
+      $select: attachmentVersionListSelect,
       $skip: 0,
       $top: 5,
     }),
-  );
+    enabled: !!fileId && selectedFieldIds.length > 0,
+  });
 
   const versions = versionsData?.pages.flatMap((page) => page.value) ?? [];
   const totalCount = versionsData?.pages[0]['@odata.count'] ?? 0;
@@ -53,35 +115,33 @@ export function AttachmentVersionList({
 
   const columns = React.useMemo(
     () => [
-      {
-        Header: 'Version',
-        accessor: 'VersionNo',
-        Cell: (props: AnalyticalTableCellInstance) => (
-          <Link to={`/attachments/${fileId}/versions/${props.value}`}>
-            <UI5Link>{`${props.value ?? 'N/A'}${props.value === currentVersionNo ? ' (Current)' : ''}`}</UI5Link>
-          </Link>
-        ),
-      },
-      {
-        Header: 'File Name',
-        accessor: 'FileName',
-        Cell: (props: AnalyticalTableCellInstance) => (
-          <Link to={`/attachments/${fileId}/versions/${props.row.original.VersionNo}`}>
-            <UI5Link>{props.value ?? 'N/A'}</UI5Link>
-          </Link>
-        ),
-      },
-      {
-        Header: 'Created At',
-        id: 'created-at',
-        Cell: (props: AnalyticalTableCellInstance) => `${props.row.original.Erdat} ${props.row.original.Erzet}`,
-      },
-      {
-        Header: 'Created By',
-        accessor: 'Ernam',
-      },
+      ...visibleColumns.map((column) => {
+        if (column.id === 'VersionNo') {
+          return {
+            ...column,
+            Cell: (props: AnalyticalTableCellInstance) => (
+              <Link to={`/attachments/${fileId}/versions/${props.value}`}>
+                <UI5Link>{`${props.value ?? 'N/A'}${props.value === currentVersionNo ? ' (Current)' : ''}`}</UI5Link>
+              </Link>
+            ),
+          };
+        }
+
+        if (column.id === 'FileName') {
+          return {
+            ...column,
+            Cell: (props: AnalyticalTableCellInstance) => (
+              <Link to={`/attachments/${fileId}/versions/${props.row.original.VersionNo}`}>
+                <UI5Link>{props.value ?? 'N/A'}</UI5Link>
+              </Link>
+            ),
+          };
+        }
+
+        return column;
+      }),
     ],
-    [fileId, currentVersionNo],
+    [currentVersionNo, fileId, visibleColumns],
   );
 
   return (
@@ -93,11 +153,17 @@ export function AttachmentVersionList({
             <ToolbarSpacer />
             {/* ToolbarButton - FileUpload */}
             <FileUpload fileId={fileId} currentExtension={currentExtension} disabled={disabled} />
+            <AttachmentVersionViewSettings />
           </Toolbar>
         }
-        data={versions}
-        columns={columns}
+        data={selectedFieldIds.length > 0 ? versions : []}
+        columns={selectedFieldIds.length > 0 ? columns : []}
         loading={isFetching || isFetchingNextPage}
+        noDataText={
+          selectedFieldIds.length === 0
+            ? 'There are no visible columns in the table right now. Please select the columns you need in the table settings.'
+            : 'No versions found.'
+        }
         rowHeight={36}
         selectionMode="None"
         visibleRows={10}
