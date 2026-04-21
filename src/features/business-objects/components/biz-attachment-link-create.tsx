@@ -196,7 +196,7 @@ function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: Bi
         onClose={() => setOpen(false)}
       >
         <div className="sticky top-4 left-4 right-4 z-10">
-          <AttachmentsFilterBar showSearch={false} showActiveFilter={false} onFilterChange={setFilter} />
+          <AttachmentsFilterBar onFilterChange={setFilter} />
         </div>
         <AnalyticalTable
           header={

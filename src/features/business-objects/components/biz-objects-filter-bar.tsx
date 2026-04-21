@@ -13,19 +13,33 @@ interface BizObjectsFilterBarProps {
   onSearchChange: (_search: string) => void;
 }
 
+const DEFAULT_FILTER_KEYS = ['BoId', 'BoType', 'BoTitle', 'Status', 'Erdat', 'Ernam'];
+
 export function BizObjectsFilterBar({ onFilterChange, onSearchChange }: BizObjectsFilterBarProps) {
   const [count, setCount] = React.useState(0);
   const [boType, setBoType] = React.useState('');
   const [status, setStatus] = React.useState('');
-  const [filterKeys, setFilterKeys] = React.useState<string[]>(['BoId', 'BoType', 'BoTitle', 'Status', 'Ernam']);
+  const [filterKeys, setFilterKeys] = React.useState<string[]>(DEFAULT_FILTER_KEYS);
   const [boIdFilterString, setBoIdFilterString] = React.useState('');
   const [boTitleFilterString, setBoTitleFilterString] = React.useState('');
+  const [createdOnFilterString, setCreatedOnFilterString] = React.useState('');
   const [createdByFilterString, setCreatedByFilterString] = React.useState('');
+  const [changedOnFilterString, setChangedOnFilterString] = React.useState('');
+  const [changedByFilterString, setChangedByFilterString] = React.useState('');
 
   const handleOnGo = function () {
     const boTypeFilter = boType ? `BoType eq '${boType}'` : '';
     const statusFilter = status ? `Status eq '${status}'` : '';
-    const filter = [boIdFilterString, boTitleFilterString, boTypeFilter, statusFilter, createdByFilterString]
+    const filter = [
+      boIdFilterString,
+      boTitleFilterString,
+      boTypeFilter,
+      statusFilter,
+      createdOnFilterString,
+      createdByFilterString,
+      changedOnFilterString,
+      changedByFilterString,
+    ]
       .filter(Boolean)
       .join(' and ');
     onFilterChange(filter);
@@ -33,10 +47,13 @@ export function BizObjectsFilterBar({ onFilterChange, onSearchChange }: BizObjec
 
   const onClear = function () {
     setCount((prev) => prev + 1);
-    setFilterKeys(['BoId', 'BoType', 'BoTitle', 'Status', 'Ernam']);
+    setFilterKeys(DEFAULT_FILTER_KEYS);
     setBoIdFilterString('');
     setBoTitleFilterString('');
+    setCreatedOnFilterString('');
     setCreatedByFilterString('');
+    setChangedOnFilterString('');
+    setChangedByFilterString('');
     setBoType('');
     setStatus('');
     onSearchChange('');
@@ -54,7 +71,12 @@ export function BizObjectsFilterBar({ onFilterChange, onSearchChange }: BizObjec
       onRestore={onClear}
       search={<Input className="*:h-full h-6.5" onChange={(e) => onSearchChange(e.target.value)} />}
     >
-      <FilterGroupItem filterKey="BoId" label="BO ID" hiddenInFilterBar={!filterKeys.includes('BoId')}>
+      <FilterGroupItem
+        filterKey="BoId"
+        label="BO ID"
+        hiddenInFilterBar={!filterKeys.includes('BoId')}
+        active={!!boIdFilterString}
+      >
         <SearchHelpDialog
           key={count}
           label="BO ID"
@@ -64,10 +86,20 @@ export function BizObjectsFilterBar({ onFilterChange, onSearchChange }: BizObjec
           afterFilterStringBuild={setBoIdFilterString}
         />
       </FilterGroupItem>
-      <FilterGroupItem filterKey="BoTitle" label="Title" hiddenInFilterBar={!filterKeys.includes('BoTitle')}>
+      <FilterGroupItem
+        filterKey="BoTitle"
+        label="Title"
+        hiddenInFilterBar={!filterKeys.includes('BoTitle')}
+        active={!!boTitleFilterString}
+      >
         <SearchHelpDialog key={count} label="Title" field="BoTitle" afterFilterStringBuild={setBoTitleFilterString} />
       </FilterGroupItem>
-      <FilterGroupItem filterKey="BoType" label="Type" hiddenInFilterBar={!filterKeys.includes('BoType')}>
+      <FilterGroupItem
+        filterKey="BoType"
+        label="Type"
+        hiddenInFilterBar={!filterKeys.includes('BoType')}
+        active={!!boType}
+      >
         <Select value={boType} onChange={(event) => setBoType(event.target.value)} className="h-6.5">
           <Option value="">All</Option>
           {BO_TYPES.map((type) => (
@@ -77,7 +109,12 @@ export function BizObjectsFilterBar({ onFilterChange, onSearchChange }: BizObjec
           ))}
         </Select>
       </FilterGroupItem>
-      <FilterGroupItem filterKey="Status" label="Status" hiddenInFilterBar={!filterKeys.includes('Status')}>
+      <FilterGroupItem
+        filterKey="Status"
+        label="Status"
+        hiddenInFilterBar={!filterKeys.includes('Status')}
+        active={!!status}
+      >
         <Select value={status} onChange={(event) => setStatus(event.target.value)} className="h-6.5">
           <Option value="">All</Option>
           {BO_STATUS.map((item) => (
@@ -87,12 +124,60 @@ export function BizObjectsFilterBar({ onFilterChange, onSearchChange }: BizObjec
           ))}
         </Select>
       </FilterGroupItem>
-      <FilterGroupItem filterKey="Ernam" label="Created By" hiddenInFilterBar={!filterKeys.includes('Ernam')}>
+      <FilterGroupItem
+        filterKey="Erdat"
+        label="Created On"
+        hiddenInFilterBar={!filterKeys.includes('Erdat')}
+        active={!!createdOnFilterString}
+      >
+        <SearchHelpDialog
+          key={count}
+          label="Created On"
+          field="Erdat"
+          options={['equal to']}
+          useApostrophe={false}
+          afterFilterStringBuild={setCreatedOnFilterString}
+        />
+      </FilterGroupItem>
+      <FilterGroupItem
+        filterKey="Ernam"
+        label="Created By"
+        hiddenInFilterBar={!filterKeys.includes('Ernam')}
+        active={!!createdByFilterString}
+      >
         <SearchHelpDialog
           key={count}
           label="Created By"
           field="Ernam"
           afterFilterStringBuild={setCreatedByFilterString}
+        />
+      </FilterGroupItem>
+      <FilterGroupItem
+        filterKey="Aedat"
+        label="Changed On"
+        hiddenInFilterBar={!filterKeys.includes('Aedat')}
+        active={!!changedOnFilterString}
+      >
+        <SearchHelpDialog
+          key={count}
+          label="Changed On"
+          field="Aedat"
+          options={['equal to']}
+          useApostrophe={false}
+          afterFilterStringBuild={setChangedOnFilterString}
+        />
+      </FilterGroupItem>
+      <FilterGroupItem
+        filterKey="Aenam"
+        label="Changed By"
+        hiddenInFilterBar={!filterKeys.includes('Aenam')}
+        active={!!changedByFilterString}
+      >
+        <SearchHelpDialog
+          key={count}
+          label="Changed By"
+          field="Aenam"
+          afterFilterStringBuild={setChangedByFilterString}
         />
       </FilterGroupItem>
     </FilterBar>

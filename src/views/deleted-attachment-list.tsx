@@ -165,7 +165,7 @@ export function DeletedAttachmentListView() {
     <DynamicPage
       headerArea={
         <DynamicPageHeader className="py-4 px-8">
-          <AttachmentsFilterBar onFilterChange={setFilter} onSearchChange={setSearch} showActiveFilter={false} />
+          <AttachmentsFilterBar onFilterChange={setFilter} onSearchChange={setSearch} />
         </DynamicPageHeader>
       }
       className="flex-1"

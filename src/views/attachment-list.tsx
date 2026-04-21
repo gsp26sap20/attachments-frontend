@@ -123,7 +123,7 @@ export function AttachmentListView() {
     <DynamicPage
       headerArea={
         <DynamicPageHeader className="px-8 py-4">
-          <AttachmentsFilterBar onFilterChange={setFilter} onSearchChange={setSearch} showActiveFilter={false} />
+          <AttachmentsFilterBar onFilterChange={setFilter} onSearchChange={setSearch} />
         </DynamicPageHeader>
       }
       className="flex-1"
