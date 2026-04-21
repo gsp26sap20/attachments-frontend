@@ -2,18 +2,18 @@ import * as React from 'react';
 import { cn } from '@/libs/utils';
 import type { UploadedFileData } from '../types';
 import { useQuery } from '@tanstack/react-query';
-import { pushErrorMessages } from '@/libs/errors';
 import { GoogleDriveIcon } from '@/components/icons';
 import '@ui5/webcomponents-icons/upload-to-cloud.js';
 import { Icon } from '@ui5/webcomponents-react/Icon';
-import { fileToUploadedFileData } from '../upload-file';
 import { BusyIndicator } from '@/components/busy-indicator';
+import { fileToUploadedFileData } from '../helpers/upload-file';
+import { pushErrorMessages } from '@/libs/helpers/error-messages';
 import type { ConfigFileItem } from '@/features/config-files/types';
 import { Button, type ButtonPropTypes } from '@ui5/webcomponents-react/Button';
 import { configFilesQueryOptions } from '@/features/config-files/options/query';
-import { type UploadConfigType, validateUploadFileData } from '../upload-config';
+import { type UploadConfigType, validateUploadFileData } from '../helpers/upload-config';
 import { FileUploader, type FileUploaderPropTypes } from '@ui5/webcomponents-react/FileUploader';
-import { buildUploadAcceptValue, findMatchingUploadConfig, getAllowedUploadExtensions } from '../upload-config';
+import { buildUploadAcceptValue, findMatchingUploadConfig, getAllowedUploadExtensions } from '../helpers/upload-config';
 
 interface FilePickerProps {
   disabled: boolean;
@@ -25,11 +25,7 @@ interface FilePickerProps {
 
 export function FilePicker({ disabled, onPick, onGoogleBtnClick, requiredType, className }: FilePickerProps) {
   const [loading, setLoading] = React.useState(false);
-  const { data: configFilesData } = useQuery(
-    configFilesQueryOptions({
-      'sap-client': 324,
-    }),
-  );
+  const { data: configFilesData } = useQuery(configFilesQueryOptions({}));
   const filteredConfigFiles = React.useMemo<ConfigFileItem[] | undefined>(() => {
     if (!configFilesData?.value) {
       return undefined;

@@ -44,7 +44,6 @@ export type AuthUsersResponse = {
 };
 
 export type AuthUsersQueryParams = {
-  'sap-client': number;
   $count?: boolean;
   $select?: string;
   $filter?: string;

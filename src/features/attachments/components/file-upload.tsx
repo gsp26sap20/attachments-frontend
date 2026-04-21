@@ -1,12 +1,10 @@
 import * as React from 'react';
-import { toast } from '@/libs/toast';
+import { toast } from '@/libs/helpers/toast';
 import { useNavigate } from 'react-router';
 import { FilePicker } from './file-picker';
 import { FilePreview } from './file-preview';
 import { formatFileSize } from '@/libs/utils';
-import { validateFileName } from '../validate';
 import type { UploadedFileData } from '../types';
-import { pushErrorMessages } from '@/libs/errors';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { Input } from '@ui5/webcomponents-react/Input';
@@ -16,10 +14,12 @@ import { Button } from '@ui5/webcomponents-react/Button';
 import { GoogleDrivePicker } from './google-drive-picker';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { BusyIndicator } from '@/components/busy-indicator';
-import { buildFileName, getEditableFileName } from '../helpers';
-import { resolveUploadTypeByExtension } from '../upload-config';
+import { validateFileName } from '../helpers/input-validate';
+import { pushErrorMessages } from '@/libs/helpers/error-messages';
 import { uploadVersionMutationOptions } from '../options/mutation';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
+import { resolveUploadTypeByExtension } from '../helpers/upload-config';
+import { buildFileName, getEditableFileName } from '../helpers/file-name';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { configFilesQueryOptions } from '@/features/config-files/options/query';
 
@@ -41,11 +41,7 @@ function FileUploadImpl({ fileId, currentExtension, disabled }: FileUploadProps)
   const [fileData, setFileData] = React.useState<UploadedFileData | null>(null);
   const [fileNameDraft, setFileNameDraft] = React.useState('');
   const [fileNameError, setFileNameError] = React.useState('');
-  const { data: configFilesData } = useQuery(
-    configFilesQueryOptions({
-      'sap-client': 324,
-    }),
-  );
+  const { data: configFilesData } = useQuery(configFilesQueryOptions({}));
   const requiredType = React.useMemo(
     () => resolveUploadTypeByExtension(currentExtension, configFilesData?.value),
     [configFilesData?.value, currentExtension],
@@ -198,7 +194,7 @@ function FileUploadImpl({ fileId, currentExtension, disabled }: FileUploadProps)
         design="Transparent"
         text="Upload"
         onClick={() => setOpen('local')}
-        disabled={disabled || !fileId || !currentExtension}
+        disabled={disabled || !fileId}
         className="h-8"
       />
       <Dialog

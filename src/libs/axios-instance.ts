@@ -1,7 +1,7 @@
 import qs from 'qs';
-import { ODATA_BASE_URL } from '@/app-constant';
 import axios, { type AxiosRequestConfig } from 'axios';
-import { setCsrfToken, clearCsrfToken } from './helpers';
+import { ODATA_BASE_URL, ODATA_SAP_CLIENT } from '@/app-constant';
+import { setCsrfToken, clearCsrfToken } from './helpers/csrf-token';
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
@@ -19,12 +19,16 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(
-  // TODO: add sap-client param to all requests
   (config) => {
     config.headers = config.headers ?? {};
     if (!config.headers['Content-Type'] && config.data && !(config.data instanceof FormData)) {
       config.headers['Content-Type'] = 'application/json';
     }
+    config.params = {
+      ...(config.params ?? {}),
+      'sap-client': ODATA_SAP_CLIENT,
+    };
+
     return config;
   },
   (error) => {

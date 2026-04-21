@@ -1,14 +1,14 @@
 import * as React from 'react';
-import { toast } from '@/libs/toast';
+import { toast } from '@/libs/helpers/toast';
 import { useQuery } from '@tanstack/react-query';
-import { pushErrorMessages } from '@/libs/errors';
 import { useAuthStore } from '@/stores/auth-store';
 import { GOOGLE_APP_ID, GOOGLE_CLIENT_ID } from '@/app-env';
+import { pushErrorMessages } from '@/libs/helpers/error-messages';
 import type { ConfigFileItem } from '@/features/config-files/types';
 import type { UploadedFileData, GooglePickerDocument } from '../types';
 import { configFilesQueryOptions } from '@/features/config-files/options/query';
-import { getGoogleDriveUploadMetadata, googleDriveFileToUploadedFileData } from '../upload-file';
-import { findMatchingUploadConfig, type UploadConfigType, validateUploadFileData } from '../upload-config';
+import { getGoogleDriveUploadMetadata, googleDriveFileToUploadedFileData } from '../helpers/upload-file';
+import { findMatchingUploadConfig, type UploadConfigType, validateUploadFileData } from '../helpers/upload-config';
 import { DrivePicker, DrivePickerDocsView, type DrivePickerEventHandlers } from '@googleworkspace/drive-picker-react';
 
 interface GoogleDrivePickerProps {
@@ -21,11 +21,7 @@ interface GoogleDrivePickerProps {
 export function GoogleDrivePicker({ onPick, onPickCancel, onLoadingChange, requiredType }: GoogleDrivePickerProps) {
   const googleAccessToken = useAuthStore((state) => state.googleAccessToken);
   const setGoogleAccessToken = useAuthStore((state) => state.setGoogleAccessToken);
-  const { data: configFilesData } = useQuery(
-    configFilesQueryOptions({
-      'sap-client': 324,
-    }),
-  );
+  const { data: configFilesData } = useQuery(configFilesQueryOptions({}));
   const filteredConfigFiles = React.useMemo<ConfigFileItem[] | undefined>(() => {
     if (!configFilesData?.value) {
       return undefined;

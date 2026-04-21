@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import * as helper from '../helpers';
+import * as helper from '../helpers/preview-file';
 
 export function useFilePreview(mimeType?: string, fileContent?: string, fileName?: string) {
   return useMemo(() => {

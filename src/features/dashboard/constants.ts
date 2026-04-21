@@ -10,45 +10,32 @@ export const API = {
   recentAuditLogs: '/RecentAuditLogs',
 };
 
-export const DEFAULT_DASHBOARD_PARAMS = {
-  'sap-client': 324,
-} as const;
-
 export const DASHBOARD_QUERY_PARAMS = {
   adminDashboardStats: {
-    ...DEFAULT_DASHBOARD_PARAMS,
     $top: 1,
   },
   attachmentOverview: {
-    ...DEFAULT_DASHBOARD_PARAMS,
     $top: 1,
   },
   attachmentStatsByType: {
-    ...DEFAULT_DASHBOARD_PARAMS,
     $orderby: 'TotalSize desc,VersionCount desc,FileExt asc',
   },
   authOverview: {
-    ...DEFAULT_DASHBOARD_PARAMS,
     $top: 1,
   },
   businessObjectOverview: {
-    ...DEFAULT_DASHBOARD_PARAMS,
     $top: 1,
   },
   configOverview: {
-    ...DEFAULT_DASHBOARD_PARAMS,
     $top: 1,
   },
   fileConfigList: {
-    ...DEFAULT_DASHBOARD_PARAMS,
     $orderby: 'IsActive desc,FileExt asc',
   },
   linkOverview: {
-    ...DEFAULT_DASHBOARD_PARAMS,
     $top: 1,
   },
   recentAuditLogs: {
-    ...DEFAULT_DASHBOARD_PARAMS,
     $top: 8,
     $orderby: 'Erdat desc,Erzet desc',
   },

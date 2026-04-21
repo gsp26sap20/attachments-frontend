@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { cn } from '@/libs/utils';
-import { formatCount } from '../helpers';
+import { formatCount } from '@/libs/utils';
 import { SectionCard } from './section-card';
 import { formatFileSize } from '@/libs/utils';
 import { useQuery } from '@tanstack/react-query';
-import { pushApiErrorMessages } from '@/libs/errors';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { BusyIndicator } from '@/components/busy-indicator';
+import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { dashboardAttachmentStatsByTypeQueryOptions } from '../options/query';
 
 function buildFileTypeItems(items: { FileExt: string; VersionCount: number; TotalSize: number }[]) {

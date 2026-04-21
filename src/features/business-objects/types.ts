@@ -18,7 +18,6 @@ export type BizObjectItem = {
 };
 
 export type BizObjectListParams = {
-  'sap-client': number;
   $count?: boolean;
   $select?: string;
   $skip?: number;
@@ -34,13 +33,11 @@ export type BizObjectListResponse = {
 };
 
 export type BizObjectDetailParams = {
-  'sap-client': number;
   $select?: string;
   $expand?: string;
 };
 
 export type BizObjectLinkedAttachmentParams = {
-  'sap-client': number;
   $count?: boolean;
   $select?: string;
   $skip?: number;

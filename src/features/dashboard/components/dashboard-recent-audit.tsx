@@ -5,10 +5,11 @@ import { SectionCard } from './section-card';
 import { useQuery } from '@tanstack/react-query';
 import { Tag } from '@ui5/webcomponents-react/Tag';
 import { Text } from '@ui5/webcomponents-react/Text';
-import { pushApiErrorMessages } from '@/libs/errors';
 import { BusyIndicator } from '@/components/busy-indicator';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
+import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { dashboardRecentAuditLogsQueryOptions } from '../options/query';
+import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 
 function displayAuditAction(action?: string) {
   switch (action) {
@@ -65,7 +66,9 @@ export function DashboardRecentAudit({ className }: { className?: string }) {
                   <Text className="block text-sm font-medium">{item.Note}</Text>
                 </div>
                 <Text className="text-xs">
-                  {item.Erdat} {item.Erzet}
+                  {[displayListDate(item.Erdat, item.Erzet), displayListTime(item.Erdat, item.Erzet)]
+                    .filter(Boolean)
+                    .join(' ')}
                 </Text>
               </div>
               <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs">
