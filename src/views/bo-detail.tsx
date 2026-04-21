@@ -18,9 +18,10 @@ import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { NotFoundIllustrated } from '@/components/not-found-illustrated';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
-import { getError, pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import { getError, pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
+import { displayDetailDate, displayDetailTime } from '@/libs/helpers/date-time';
 import { type BoType, type BoStatus } from '@/features/business-objects/constants';
 import { BizObjectLinkedAttachments } from '@/features/business-objects/components';
 import { BizForm, type BizFormValues } from '@/features/business-objects/components';
@@ -193,11 +194,11 @@ export function BoDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Created On</Label>
-                    <Text>{bizObject?.Erdat || '–'}</Text>
+                    <Text>{displayDetailDate(bizObject?.Erdat, bizObject?.Erzet)}</Text>
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Created At</Label>
-                    <Text>{bizObject?.Erzet || '–'}</Text>
+                    <Text>{displayDetailTime(bizObject?.Erdat, bizObject?.Erzet)}</Text>
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -207,11 +208,11 @@ export function BoDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Last Changed On</Label>
-                    <Text>{bizObject?.Aedat || '–'}</Text>
+                    <Text>{displayDetailDate(bizObject?.Aedat, bizObject?.Aezet)}</Text>
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Last Changed At</Label>
-                    <Text>{bizObject?.Aezet || '–'}</Text>
+                    <Text>{displayDetailTime(bizObject?.Aedat, bizObject?.Aezet)}</Text>
                   </div>
                 </div>
               </div>

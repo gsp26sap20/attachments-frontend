@@ -16,6 +16,7 @@ import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { AttachmentsFilterBar } from '@/features/attachments/components';
 import { displayVersion } from '@/features/attachments/helpers/formatter';
+import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -45,11 +46,31 @@ const ALL_COLUMNS = [
     id: 'CurrentVersion',
     Cell: (props: AnalyticalTableCellInstance) => displayVersion(props.value),
   },
-  { Header: 'Created On', accessor: 'Erdat', id: 'Erdat' },
-  { Header: 'Created At', accessor: 'Erzet', id: 'Erzet' },
+  {
+    Header: 'Created On',
+    accessor: 'Erdat',
+    id: 'Erdat',
+    Cell: (props: AnalyticalTableCellInstance) => displayListDate(props.row.original.Erdat, props.row.original.Erzet),
+  },
+  {
+    Header: 'Created At',
+    accessor: 'Erzet',
+    id: 'Erzet',
+    Cell: (props: AnalyticalTableCellInstance) => displayListTime(props.row.original.Erdat, props.row.original.Erzet),
+  },
   { Header: 'Created By', accessor: 'Ernam', id: 'Ernam' },
-  { Header: 'Changed On', accessor: 'Aedat', id: 'Aedat' },
-  { Header: 'Changed At', accessor: 'Aezet', id: 'Aezet' },
+  {
+    Header: 'Changed On',
+    accessor: 'Aedat',
+    id: 'Aedat',
+    Cell: (props: AnalyticalTableCellInstance) => displayListDate(props.row.original.Aedat, props.row.original.Aezet),
+  },
+  {
+    Header: 'Changed At',
+    accessor: 'Aezet',
+    id: 'Aezet',
+    Cell: (props: AnalyticalTableCellInstance) => displayListTime(props.row.original.Aedat, props.row.original.Aezet),
+  },
   { Header: 'Changed By', accessor: 'Aenam', id: 'Aenam' },
   {
     Header: 'Edit Lock',

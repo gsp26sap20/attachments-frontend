@@ -8,6 +8,7 @@ import { Icon } from '@ui5/webcomponents-react/Icon';
 import { List } from '@ui5/webcomponents-react/List';
 import { displayVersion } from '../helpers/formatter';
 import { CardHeader } from '@ui5/webcomponents-react/CardHeader';
+import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { ListItemStandard } from '@ui5/webcomponents-react/ListItemStandard';
 
 interface AttachmentCardProps {
@@ -34,19 +35,19 @@ export function AttachmentCard({ data, loading }: AttachmentCardProps) {
     () =>
       [
         selectedFieldIdSet.has('Erdat') && (
-          <ListItemStandard key="Erdat" text="Created On" description={data.Erdat || '-'} />
+          <ListItemStandard key="Erdat" text="Created On" description={displayListDate(data.Erdat, data.Erzet)} />
         ),
         selectedFieldIdSet.has('Erzet') && (
-          <ListItemStandard key="Erzet" text="Created At" description={data.Erzet || '-'} />
+          <ListItemStandard key="Erzet" text="Created At" description={displayListTime(data.Erdat, data.Erzet)} />
         ),
         selectedFieldIdSet.has('Ernam') && (
           <ListItemStandard key="Ernam" text="Created By" description={data.Ernam || '-'} />
         ),
         selectedFieldIdSet.has('Aedat') && (
-          <ListItemStandard key="Aedat" text="Changed On" description={data.Aedat || '-'} />
+          <ListItemStandard key="Aedat" text="Changed On" description={displayListDate(data.Aedat, data.Aezet)} />
         ),
         selectedFieldIdSet.has('Aezet') && (
-          <ListItemStandard key="Aezet" text="Changed At" description={data.Aezet || '-'} />
+          <ListItemStandard key="Aezet" text="Changed At" description={displayListTime(data.Aedat, data.Aezet)} />
         ),
         selectedFieldIdSet.has('Aenam') && (
           <ListItemStandard key="Aenam" text="Changed By" description={data.Aenam || '-'} />

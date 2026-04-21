@@ -25,6 +25,7 @@ import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { downloadFile } from '@/features/attachments/helpers/download-file';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
+import { displayDetailDate, displayDetailTime } from '@/libs/helpers/date-time';
 import { validateFileTitle } from '@/features/attachments/helpers/input-validate';
 import { attachmentDetailQueryOptions } from '@/features/attachments/options/query';
 import { deleteAttachmentMutationOptions } from '@/features/attachments/options/mutation';
@@ -296,11 +297,11 @@ export function AttachmentDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Created On</Label>
-                    <Text>{attachment?.Erdat || '-'}</Text>
+                    <Text>{displayDetailDate(attachment?.Erdat, attachment?.Erzet)}</Text>
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Created At</Label>
-                    <Text>{attachment?.Erzet || '-'}</Text>
+                    <Text>{displayDetailTime(attachment?.Erdat, attachment?.Erzet)}</Text>
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -310,11 +311,11 @@ export function AttachmentDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Last Changed On</Label>
-                    <Text>{attachment?.Aedat || '-'}</Text>
+                    <Text>{displayDetailDate(attachment?.Aedat, attachment?.Aezet)}</Text>
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Last Changed At</Label>
-                    <Text>{attachment?.Aezet || '-'}</Text>
+                    <Text>{displayDetailTime(attachment?.Aedat, attachment?.Aezet)}</Text>
                   </div>
                 </div>
               </div>

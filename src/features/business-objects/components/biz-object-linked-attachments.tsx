@@ -18,6 +18,7 @@ import { displayVersion } from '@/features/attachments/helpers/formatter';
 import { bizObjectLinkedAttachmentsQueryOptions } from '../options/query';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
 import { unlinkAttachmentFromBoMutationOptions } from '../options/mutation';
+import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 import { BIZ_OBJECT_LINKED_ATTACHMENT_FIELDS, type BizObjectLinkedAttachmentFieldId } from '../view-config';
@@ -63,11 +64,13 @@ const ALL_COLUMNS = [
     Header: 'Linked On',
     accessor: 'Erdat',
     id: 'LinkErdat',
+    Cell: (props: AnalyticalTableCellInstance) => displayListDate(props.row.original.Erdat, props.row.original.Erzet),
   },
   {
     Header: 'Linked At',
     accessor: 'Erzet',
     id: 'LinkErzet',
+    Cell: (props: AnalyticalTableCellInstance) => displayListTime(props.row.original.Erdat, props.row.original.Erzet),
   },
   {
     Header: 'Linked By',

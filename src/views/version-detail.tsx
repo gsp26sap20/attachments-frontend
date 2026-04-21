@@ -25,6 +25,7 @@ import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { downloadFile } from '@/features/attachments/helpers/download-file';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
+import { displayDetailDate, displayDetailTime } from '@/libs/helpers/date-time';
 import { attachmentTitleQueryOptions } from '@/features/attachments/options/query';
 import { rollbackVersionMutationOptions } from '@/features/attachments/options/mutation';
 import { attachmentVersionDetailQueryOptions } from '@/features/attachments/options/query';
@@ -214,11 +215,11 @@ export function VersionDetailView() {
                 </div>
                 <div className="flex flex-col">
                   <Label showColon>Created On</Label>
-                  <Text>{version?.Erdat || '-'}</Text>
+                  <Text>{displayDetailDate(version?.Erdat, version?.Erzet)}</Text>
                 </div>
                 <div className="flex flex-col">
                   <Label showColon>Created At</Label>
-                  <Text>{version?.Erzet || '-'}</Text>
+                  <Text>{displayDetailTime(version?.Erdat, version?.Erzet)}</Text>
                 </div>
               </div>
             </div>

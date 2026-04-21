@@ -11,6 +11,7 @@ import { BusyIndicator } from '@/components/busy-indicator';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { linkBoToAttachmentMutationOptions } from '../options/mutation';
+import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { BizObjectsFilterBar } from '@/features/business-objects/components';
 import { bizObjectsQueryOptions } from '@/features/business-objects/options/query';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -55,11 +56,13 @@ const ALL_COLUMNS = [
     Header: 'Created On',
     accessor: 'Erdat',
     id: 'Erdat',
+    Cell: (props: AnalyticalTableCellInstance) => displayListDate(props.row.original.Erdat, props.row.original.Erzet),
   },
   {
     Header: 'Created At',
     accessor: 'Erzet',
     id: 'Erzet',
+    Cell: (props: AnalyticalTableCellInstance) => displayListTime(props.row.original.Erdat, props.row.original.Erzet),
   },
   {
     Header: 'Created By',
@@ -70,11 +73,13 @@ const ALL_COLUMNS = [
     Header: 'Changed On',
     accessor: 'Aedat',
     id: 'Aedat',
+    Cell: (props: AnalyticalTableCellInstance) => displayListDate(props.row.original.Aedat, props.row.original.Aezet),
   },
   {
     Header: 'Changed At',
     accessor: 'Aezet',
     id: 'Aezet',
+    Cell: (props: AnalyticalTableCellInstance) => displayListTime(props.row.original.Aedat, props.row.original.Aezet),
   },
   {
     Header: 'Changed By',
@@ -204,7 +209,11 @@ function AttachmentBizLinkCreateImpl({ fileId, linkedBizObjectIds, disabled }: A
             <Toolbar className="rounded-t-xl px-4 py-2">
               <Title level="H4">Objects {remainingCount ? `(${remainingCount})` : ''}</Title>
               <ToolbarSpacer />
-              <ViewSettings fields={BO_LIST_FIELDS} selectedIds={selectedFieldIds} setSelectedIds={setSelectedFieldIds} />
+              <ViewSettings
+                fields={BO_LIST_FIELDS}
+                selectedIds={selectedFieldIds}
+                setSelectedIds={setSelectedFieldIds}
+              />
             </Toolbar>
           }
           data={selectedFieldIds.length > 0 ? bizObjects : []}

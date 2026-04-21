@@ -12,6 +12,7 @@ import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { linkAttachmentToBoMutationOptions } from '../options/mutation';
+import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { displayVersion } from '@/features/attachments/helpers/formatter';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -50,11 +51,13 @@ const ALL_COLUMNS = [
     Header: 'Created On',
     accessor: 'Erdat',
     id: 'Erdat',
+    Cell: (props: AnalyticalTableCellInstance) => displayListDate(props.row.original.Erdat, props.row.original.Erzet),
   },
   {
     Header: 'Created At',
     accessor: 'Erzet',
     id: 'Erzet',
+    Cell: (props: AnalyticalTableCellInstance) => displayListTime(props.row.original.Erdat, props.row.original.Erzet),
   },
   {
     Header: 'Created By',
@@ -65,11 +68,13 @@ const ALL_COLUMNS = [
     Header: 'Changed On',
     accessor: 'Aedat',
     id: 'Aedat',
+    Cell: (props: AnalyticalTableCellInstance) => displayListDate(props.row.original.Aedat, props.row.original.Aezet),
   },
   {
     Header: 'Changed At',
     accessor: 'Aezet',
     id: 'Aezet',
+    Cell: (props: AnalyticalTableCellInstance) => displayListTime(props.row.original.Aedat, props.row.original.Aezet),
   },
   {
     Header: 'Changed By',

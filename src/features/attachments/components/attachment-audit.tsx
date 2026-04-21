@@ -10,6 +10,7 @@ import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { attachmentAuditsQueryOptions } from '../options/query';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
+import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { ATTACHMENT_AUDIT_FIELDS, type AttachmentAuditFieldId } from '../view-config';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
@@ -33,11 +34,13 @@ const ALL_COLUMNS = [
     Header: 'Performed On',
     accessor: 'Erdat',
     id: 'Erdat',
+    Cell: (props: AnalyticalTableCellInstance) => displayListDate(props.row.original.Erdat, props.row.original.Erzet),
   },
   {
     Header: 'Performed At',
     accessor: 'Erzet',
     id: 'Erzet',
+    Cell: (props: AnalyticalTableCellInstance) => displayListTime(props.row.original.Erdat, props.row.original.Erzet),
   },
   {
     Header: 'Performed By',

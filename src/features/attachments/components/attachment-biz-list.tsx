@@ -16,6 +16,7 @@ import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { AttachmentBizLinkCreate } from './attachment-biz-link-create';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { unlinkBoFromAttachmentMutationOptions } from '../options/mutation';
+import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ATTACHMENT_BIZ_LIST_FIELDS, type AttachmentBizListFieldId } from '../view-config';
 import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers/formatter';
@@ -57,11 +58,13 @@ const ALL_COLUMNS = [
     Header: 'Linked On',
     accessor: 'Erdat',
     id: 'LinkErdat',
+    Cell: (props: AnalyticalTableCellInstance) => displayListDate(props.row.original.Erdat, props.row.original.Erzet),
   },
   {
     Header: 'Linked At',
     accessor: 'Erzet',
     id: 'LinkErzet',
+    Cell: (props: AnalyticalTableCellInstance) => displayListTime(props.row.original.Erdat, props.row.original.Erzet),
   },
   {
     Header: 'Link By',

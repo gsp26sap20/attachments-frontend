@@ -15,6 +15,7 @@ import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { attachmentVersionsQueryOptions } from '../options/query';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
+import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { VERSION_LIST_FIELDS, type AttachmentVersionListFieldId } from '../view-config';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
@@ -60,11 +61,13 @@ const ALL_COLUMNS = [
     Header: 'Created On',
     accessor: 'Erdat',
     id: 'Erdat',
+    Cell: (props: AnalyticalTableCellInstance) => displayListDate(props.row.original.Erdat, props.row.original.Erzet),
   },
   {
     Header: 'Created At',
     accessor: 'Erzet',
     id: 'Erzet',
+    Cell: (props: AnalyticalTableCellInstance) => displayListTime(props.row.original.Erdat, props.row.original.Erzet),
   },
   {
     Header: 'Created By',
