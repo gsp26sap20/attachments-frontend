@@ -1,7 +1,6 @@
 export const API = {
   endpoint: '/Attachments',
-  detailExpand: '_CurrentVersion($select=FileContent,FileId,FileName,FileExtension,MimeType,VersionNo)',
-  versionDetailSelect: 'Erdat,Ernam,Erzet,FileContent,FileExtension,FileId,FileName,FileSize,MimeType,VersionNo',
+  detailExpand: '_CurrentVersion',
   versionsEndpoint: (fileId: string) => `/Attachments(${fileId})/_Versions`,
   versionDetailEndpoint: (fileId: string, versionNo: string) =>
     `/Attachments(${fileId})/_Versions(FileId=${fileId},VersionNo='${versionNo}')`,
@@ -21,4 +20,21 @@ export const MUTATION_API = {
   uploadVersion: '/AttachmentVersions',
   linkBo: () => `/BusinessObjectAttachmentLinks`,
   unlinkBo: (boId: string, fileId: string) => `/BusinessObjectAttachmentLinks(BoId=${boId},FileId=${fileId})`,
+};
+
+export const QUERY_KEYS = {
+  attachmentList: () => ['attachments', 'list'],
+  attachmentListWithParams: (params: unknown) => ['attachments', 'list', params],
+  attachmentDetail: (fileId: string) => ['attachments', fileId, 'detail'],
+  attachmentDetailWithParams: (fileId: string, params: unknown) => ['attachments', fileId, 'detail', params],
+  attachmentVersions: (fileId: string) => ['attachments', fileId, 'versions'],
+  attachmentVersionsWithParams: (fileId: string, params: unknown) => ['attachments', fileId, 'versions', params],
+  attachmentAudit: (fileId: string) => ['attachments', fileId, 'audit'],
+  attachmentAuditWithParams: (fileId: string, params: unknown) => ['attachments', fileId, 'audit', params],
+  // prettier-ignore
+  attachmentVersionDetail: (fileId: string, versionNo: string) => ['attachments', fileId, 'versions', versionNo, 'detail'],
+  attachmentTitle: (fileId: string) => ['attachments', fileId, 'title'],
+  attachmentCurrentVersion: (fileId: string) => ['attachments', fileId, 'current-version'],
+  attachmentBoLinks: (fileId: string) => ['attachments', fileId, 'biz-objects'],
+  attachmentBoLinksWithParams: (fileId: string, params: unknown) => ['attachments', fileId, 'biz-objects', params],
 };

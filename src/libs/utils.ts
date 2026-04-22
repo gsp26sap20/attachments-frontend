@@ -37,9 +37,12 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-function formatFileSize(bytes: number | string | undefined) {
+function formatFileSize(bytes: number | string | undefined, fallback = '0 Bytes') {
   const numBytes = typeof bytes === 'string' ? Number(bytes) : bytes;
-  if (!numBytes || isNaN(numBytes)) return '0 Bytes';
+
+  if (numBytes === undefined || numBytes === null || isNaN(numBytes)) {
+    return fallback;
+  }
 
   const k = 1024;
 

@@ -9,18 +9,19 @@ import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { Input } from '@ui5/webcomponents-react/Input';
 import { Label } from '@ui5/webcomponents-react/Label';
+import { useInvalidateAttachmentQuery } from '../hooks';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { GoogleDrivePicker } from './google-drive-picker';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { BusyIndicator } from '@/components/busy-indicator';
 import { validateFileName } from '../helpers/input-validate';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { pushErrorMessages } from '@/libs/helpers/error-messages';
 import { uploadVersionMutationOptions } from '../options/mutation';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { resolveUploadTypeByExtension } from '../helpers/upload-config';
 import { buildFileName, getEditableFileName } from '../helpers/file-name';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { configFilesQueryOptions } from '@/features/config-files/options/query';
 
 interface FileUploadProps {
@@ -35,7 +36,7 @@ export function FileUpload(props: FileUploadProps) {
 
 function FileUploadImpl({ fileId, currentExtension, disabled }: FileUploadProps) {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const invalidateAtt = useInvalidateAttachmentQuery();
   const [driveLoading, setDriveLoading] = React.useState(false);
   const [open, setOpen] = React.useState<'local' | 'drive' | null>(null);
   const [fileData, setFileData] = React.useState<UploadedFileData | null>(null);
@@ -55,9 +56,10 @@ function FileUploadImpl({ fileId, currentExtension, disabled }: FileUploadProps)
         setFileNameDraft('');
         setFileNameError('');
         setOpen(null);
-        queryClient.invalidateQueries({
-          queryKey: ['attachments', fileId],
-        });
+        invalidateAtt.invalidateAttachmentDetail(fileId);
+        invalidateAtt.invalidateAttachmentVersions(fileId);
+        invalidateAtt.invalidateAttachmentAudit(fileId);
+        invalidateAtt.invalidateAttachmentCurrentVersion(fileId);
         navigate(`/attachments/${data.FileId}`);
       },
     }),
@@ -150,7 +152,7 @@ function FileUploadImpl({ fileId, currentExtension, disabled }: FileUploadProps)
         <FlexBox alignItems="Start" justifyContent="Start" wrap="Wrap" className="gap-8 mb-6">
           <FlexBox direction="Column">
             <Label showColon>File Size</Label>
-            <Text>{fileData?.FileSize ? formatFileSize(fileData.FileSize) : '-'}</Text>
+            <Text>{formatFileSize(fileData.FileSize, '-')}</Text>
           </FlexBox>
           <FlexBox direction="Column">
             <Label showColon>Mime Type</Label>
@@ -242,5 +244,3 @@ function FileUploadImpl({ fileId, currentExtension, disabled }: FileUploadProps)
     </React.Fragment>
   );
 }
-
-// TODO: Allows uploading attachments directly within the BO.

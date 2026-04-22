@@ -1,15 +1,14 @@
-import { API } from '../constants';
+import { API, QUERY_KEYS } from '../constants';
 import { ODATA_SERVICE } from '@/app-constant';
 import type { AxiosApiError } from '@/types/common';
 import { axiosInstance } from '@/libs/axios-instance';
-import type { BizObjectDetailParams, BizObjectItem } from '../types';
-import type { BizObjectListParams, BizObjectListResponse } from '../types';
+import type { BizObjectListParams, BizObjectListResponse, BizObjectItem } from '../types';
 import { infiniteQueryOptions, keepPreviousData, queryOptions } from '@tanstack/react-query';
 import type { BizObjectLinkedAttachmentParams, BizObjectLinkedAttachmentsResponse } from '../types';
 
 export function bizObjectsQueryOptions(params: BizObjectListParams) {
   return infiniteQueryOptions({
-    queryKey: ['biz-objects', params],
+    queryKey: QUERY_KEYS.bizObjectListWithParams(params),
     initialPageParam: params.$skip ?? 0,
     queryFn: ({ pageParam }) => {
       const res = axiosInstance.get<BizObjectListResponse>(`${ODATA_SERVICE.BIZ}${API.endpoint}`, {
@@ -38,13 +37,11 @@ export function bizObjectsQueryOptions(params: BizObjectListParams) {
   });
 }
 
-export function bizObjectDetailQueryOptions(boId: string, params: BizObjectDetailParams) {
+export function bizObjectDetailQueryOptions(boId: string) {
   return queryOptions<BizObjectItem, AxiosApiError>({
-    queryKey: ['biz-objects', boId, params],
+    queryKey: QUERY_KEYS.bizObjectDetail(boId),
     queryFn: () => {
-      const res = axiosInstance.get<BizObjectItem>(`${ODATA_SERVICE.BIZ}${API.endpoint}(${boId})`, {
-        params,
-      });
+      const res = axiosInstance.get<BizObjectItem>(`${ODATA_SERVICE.BIZ}${API.endpoint}(${boId})`);
       return res;
     },
     enabled: !!boId,
@@ -55,7 +52,7 @@ export function bizObjectDetailQueryOptions(boId: string, params: BizObjectDetai
 
 export function bizObjectLinkedAttachmentsQueryOptions(boId: string, params: BizObjectLinkedAttachmentParams) {
   return infiniteQueryOptions({
-    queryKey: ['biz-objects', boId, 'linked-attachments', params],
+    queryKey: QUERY_KEYS.bizObjectAttachmentLinksWithParams(boId, params),
     initialPageParam: params.$skip ?? 0,
     queryFn: async ({ pageParam }) => {
       const res = await axiosInstance.get<BizObjectLinkedAttachmentsResponse>(

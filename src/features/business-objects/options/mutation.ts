@@ -46,7 +46,6 @@ export function createBizObjectMutationOptions({ onSuccess, onError }: CreateBiz
 
       const res = await axiosInstance.post<CreateBizObjectResponse>(`${ODATA_SERVICE.BIZ}${API.endpoint}`, payload, {
         headers: {
-          'accept-language': 'en',
           ...(token ? { 'x-csrf-token': token } : {}),
         },
       });
@@ -72,7 +71,6 @@ export function updateBizObjectMutationOptions({ boId, onSuccess, onError }: Upd
 
       const res = await axiosInstance.put<unknown>(`${ODATA_SERVICE.BIZ}${API.endpoint}(BoId=${boId})`, payload, {
         headers: {
-          'accept-language': 'en',
           ...(token ? { 'x-csrf-token': token } : {}),
         },
       });
@@ -97,7 +95,6 @@ export function deleteBizObjectMutationOptions({ boId, onSuccess, onError }: Del
       }
       const res = await axiosInstance.delete(`${ODATA_SERVICE.BIZ}${API.endpoint}(BoId=${boId})`, {
         headers: {
-          'accept-language': 'en',
           ...(token ? { 'x-csrf-token': token } : {}),
         },
       });
@@ -123,7 +120,6 @@ export function linkAttachmentToBoMutationOptions({ onSuccess, onError }: LinkAt
 
       const res = await axiosInstance.post(`${ODATA_SERVICE.BIZ}${MUTATION_API.linkAttachment()}`, payload, {
         headers: {
-          'accept-language': 'en',
           ...(token ? { 'x-csrf-token': token } : {}),
         },
       });
@@ -148,7 +144,6 @@ export function unlinkAttachmentFromBoMutationOptions({ onSuccess, onError }: Un
       }
       const res = await axiosInstance.delete(`${ODATA_SERVICE.BIZ}${MUTATION_API.unlinkAttachment(BoId, FileId)}`, {
         headers: {
-          'accept-language': 'en', // TODO: handle i18n
           ...(token ? { 'x-csrf-token': token } : {}),
         },
       });
@@ -161,5 +156,3 @@ export function unlinkAttachmentFromBoMutationOptions({ onSuccess, onError }: Un
     },
   });
 }
-
-// TODO: handle csrf token deletion

@@ -22,6 +22,7 @@ export function LoadMoreTrigger({
 }: LoadMoreTriggerProps) {
   const targetRef = React.useRef<HTMLDivElement | null>(null);
   const pendingRef = React.useRef(false);
+  const triggeredWhileVisibleRef = React.useRef(false);
   const [isIntersecting, setIsIntersecting] = React.useState(false);
   const isActive = enabled && hasMore;
 
@@ -51,10 +52,28 @@ export function LoadMoreTrigger({
   }, [isActive, rootMargin, threshold]);
 
   React.useEffect(() => {
+    if (!isActive) {
+      triggeredWhileVisibleRef.current = false;
+      setIsIntersecting(false);
+      return;
+    }
+
+    if (!isIntersecting) {
+      triggeredWhileVisibleRef.current = false;
+    }
+  }, [isActive, isIntersecting]);
+
+  React.useEffect(() => {
     if (!isActive || !isIntersecting || isLoading || pendingRef.current) {
       return;
     }
 
+    if (triggeredWhileVisibleRef.current) {
+      return;
+    }
+
+    // Prevent chained page loads while the observer still reports the previous visible state.
+    triggeredWhileVisibleRef.current = true;
     pendingRef.current = true;
 
     void Promise.resolve()

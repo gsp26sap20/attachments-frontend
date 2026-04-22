@@ -1,3 +1,4 @@
+import { getAcceptLanguage } from '@/libs/helpers/locale';
 import type { GoogleWorkspaceMimeType } from '@/types/common';
 import type { UploadedFileData, GooglePickerDocument } from '../types';
 import { FALLBACK_EXTENSION, FALLBACK_MIME_TYPE, GOOGLE_WORKSPACE_EXPORTS } from '@/app-constant';
@@ -103,6 +104,7 @@ async function fetchGoogleDriveBlob(url: string, accessToken: string, fallbackMe
   const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
+      'Accept-Language': getAcceptLanguage(),
     },
   });
   if (!response.ok) {

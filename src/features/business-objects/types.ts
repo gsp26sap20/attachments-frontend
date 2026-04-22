@@ -32,11 +32,6 @@ export type BizObjectListResponse = {
   value: BizObjectItem[];
 };
 
-export type BizObjectDetailParams = {
-  $select?: string;
-  $expand?: string;
-};
-
 export type BizObjectLinkedAttachmentParams = {
   $count?: boolean;
   $select?: string;

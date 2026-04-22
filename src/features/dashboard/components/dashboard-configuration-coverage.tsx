@@ -26,10 +26,8 @@ export function DashboardConfigurationCoverage({ className }: { className?: stri
     }
   }, [configOverviewQuery.error, fileConfigListQuery.error]);
 
-  const isLoading =
-    !configOverviewQuery.data &&
-    !fileConfigListQuery.data &&
-    (configOverviewQuery.isFetching || fileConfigListQuery.isFetching);
+  const isLoading = configOverviewQuery.isLoading || fileConfigListQuery.isLoading;
+  const isFetching = configOverviewQuery.isFetching || fileConfigListQuery.isFetching;
 
   const items = fileConfigListQuery.data ?? [];
 
@@ -43,7 +41,8 @@ export function DashboardConfigurationCoverage({ className }: { className?: stri
         <Tag design="Positive">Active {configOverviewQuery.data?.ActiveConfigs ?? 0}</Tag>
         <Tag design="Information">Total {configOverviewQuery.data?.TotalConfigs ?? 0}</Tag>
       </FlexBox>
-      {items.length === 0 ? (
+      {isLoading && <BusyIndicator type="loading" show={isLoading} />}
+      {items.length === 0 && !isLoading ? (
         <Text className="text-sm">No configuration data available.</Text>
       ) : (
         <div className="space-y-2 max-h-[150vh] overflow-y-scroll p-2">
@@ -58,13 +57,13 @@ export function DashboardConfigurationCoverage({ className }: { className?: stri
               </div>
               <div className="grid gap-1 text-xs">
                 <span>{formatMimeTypesForDisplay(item.MimeType) || '-'}</span>
-                <span>Max size {formatFileSize(item.MaxBytes)}</span>
+                <span>Max size {formatFileSize(item.MaxBytes, 'N/A')}</span>
               </div>
             </div>
           ))}
         </div>
       )}
-      <BusyIndicator type="pending" show={isLoading} />
+      <BusyIndicator type="pending" show={!isLoading && isFetching} />
     </SectionCard>
   );
 }

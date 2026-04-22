@@ -2,7 +2,7 @@ import { ODATA_SERVICE } from '@/app-constant';
 import type { DashboardCollection } from '../types';
 import { queryOptions } from '@tanstack/react-query';
 import { axiosInstance } from '@/libs/axios-instance';
-import { API, DASHBOARD_QUERY_PARAMS } from '../constants';
+import { API, DASHBOARD_QUERY_PARAMS, QUERY_KEYS } from '../constants';
 import type { FileConfigOverviewItem, AttachmentOverviewItem } from '../types';
 import type { ConfigOverviewItem, AuthOverviewItem, LinkOverviewItem, RecentAuditLogItem } from '../types';
 import type { AdminDashboardStatsItem, AttachmentStatsByTypeItem, BusinessObjectOverviewItem } from '../types';
@@ -15,7 +15,7 @@ function fetchDashboardCollection<T>(endpoint: string, params: Record<string, st
 
 export function dashboardAdminDashboardStatsQueryOptions() {
   return queryOptions({
-    queryKey: ['dashboard', 'admin-dashboard-stats'],
+    queryKey: QUERY_KEYS.adminDashboardStats(),
     queryFn: async () => {
       const res = await fetchDashboardCollection<AdminDashboardStatsItem>(
         API.adminDashboardStats,
@@ -32,7 +32,7 @@ export function dashboardAdminDashboardStatsQueryOptions() {
 
 export function dashboardAttachmentOverviewQueryOptions() {
   return queryOptions({
-    queryKey: ['dashboard', 'attachment-overview'],
+    queryKey: QUERY_KEYS.attachmentOverview(),
     queryFn: async () => {
       const res = await fetchDashboardCollection<AttachmentOverviewItem>(
         API.attachmentOverview,
@@ -49,7 +49,7 @@ export function dashboardAttachmentOverviewQueryOptions() {
 
 export function dashboardAttachmentStatsByTypeQueryOptions() {
   return queryOptions({
-    queryKey: ['dashboard', 'attachment-stats-by-type'],
+    queryKey: QUERY_KEYS.attachmentStatsByType(),
     queryFn: async () => {
       const res = await fetchDashboardCollection<AttachmentStatsByTypeItem>(
         API.attachmentStatsByType,
@@ -66,7 +66,7 @@ export function dashboardAttachmentStatsByTypeQueryOptions() {
 
 export function dashboardAuthOverviewQueryOptions() {
   return queryOptions({
-    queryKey: ['dashboard', 'auth-overview'],
+    queryKey: QUERY_KEYS.authOverview(),
     queryFn: async () => {
       const res = await fetchDashboardCollection<AuthOverviewItem>(
         API.authOverview,
@@ -83,7 +83,7 @@ export function dashboardAuthOverviewQueryOptions() {
 
 export function dashboardBusinessObjectOverviewQueryOptions() {
   return queryOptions({
-    queryKey: ['dashboard', 'business-object-overview'],
+    queryKey: QUERY_KEYS.businessObjectOverview(),
     queryFn: async () => {
       const res = await fetchDashboardCollection<BusinessObjectOverviewItem>(
         API.businessObjectOverview,
@@ -100,7 +100,7 @@ export function dashboardBusinessObjectOverviewQueryOptions() {
 
 export function dashboardConfigOverviewQueryOptions() {
   return queryOptions({
-    queryKey: ['dashboard', 'config-overview'],
+    queryKey: QUERY_KEYS.configOverview(),
     queryFn: async () => {
       const res = await fetchDashboardCollection<ConfigOverviewItem>(
         API.configOverview,
@@ -117,7 +117,7 @@ export function dashboardConfigOverviewQueryOptions() {
 
 export function dashboardFileConfigListQueryOptions() {
   return queryOptions({
-    queryKey: ['dashboard', 'file-config-list'],
+    queryKey: QUERY_KEYS.fileConfigList(),
     queryFn: async () => {
       const res = await fetchDashboardCollection<FileConfigOverviewItem>(
         API.fileConfigList,
@@ -134,7 +134,7 @@ export function dashboardFileConfigListQueryOptions() {
 
 export function dashboardLinkOverviewQueryOptions() {
   return queryOptions({
-    queryKey: ['dashboard', 'link-overview'],
+    queryKey: QUERY_KEYS.linkOverview(),
     queryFn: async () => {
       const res = await fetchDashboardCollection<LinkOverviewItem>(
         API.linkOverview,
@@ -151,7 +151,7 @@ export function dashboardLinkOverviewQueryOptions() {
 
 export function dashboardRecentAuditLogsQueryOptions() {
   return queryOptions({
-    queryKey: ['dashboard', 'recent-audit-logs'],
+    queryKey: QUERY_KEYS.recentAuditLogs(),
     queryFn: async () => {
       const res = await fetchDashboardCollection<RecentAuditLogItem>(
         API.recentAuditLogs,

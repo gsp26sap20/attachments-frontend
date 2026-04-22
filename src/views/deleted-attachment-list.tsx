@@ -8,20 +8,20 @@ import { Button } from '@ui5/webcomponents-react/Button';
 import { ViewSettings } from '@/components/view-settings';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
-import { LoadMoreTrigger } from '@/components/load-more-trigger';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import type { AttachmentItem } from '@/features/attachments/types';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
+import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
-import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { AttachmentsFilterBar } from '@/features/attachments/components';
 import { displayVersion } from '@/features/attachments/helpers/formatter';
+import { useInvalidateAttachmentQuery } from '@/features/attachments/hooks';
 import { buildSelectWithDateTimeFields } from '@/libs/helpers/odata-select';
 import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { restoreAttachmentMutationOptions } from '@/features/attachments/options/mutation';
+import { ToolbarButton, type ToolbarButtonPropTypes } from '@ui5/webcomponents-react/ToolbarButton';
 import { ATTACHMENT_LIST_FIELDS, type AttachmentListFieldId } from '@/features/attachments/view-config';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
@@ -88,7 +88,7 @@ function RestoreAttachmentButton({
 }: {
   attachment: AttachmentItem;
   disabled: boolean;
-  onRestore: (_fileId: string) => void;
+  onRestore: (fileId: string) => void;
 }) {
   return (
     <Button
@@ -105,7 +105,7 @@ function RestoreAttachmentButton({
 }
 
 export function DeletedAttachmentListView() {
-  const queryClient = useQueryClient();
+  const invalidateAtt = useInvalidateAttachmentQuery();
   const selectedFieldIds = useViewStore((state) => state.attachmentListVisibleFieldIds);
   const setSelectedFieldIds = useViewStore((state) => state.setAttachmentListVisibleFieldIds);
   const [search, setSearch] = React.useState('');
@@ -132,7 +132,7 @@ export function DeletedAttachmentListView() {
     [attachmentListSelect, filter, search],
   );
 
-  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage, refetch, error } = useInfiniteQuery({
+  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage, error } = useInfiniteQuery({
     ...attachmentsQueryOptions(attachmentListParams),
     enabled: selectedFieldIds.length > 0,
   });
@@ -146,18 +146,22 @@ export function DeletedAttachmentListView() {
     variables: restoringFileId,
   } = useMutation(
     restoreAttachmentMutationOptions({
-      onSuccess: () => {
+      onSuccess: (data) => {
+        invalidateAtt.invalidateAttachmentList();
+        invalidateAtt.invalidateAttachmentDetail(data.FileId);
         toast('Attachment restored successfully');
-        queryClient.invalidateQueries({ queryKey: ['attachments'] });
       },
     }),
   );
 
   const handleRestore = React.useCallback(
     (fileId: string) => {
+      if (isRestoring) {
+        return;
+      }
       restoreAttachment(fileId);
     },
-    [restoreAttachment],
+    [isRestoring, restoreAttachment],
   );
 
   const columns = React.useMemo(
@@ -181,6 +185,13 @@ export function DeletedAttachmentListView() {
       },
     ],
     [handleRestore, isRestoring, restoringFileId, visibleColumns],
+  );
+
+  const handleRefetch: ToolbarButtonPropTypes['onClick'] = React.useCallback(
+    function () {
+      invalidateAtt.invalidateAttachmentList();
+    },
+    [invalidateAtt],
   );
 
   React.useEffect(() => {
@@ -208,9 +219,8 @@ export function DeletedAttachmentListView() {
               design="Transparent"
               icon="refresh"
               text="Refresh"
-              onClick={() => {
-                refetch();
-              }}
+              onClick={handleRefetch}
+              disabled={isFetching || isFetchingNextPage || isRestoring}
             />
             <ViewSettings
               fields={ATTACHMENT_LIST_FIELDS}
@@ -234,11 +244,8 @@ export function DeletedAttachmentListView() {
         rowHeight={36}
         scaleWidthMode="Smart"
         visibleRowCountMode="Auto"
-      />
-      <LoadMoreTrigger
-        hasMore={hasNextPage}
-        isLoading={isFetchingNextPage}
-        enabled={selectedFieldIds.length > 0}
+        infiniteScroll={hasNextPage}
+        infiniteScrollThreshold={5}
         onLoadMore={() => fetchNextPage()}
       />
     </DynamicPage>

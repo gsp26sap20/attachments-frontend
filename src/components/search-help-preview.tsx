@@ -14,6 +14,7 @@ interface SearchHelpPreviewProps extends React.ComponentProps<typeof FlexBox> {
   insideDialog?: boolean;
   icon?: MultiInputPropTypes['icon'];
   onValueHelpTrigger?: () => void;
+  onInputValue?: (value: string) => void;
 }
 
 function tokenStandardization(token: SearchHelpToken): string {
@@ -39,11 +40,17 @@ function tokenStandardization(token: SearchHelpToken): string {
 }
 
 export function SearchHelpPreview({ tokens, onTokensDelete, insideDialog, icon, ...props }: SearchHelpPreviewProps) {
+  const { onInputValue } = props;
   const handleTokenDelete: MultiInputPropTypes['onTokenDelete'] = function (e) {
     const tokenIds = e.detail.tokens
       .map((token) => token.dataset.id)
       .filter((tokenId): tokenId is SearchHelpToken['id'] => Boolean(tokenId));
     onTokensDelete(tokenIds);
+  };
+
+  const handleInputValue: MultiInputPropTypes['onChange'] = function (e) {
+    onInputValue?.(e.target.value);
+    e.target.value = '';
   };
 
   if (insideDialog) {
@@ -52,7 +59,6 @@ export function SearchHelpPreview({ tokens, onTokensDelete, insideDialog, icon, 
         <Title>{tokens.length > 0 ? `Conditions (${tokens.length})` : 'No Conditions Entered'}</Title>
         <FlexBox {...props} className={cn('gap-2 h-6.5', props.className)}>
           <MultiInput
-            onSelectionChange={function fQ() {}}
             onTokenDelete={handleTokenDelete}
             className="w-full h-full"
             type="Text"
@@ -65,6 +71,7 @@ export function SearchHelpPreview({ tokens, onTokensDelete, insideDialog, icon, 
                 className="border mx-px h-5"
               />
             ))}
+            onChange={handleInputValue}
           />
           <Button
             icon="decline"
@@ -79,7 +86,7 @@ export function SearchHelpPreview({ tokens, onTokensDelete, insideDialog, icon, 
 
   return (
     <MultiInput
-      onSelectionChange={function fQ() {}}
+      onChange={handleInputValue}
       onTokenDelete={handleTokenDelete}
       className="w-full h-6.5"
       type="Text"

@@ -4,34 +4,34 @@ import { axiosInstance } from '@/libs/axios-instance';
 import { mutationOptions } from '@tanstack/react-query';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers/csrf-token';
-import type { RollbackVersionPayload, UploadVersionResponse } from '../types';
 import type { UploadVersionPayload, CreateAttachmentResponse } from '../types';
+import type { RollbackVersionPayload, UploadVersionResponse, RestoreAttachmentResponse } from '../types';
 import type { LinkBoPayload, UnlinkBoPayload, CreateAttachmentPayload, UpdateAttachmentPayload } from '../types';
 
 type Params = {
   fileId: string;
   onSuccess?: () => void;
-  onError?: (_error: unknown) => void;
+  onError?: (error: unknown) => void;
 };
 
 type CreateAttachmentParams = {
   onSuccess?: (data: CreateAttachmentResponse) => void;
-  onError?: (_error: unknown) => void;
+  onError?: (error: unknown) => void;
 };
 
 type RestoreAttachmentParams = {
-  onSuccess?: () => void;
-  onError?: (_error: unknown) => void;
+  onSuccess?: (data: RestoreAttachmentResponse) => void;
+  onError?: (error: unknown) => void;
 };
 
 type LinkBoMutationParams = {
   onSuccess?: () => void;
-  onError?: (_error: unknown) => void;
+  onError?: (error: unknown) => void;
 };
 
 type UnlinkBoMutationParams = {
   onSuccess?: () => void;
-  onError?: (_error: unknown) => void;
+  onError?: (error: unknown) => void;
 };
 
 export function rollbackVersionMutationOptions({ fileId, onSuccess, onError }: Params) {
@@ -49,7 +49,6 @@ export function rollbackVersionMutationOptions({ fileId, onSuccess, onError }: P
         payload,
         {
           headers: {
-            'accept-language': 'en',
             ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
@@ -78,7 +77,6 @@ export function deleteAttachmentMutationOptions({ fileId, onSuccess, onError }: 
         `${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.deleteAttachment(fileId)}`,
         {
           headers: {
-            'accept-language': 'en',
             ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
@@ -103,12 +101,11 @@ export function restoreAttachmentMutationOptions({ onSuccess, onError }: Restore
         token = getCsrfToken();
       }
 
-      const res = await axiosInstance.post<unknown>(
+      const res = await axiosInstance.post<RestoreAttachmentResponse>(
         `${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.restoreAttachment(fileId)}`,
         undefined,
         {
           headers: {
-            'accept-language': 'en',
             ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
@@ -136,7 +133,6 @@ export function updateAttachmentTitleMutationOptions({ fileId, onSuccess, onErro
         payload,
         {
           headers: {
-            'accept-language': 'en',
             ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
@@ -171,7 +167,6 @@ export function uploadVersionMutationOptions({
         payload,
         {
           headers: {
-            'accept-language': 'en',
             ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
@@ -201,7 +196,6 @@ export function createAttachmentMutationOptions({ onSuccess, onError }: CreateAt
         payload,
         {
           headers: {
-            'accept-language': 'en',
             ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
@@ -228,7 +222,6 @@ export function linkBoToAttachmentMutationOptions({ onSuccess, onError }: LinkBo
 
       const res = await axiosInstance.post(`${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.linkBo()}`, payload, {
         headers: {
-          'accept-language': 'en',
           ...(token ? { 'x-csrf-token': token } : {}),
         },
       });
@@ -255,7 +248,6 @@ export function unlinkBoFromAttachmentMutationOptions({ onSuccess, onError }: Un
 
       const res = await axiosInstance.delete(`${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.unlinkBo(BoId, FileId)}`, {
         headers: {
-          'accept-language': 'en',
           ...(token ? { 'x-csrf-token': token } : {}),
         },
       });
