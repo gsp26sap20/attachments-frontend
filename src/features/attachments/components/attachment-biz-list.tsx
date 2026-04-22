@@ -24,6 +24,12 @@ import { ATTACHMENT_BIZ_LIST_FIELDS, type AttachmentBizListFieldId } from '../vi
 import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers/formatter';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
+interface AttachmentBizListProps {
+  fileId: string;
+  disabled: boolean;
+  onCountChange: (count: number) => void;
+}
+
 type AttachmentBizListColumn = {
   id: AttachmentBizListFieldId;
 } & Record<string, unknown>;
@@ -75,7 +81,7 @@ const ALL_COLUMNS = [
   },
 ] as const satisfies readonly AttachmentBizListColumn[];
 
-export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabled: boolean }) {
+export function AttachmentBizList({ fileId, disabled, onCountChange }: AttachmentBizListProps) {
   const navigate = useNavigate();
   const invalidateBiz = useInvalidateBizObjectQuery();
   const invalidateAtt = useInvalidateAttachmentQuery();
@@ -126,6 +132,10 @@ export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabl
       pushApiErrorMessages(error);
     }
   }, [error]);
+
+  React.useEffect(() => {
+    onCountChange(totalCount);
+  }, [totalCount, onCountChange]);
 
   const columns = React.useMemo(
     () => [

@@ -27,6 +27,7 @@ import { BIZ_OBJECT_LINKED_ATTACHMENT_FIELDS, type BizObjectLinkedAttachmentFiel
 type BizObjectAttachmentListProps = {
   boId: string;
   disabled?: boolean;
+  onCountChange: (count: number) => void;
 };
 
 type BizObjectLinkedAttachmentColumn = {
@@ -80,7 +81,7 @@ const ALL_COLUMNS = [
   },
 ] as const satisfies readonly BizObjectLinkedAttachmentColumn[];
 
-export function BizObjectAttachmentList({ boId, disabled }: BizObjectAttachmentListProps) {
+export function BizObjectAttachmentList({ boId, disabled, onCountChange }: BizObjectAttachmentListProps) {
   const navigate = useNavigate();
   const invalidateBiz = useInvalidateBizObjectQuery();
   const selectedFieldIds = useViewStore((state) => state.bizObjectLinkedAttachmentVisibleFieldIds);
@@ -171,6 +172,10 @@ export function BizObjectAttachmentList({ boId, disabled }: BizObjectAttachmentL
       pushApiErrorMessages(error);
     }
   }, [error]);
+
+  React.useEffect(() => {
+    onCountChange(totalCount);
+  }, [totalCount, onCountChange]);
 
   return (
     <>

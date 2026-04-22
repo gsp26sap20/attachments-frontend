@@ -49,7 +49,6 @@ export function rollbackVersionMutationOptions({ fileId, onSuccess, onError }: P
         payload,
         {
           headers: {
-            'accept-language': 'en',
             ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
@@ -78,7 +77,6 @@ export function deleteAttachmentMutationOptions({ fileId, onSuccess, onError }: 
         `${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.deleteAttachment(fileId)}`,
         {
           headers: {
-            'accept-language': 'en',
             ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
@@ -108,7 +106,6 @@ export function restoreAttachmentMutationOptions({ onSuccess, onError }: Restore
         undefined,
         {
           headers: {
-            'accept-language': 'en',
             ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
@@ -136,7 +133,6 @@ export function updateAttachmentTitleMutationOptions({ fileId, onSuccess, onErro
         payload,
         {
           headers: {
-            'accept-language': 'en',
             ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
@@ -171,7 +167,6 @@ export function uploadVersionMutationOptions({
         payload,
         {
           headers: {
-            'accept-language': 'en',
             ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
@@ -201,7 +196,6 @@ export function createAttachmentMutationOptions({ onSuccess, onError }: CreateAt
         payload,
         {
           headers: {
-            'accept-language': 'en',
             ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
@@ -228,7 +222,6 @@ export function linkBoToAttachmentMutationOptions({ onSuccess, onError }: LinkBo
 
       const res = await axiosInstance.post(`${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.linkBo()}`, payload, {
         headers: {
-          'accept-language': 'en',
           ...(token ? { 'x-csrf-token': token } : {}),
         },
       });
@@ -255,7 +248,6 @@ export function unlinkBoFromAttachmentMutationOptions({ onSuccess, onError }: Un
 
       const res = await axiosInstance.delete(`${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.unlinkBo(BoId, FileId)}`, {
         headers: {
-          'accept-language': 'en',
           ...(token ? { 'x-csrf-token': token } : {}),
         },
       });

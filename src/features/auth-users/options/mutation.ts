@@ -29,7 +29,6 @@ export function createAuthUserMutationOptions({ onSuccess, onError }: CreateAuth
 
       const res = axiosInstance.post<CreateAuthUserResponse>(`${ODATA_SERVICE.AUTH}${API.endpoint}`, payload, {
         headers: {
-          'accept-language': 'en',
           ...(token ? { 'x-csrf-token': token } : {}),
         },
       });
@@ -58,7 +57,6 @@ export function deleteAuthUserMutationOptions({ onSuccess, onError }: DeleteAuth
         `${ODATA_SERVICE.AUTH}${API.endpoint}(Uname='${params.Uname}')`,
         {
           headers: {
-            'accept-language': 'en',
             ...(token ? { 'x-csrf-token': token } : {}),
           },
         },

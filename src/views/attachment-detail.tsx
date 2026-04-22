@@ -41,6 +41,7 @@ export function AttachmentDetailView() {
   const { id } = useParams();
   const navigate = useNavigate();
   const invalidateAtt = useInvalidateAttachmentQuery();
+  const [linkedCount, setLinkedCount] = React.useState(0);
   const invalidateConfig = useInvalidateConfigFileQuery();
   const { data: currentAuthUser, isPending: isAuthPending } = useCurrentAuthUser();
   const [isEditMode, setIsEditMode] = React.useState(false);
@@ -205,7 +206,13 @@ export function AttachmentDetailView() {
                     <ToolbarButton
                       design="Default"
                       text="Delete"
-                      onClick={() => setDeleteDialogOpen(true)}
+                      onClick={() => {
+                        if (linkedCount > 0) {
+                          pushErrorMessages(['Cannot delete attachment with linked business objects']);
+                          return;
+                        }
+                        setDeleteDialogOpen(true);
+                      }}
                       disabled={isDeleting || !canDeleteAttachment}
                     />
                   )}
@@ -358,7 +365,7 @@ export function AttachmentDetailView() {
           titleText="Linked Objects"
           style={{ display: isFetching ? 'none' : 'block' }}
         >
-          <AttachmentBizList fileId={id!} disabled={!canEditAttachment} />
+          <AttachmentBizList fileId={id!} disabled={!canEditAttachment} onCountChange={setLinkedCount} />
         </ObjectPageSection>
         <ObjectPageSection
           aria-label="Audit Log"
