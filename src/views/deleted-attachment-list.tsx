@@ -8,7 +8,6 @@ import { Button } from '@ui5/webcomponents-react/Button';
 import { ViewSettings } from '@/components/view-settings';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
-import { LoadMoreTrigger } from '@/components/load-more-trigger';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import type { AttachmentItem } from '@/features/attachments/types';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
@@ -245,11 +244,8 @@ export function DeletedAttachmentListView() {
         rowHeight={36}
         scaleWidthMode="Smart"
         visibleRowCountMode="Auto"
-      />
-      <LoadMoreTrigger
-        hasMore={hasNextPage}
-        isLoading={isFetchingNextPage}
-        enabled={selectedFieldIds.length > 0}
+        infiniteScroll={hasNextPage}
+        infiniteScrollThreshold={5}
         onLoadMore={() => fetchNextPage()}
       />
     </DynamicPage>

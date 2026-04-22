@@ -13,6 +13,7 @@ import { ViewSettings } from '@/components/view-settings';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
+import { BusyIndicator } from '@/components/busy-indicator';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { LoadMoreTrigger } from '@/components/load-more-trigger';
@@ -205,6 +206,9 @@ export function AttachmentListView() {
           rowHeight={36}
           scaleWidthMode="Smart"
           visibleRowCountMode="Auto"
+          infiniteScroll={hasNextPage}
+          infiniteScrollThreshold={5}
+          onLoadMore={() => fetchNextPage()}
         />
       )}
       {viewMode === 'grid' && (
@@ -233,23 +237,31 @@ export function AttachmentListView() {
               setSelectedIds={setSelectedFieldIds}
             />
           </Toolbar>
-          {attachments.length === 0 && selectedFieldIds.length > 0 && <IllustratedMessage name="NoData" />}
+          {!isFetching && attachments.length === 0 && selectedFieldIds.length > 0 && (
+            <IllustratedMessage name="NoData" />
+          )}
+          {isFetching && (
+            <div className="flex justify-center">
+              <BusyIndicator type="loading" show={isFetching} />
+            </div>
+          )}
           {selectedFieldIds.length === 0 && (
             <h4 className="text-center">
               There are no visible fields in the table right now. Please select the fields you need in the table
               settings.
             </h4>
           )}
-          <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
-            {selectedFieldIds.length > 0 &&
-              attachments.map((attachment) => (
+          {selectedFieldIds.length > 0 && (
+            <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
+              {attachments.map((attachment) => (
                 <AttachmentCard key={attachment.FileId} data={attachment} loading={isFetching || isFetchingNextPage} />
               ))}
-          </Grid>
+            </Grid>
+          )}
         </FlexBox>
       )}
       <LoadMoreTrigger
-        hasMore={hasNextPage}
+        hasMore={viewMode === 'grid' && hasNextPage}
         isLoading={isFetching || isFetchingNextPage}
         enabled={selectedFieldIds.length > 0}
         onLoadMore={() => fetchNextPage()}

@@ -12,6 +12,7 @@ import { Button } from '@ui5/webcomponents-react/Button';
 import { ViewSettings } from '@/components/view-settings';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
+import { BusyIndicator } from '@/components/busy-indicator';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
@@ -200,6 +201,9 @@ export function BoListView() {
           rowHeight={36}
           scaleWidthMode="Smart"
           visibleRowCountMode="Auto"
+          infiniteScroll={hasNextPage}
+          infiniteScrollThreshold={5}
+          onLoadMore={() => fetchNextPage()}
         />
       )}
       {viewMode === 'grid' && (
@@ -227,23 +231,31 @@ export function BoListView() {
               setSelectedIds={setBoListVisibleFieldIds}
             />
           </Toolbar>
-          {bizObjects.length === 0 && boListVisibleFieldIds.length > 0 && <IllustratedMessage name="NoData" />}
+          {!isFetching && bizObjects.length === 0 && boListVisibleFieldIds.length > 0 && (
+            <IllustratedMessage name="NoData" />
+          )}
+          {isFetching && (
+            <div className="flex justify-center">
+              <BusyIndicator type="loading" show={isFetching} />
+            </div>
+          )}
           {boListVisibleFieldIds.length === 0 && (
             <h4 className="text-center">
               There are no visible fields in the table right now. Please select the fields you need in the table
               settings.
             </h4>
           )}
-          <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
-            {boListVisibleFieldIds.length > 0 &&
-              bizObjects.map((bizObject) => (
+          {boListVisibleFieldIds.length > 0 && (
+            <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
+              {bizObjects.map((bizObject) => (
                 <BizObjectCard key={bizObject.BoId} data={bizObject} loading={isFetching || isFetchingNextPage} />
               ))}
-          </Grid>
+            </Grid>
+          )}
         </FlexBox>
       )}
       <LoadMoreTrigger
-        hasMore={hasNextPage}
+        hasMore={viewMode === 'grid' && hasNextPage}
         isLoading={isFetchingNextPage}
         enabled={boListVisibleFieldIds.length > 0}
         onLoadMore={() => fetchNextPage()}
