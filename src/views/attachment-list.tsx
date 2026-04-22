@@ -13,20 +13,22 @@ import { ViewSettings } from '@/components/view-settings';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
-import '@ui5/webcomponents-icons/navigation-right-arrow.js';
+import { BusyIndicator } from '@/components/busy-indicator';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { LoadMoreTrigger } from '@/components/load-more-trigger';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
-import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { displayVersion } from '@/features/attachments/helpers/formatter';
 import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
+import { useInvalidateAttachmentQuery } from '@/features/attachments/hooks';
 import { buildSelectWithDateTimeFields } from '@/libs/helpers/odata-select';
+import { useInvalidateConfigFileQuery } from '@/features/config-files/hooks';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
+import { ToolbarButton, type ToolbarButtonPropTypes } from '@ui5/webcomponents-react/ToolbarButton';
 import { ATTACHMENT_LIST_FIELDS, type AttachmentListFieldId } from '@/features/attachments/view-config';
 import { AttachmentsFilterBar, AttachmentCard, AttachmentCreate } from '@/features/attachments/components';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
@@ -89,6 +91,8 @@ const ALL_COLUMNS = [
 
 export function AttachmentListView() {
   const navigate = useNavigate();
+  const invalidateAtt = useInvalidateAttachmentQuery();
+  const invalidateConfig = useInvalidateConfigFileQuery();
   const viewMode = useAppStore((state) => state.viewMode);
   const setViewMode = useAppStore((state) => state.setViewMode);
   const selectedFieldIds = useViewStore((state) => state.attachmentListVisibleFieldIds);
@@ -112,7 +116,7 @@ export function AttachmentListView() {
     }),
     [attachmentListSelect, filter, search],
   );
-  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage, refetch, error } = useInfiniteQuery({
+  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage, error } = useInfiniteQuery({
     ...attachmentsQueryOptions(attachmentListParams),
     enabled: selectedFieldIds.length > 0,
   });
@@ -139,6 +143,11 @@ export function AttachmentListView() {
     ],
     [navigate, visibleColumns],
   );
+
+  const handleRefresh: ToolbarButtonPropTypes['onClick'] = React.useCallback(() => {
+    invalidateAtt.invalidateAttachmentList();
+    invalidateConfig.invalidateConfigFileList();
+  }, [invalidateAtt, invalidateConfig]);
 
   React.useEffect(() => {
     if (error) {
@@ -168,9 +177,8 @@ export function AttachmentListView() {
                 design="Transparent"
                 icon="refresh"
                 text="Refresh"
-                onClick={() => {
-                  refetch();
-                }}
+                onClick={handleRefresh}
+                disabled={isFetching || isFetchingNextPage}
               />
               <ToolbarButton
                 icon="table-view"
@@ -198,6 +206,9 @@ export function AttachmentListView() {
           rowHeight={36}
           scaleWidthMode="Smart"
           visibleRowCountMode="Auto"
+          infiniteScroll={hasNextPage}
+          infiniteScrollThreshold={5}
+          onLoadMore={() => fetchNextPage()}
         />
       )}
       {viewMode === 'grid' && (
@@ -211,9 +222,8 @@ export function AttachmentListView() {
               design="Transparent"
               icon="refresh"
               text="Refresh"
-              onClick={() => {
-                refetch();
-              }}
+              onClick={handleRefresh}
+              disabled={isFetching || isFetchingNextPage}
             />
             <ToolbarButton
               icon="list"
@@ -227,23 +237,31 @@ export function AttachmentListView() {
               setSelectedIds={setSelectedFieldIds}
             />
           </Toolbar>
-          {attachments.length === 0 && selectedFieldIds.length > 0 && <IllustratedMessage name="NoData" />}
+          {!isFetching && attachments.length === 0 && selectedFieldIds.length > 0 && (
+            <IllustratedMessage name="NoData" />
+          )}
+          {isFetching && (
+            <div className="flex justify-center">
+              <BusyIndicator type="loading" show={isFetching} />
+            </div>
+          )}
           {selectedFieldIds.length === 0 && (
             <h4 className="text-center">
               There are no visible fields in the table right now. Please select the fields you need in the table
               settings.
             </h4>
           )}
-          <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
-            {selectedFieldIds.length > 0 &&
-              attachments.map((attachment) => (
+          {selectedFieldIds.length > 0 && (
+            <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
+              {attachments.map((attachment) => (
                 <AttachmentCard key={attachment.FileId} data={attachment} loading={isFetching || isFetchingNextPage} />
               ))}
-          </Grid>
+            </Grid>
+          )}
         </FlexBox>
       )}
       <LoadMoreTrigger
-        hasMore={hasNextPage}
+        hasMore={viewMode === 'grid' && hasNextPage}
         isLoading={isFetching || isFetchingNextPage}
         enabled={selectedFieldIds.length > 0}
         onLoadMore={() => fetchNextPage()}

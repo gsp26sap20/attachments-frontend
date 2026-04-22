@@ -40,3 +40,16 @@ export const DASHBOARD_QUERY_PARAMS = {
     $orderby: 'Erdat desc,Erzet desc',
   },
 } as const;
+
+export const QUERY_KEYS = {
+  dashboard: () => ['dashboard'],
+  adminDashboardStats: () => ['dashboard', 'admin-stats'],
+  attachmentOverview: () => ['dashboard', 'attachment-overview'],
+  attachmentStatsByType: () => ['dashboard', 'attachment-stats-by-type'],
+  authOverview: () => ['dashboard', 'auth-overview'],
+  businessObjectOverview: () => ['dashboard', 'business-object-overview'],
+  configOverview: () => ['dashboard', 'config-overview'],
+  fileConfigList: () => ['dashboard', 'file-config-list'],
+  linkOverview: () => ['dashboard', 'link-overview'],
+  recentAuditLogs: () => ['dashboard', 'recent-audit-logs'],
+};

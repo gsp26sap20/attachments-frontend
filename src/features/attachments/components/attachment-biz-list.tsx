@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { useViewStore } from '@/stores/view-store';
 import { Title } from '@ui5/webcomponents-react/Title';
+import { useInvalidateAttachmentQuery } from '../hooks';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { ViewSettings } from '@/components/view-settings';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
@@ -13,14 +14,21 @@ import { attachmentBOsQueryOptions } from '../options/query';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
+import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 import { AttachmentBizLinkCreate } from './attachment-biz-link-create';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { unlinkBoFromAttachmentMutationOptions } from '../options/mutation';
 import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInvalidateBizObjectQuery } from '@/features/business-objects/hooks';
 import { ATTACHMENT_BIZ_LIST_FIELDS, type AttachmentBizListFieldId } from '../view-config';
 import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers/formatter';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
+
+interface AttachmentBizListProps {
+  fileId: string;
+  disabled: boolean;
+  onCountChange: (count: number | null) => void;
+}
 
 type AttachmentBizListColumn = {
   id: AttachmentBizListFieldId;
@@ -73,9 +81,10 @@ const ALL_COLUMNS = [
   },
 ] as const satisfies readonly AttachmentBizListColumn[];
 
-export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabled: boolean }) {
+export function AttachmentBizList({ fileId, disabled, onCountChange }: AttachmentBizListProps) {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const invalidateBiz = useInvalidateBizObjectQuery();
+  const invalidateAtt = useInvalidateAttachmentQuery();
   const selectedFieldIds = useViewStore((state) => state.attachmentBizListVisibleFieldIds);
   const setSelectedFieldIds = useViewStore((state) => state.setAttachmentBizListVisibleFieldIds);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
@@ -96,7 +105,6 @@ export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabl
       $skip: 0,
       $top: 5,
       $orderby: 'Erdat desc,Erzet desc',
-      // TODO: Move to constants
       $expand: '_Bo',
     }),
   );
@@ -104,16 +112,17 @@ export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabl
   const { mutate: unlinkBoFromAttachment, isPending } = useMutation(
     unlinkBoFromAttachmentMutationOptions({
       onSuccess: () => {
+        invalidateAtt.invalidateAttachmentDetail(fileId);
+        invalidateAtt.invalidateAttachmentAudit(fileId);
+        invalidateAtt.invalidateAttachmentBoLinks(fileId);
         toast('Business object unlinked successfully');
-        queryClient.invalidateQueries({ queryKey: ['attachments', fileId, 'detail'] });
-        queryClient.invalidateQueries({ queryKey: ['attachments', fileId, 'audit'] });
-        queryClient.invalidateQueries({ queryKey: ['attachments', fileId, 'biz-objects'] });
       },
     }),
   );
 
   const bizObjects = bizObjectsData?.pages.flatMap((page) => page.value) ?? [];
-  const totalCount = bizObjectsData?.pages[0]['@odata.count'] ?? 0;
+  const firstPage = bizObjectsData?.pages[0];
+  const totalCount = firstPage?.['@odata.count'] ?? 0;
   const visibleColumns = React.useMemo(
     () => ALL_COLUMNS.filter((col) => selectedFieldIds.includes(col.id)),
     [selectedFieldIds],
@@ -124,6 +133,16 @@ export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabl
       pushApiErrorMessages(error);
     }
   }, [error]);
+
+  React.useEffect(() => {
+    if (error) {
+      onCountChange(null);
+    } else if (firstPage) {
+      onCountChange(totalCount);
+    } else {
+      onCountChange(null);
+    }
+  }, [firstPage, totalCount, onCountChange, error]);
 
   const columns = React.useMemo(
     () => [
@@ -215,6 +234,8 @@ export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabl
         onClose={(action) => {
           setDeleteDialogOpen(false);
           if (action === 'OK' && bizObjectToDelete?.boId) {
+            invalidateBiz.invalidateBizObjectDetail(bizObjectToDelete.boId);
+            invalidateBiz.invalidateBizObjectAttachmentLinks(bizObjectToDelete.boId);
             unlinkBoFromAttachment({
               FileId: fileId,
               BoId: bizObjectToDelete.boId,

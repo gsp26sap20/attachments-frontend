@@ -10,20 +10,19 @@ import { formatFileSize } from '@/libs/utils';
 import '@ui5/webcomponents-icons/document.js';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { Icon } from '@ui5/webcomponents-react/Icon';
-import { API } from '@/features/attachments/constants';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Label } from '@ui5/webcomponents-react/Label';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { BusyIndicator } from '@/components/busy-indicator';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { FilePreview } from '@/features/attachments/components';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
-import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { NotFoundIllustrated } from '@/components/not-found-illustrated';
 import { displayVersion } from '@/features/attachments/helpers/formatter';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
+import { useInvalidateAttachmentQuery } from '@/features/attachments/hooks';
 import { downloadFile } from '@/features/attachments/helpers/download-file';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
 import { displayDetailDate, displayDetailTime } from '@/libs/helpers/date-time';
 import { attachmentTitleQueryOptions } from '@/features/attachments/options/query';
@@ -31,20 +30,17 @@ import { rollbackVersionMutationOptions } from '@/features/attachments/options/m
 import { attachmentVersionDetailQueryOptions } from '@/features/attachments/options/query';
 import { attachmentCurrentVersionQueryOptions } from '@/features/attachments/options/query';
 import { pushErrorMessages, pushApiErrorMessages, getError } from '@/libs/helpers/error-messages';
+import { ToolbarButton, type ToolbarButtonPropTypes } from '@ui5/webcomponents-react/ToolbarButton';
 
 export function VersionDetailView() {
   const { id, versionNo } = useParams();
-  const queryClient = useQueryClient();
+  const invalidateAtt = useInvalidateAttachmentQuery();
   const navigate = useNavigate();
   const {
     data: version,
     isFetching: isVersionFetching,
     error: dataError,
-  } = useQuery(
-    attachmentVersionDetailQueryOptions(id!, versionNo!, {
-      $select: API.versionDetailSelect,
-    }),
-  );
+  } = useQuery(attachmentVersionDetailQueryOptions(id!, versionNo!));
   const { data: title, isFetching: isTitleFetching, error: titleError } = useQuery(attachmentTitleQueryOptions(id!));
   const {
     data: currentVersion,
@@ -56,9 +52,8 @@ export function VersionDetailView() {
     rollbackVersionMutationOptions({
       fileId: id!,
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ['attachments', id],
-        });
+        invalidateAtt.invalidateAttachmentDetail(id!);
+        invalidateAtt.invalidateAttachmentCurrentVersion(id!);
         toast(`Version ${displayVersion(versionNo, 'N/A')} is now current`);
       },
     }),
@@ -76,11 +71,11 @@ export function VersionDetailView() {
 
   const notFoundError = attachmentNotFoundError ?? versionNotFoundError;
 
-  const refetchVersion = function () {
-    queryClient.invalidateQueries({
-      queryKey: ['attachments', id],
-    });
-  };
+  const refetchVersion: ToolbarButtonPropTypes['onClick'] = React.useCallback(() => {
+    invalidateAtt.invalidateAttachmentVersionDetail(id!, versionNo!);
+    invalidateAtt.invalidateAttachmentTitle(id!);
+    invalidateAtt.invalidateAttachmentCurrentVersion(id!);
+  }, [invalidateAtt, id, versionNo]);
 
   React.useEffect(() => {
     if (dataError && dataError !== versionNotFoundError) {
@@ -145,8 +140,8 @@ export function VersionDetailView() {
                   design="Default"
                   icon="refresh"
                   tooltip="Refresh"
-                  onClick={() => refetchVersion()}
-                  disabled={isFetching}
+                  onClick={refetchVersion}
+                  disabled={isFetching || isRollbacking}
                 />
               </Toolbar>
             }
@@ -191,7 +186,7 @@ export function VersionDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>File Size</Label>
-                    <Text>{version?.FileSize ? formatFileSize(version.FileSize) : '-'}</Text>
+                    <Text>{formatFileSize(version?.FileSize, '-')}</Text>
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -245,5 +240,3 @@ export function VersionDetailView() {
     </div>
   );
 }
-
-// TODO: Author check for Edit Lock

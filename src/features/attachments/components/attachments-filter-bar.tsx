@@ -7,8 +7,8 @@ import { SearchHelpDialog } from '@/components/search-help-dialog';
 import { FilterGroupItem } from '@ui5/webcomponents-react/FilterGroupItem';
 
 interface AttachmentsFilterBarProps {
-  onFilterChange: (_filter: string) => void;
-  onSearchChange?: (_search: string) => void;
+  onFilterChange: (filter: string) => void;
+  onSearchChange?: (search: string) => void;
 }
 
 const DEFAULT_FILTER_KEYS = ['FileId', 'Title', 'CurrentVersion', 'Erdat', 'Ernam'];
@@ -102,6 +102,7 @@ export function AttachmentsFilterBar({ onFilterChange, onSearchChange }: Attachm
           key={count}
           label="Version"
           field="CurrentVersion"
+          options={['equal to']}
           afterFilterStringBuild={setCurrentVersionFilterString}
         />
       </FilterGroupItem>

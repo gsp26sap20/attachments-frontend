@@ -45,7 +45,6 @@ export function createConfigFileMutationOptions({ onSuccess, onError }: CreateCo
         payload,
         {
           headers: {
-            'accept-language': 'en',
             ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
@@ -76,7 +75,6 @@ export function enableConfigFileMutationOptions({ onSuccess, onError }: EnableCo
         undefined,
         {
           headers: {
-            'accept-language': 'en',
             ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
@@ -107,7 +105,6 @@ export function updateConfigFileMutationOptions({ fileExt, onSuccess, onError }:
         payload,
         {
           headers: {
-            'accept-language': 'en',
             ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
@@ -138,7 +135,6 @@ export function disableConfigFileMutationOptions({ onSuccess, onError }: Disable
         undefined,
         {
           headers: {
-            'accept-language': 'en',
             ...(token ? { 'x-csrf-token': token } : {}),
           },
         },

@@ -1,4 +1,5 @@
 import qs from 'qs';
+import { getAcceptLanguage } from './helpers/locale';
 import axios, { type AxiosRequestConfig } from 'axios';
 import { ODATA_BASE_URL, ODATA_SAP_CLIENT } from '@/app-constant';
 import { setCsrfToken, clearCsrfToken } from './helpers/csrf-token';
@@ -21,8 +22,15 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     config.headers = config.headers ?? {};
-    if (!config.headers['Content-Type'] && config.data && !(config.data instanceof FormData)) {
+
+    const hasContentType = config.headers['Content-Type'] || config.headers['content-type'];
+    if (!hasContentType && config.data && !(config.data instanceof FormData)) {
       config.headers['Content-Type'] = 'application/json';
+    }
+    // prettier-ignore
+    const hasAcceptLanguage = config.headers['Accept-Language'] || config.headers['accept-language'];
+    if (!hasAcceptLanguage) {
+      config.headers['Accept-Language'] = getAcceptLanguage();
     }
     config.params = {
       ...(config.params ?? {}),

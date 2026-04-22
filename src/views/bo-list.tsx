@@ -12,6 +12,7 @@ import { Button } from '@ui5/webcomponents-react/Button';
 import { ViewSettings } from '@/components/view-settings';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
+import { BusyIndicator } from '@/components/busy-indicator';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
@@ -19,14 +20,15 @@ import { LoadMoreTrigger } from '@/components/load-more-trigger';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
-import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { buildSelectWithDateTimeFields } from '@/libs/helpers/odata-select';
 import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
+import { useInvalidateBizObjectQuery } from '@/features/business-objects/hooks';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
 import { bizObjectsQueryOptions } from '@/features/business-objects/options/query';
 import { BO_LIST_FIELDS, type BoListFieldId } from '@/features/business-objects/view-config';
 import { displayBoType, displayBoStatus } from '@/features/business-objects/helpers/formatter';
+import { ToolbarButton, type ToolbarButtonPropTypes } from '@ui5/webcomponents-react/ToolbarButton';
 import { BizObjectCard, BizObjectsFilterBar, BizCreate } from '@/features/business-objects/components';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
@@ -88,6 +90,7 @@ const ALL_COLUMNS = [
 
 export function BoListView() {
   const navigate = useNavigate();
+  const invalidateBo = useInvalidateBizObjectQuery();
   const viewMode = useAppStore((state) => state.viewMode);
   const setViewMode = useAppStore((state) => state.setViewMode);
   const boListVisibleFieldIds = useViewStore((state) => state.boListVisibleFieldIds);
@@ -103,7 +106,7 @@ export function BoListView() {
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState('');
 
-  const { data, isFetching, isFetchingNextPage, error, refetch, hasNextPage, fetchNextPage } = useInfiniteQuery({
+  const { data, isFetching, isFetchingNextPage, error, hasNextPage, fetchNextPage } = useInfiniteQuery({
     ...bizObjectsQueryOptions({
       $skip: 0,
       $top: 20,
@@ -137,6 +140,10 @@ export function BoListView() {
     [navigate, visibleColumns],
   );
 
+  const handleRefetch: ToolbarButtonPropTypes['onClick'] = React.useCallback(() => {
+    invalidateBo.invalidateBizObjectList();
+  }, [invalidateBo]);
+
   React.useEffect(() => {
     if (!error) {
       return;
@@ -165,9 +172,8 @@ export function BoListView() {
                 design="Transparent"
                 icon="refresh"
                 text="Refresh"
-                onClick={() => {
-                  refetch();
-                }}
+                onClick={handleRefetch}
+                disabled={isFetching || isFetchingNextPage}
               />
               <ToolbarButton
                 icon="table-view"
@@ -195,6 +201,9 @@ export function BoListView() {
           rowHeight={36}
           scaleWidthMode="Smart"
           visibleRowCountMode="Auto"
+          infiniteScroll={hasNextPage}
+          infiniteScrollThreshold={5}
+          onLoadMore={() => fetchNextPage()}
         />
       )}
       {viewMode === 'grid' && (
@@ -207,9 +216,8 @@ export function BoListView() {
               design="Transparent"
               icon="refresh"
               text="Refresh"
-              onClick={() => {
-                refetch();
-              }}
+              onClick={handleRefetch}
+              disabled={isFetching || isFetchingNextPage}
             />
             <ToolbarButton
               icon="list"
@@ -223,23 +231,31 @@ export function BoListView() {
               setSelectedIds={setBoListVisibleFieldIds}
             />
           </Toolbar>
-          {bizObjects.length === 0 && boListVisibleFieldIds.length > 0 && <IllustratedMessage name="NoData" />}
+          {!isFetching && bizObjects.length === 0 && boListVisibleFieldIds.length > 0 && (
+            <IllustratedMessage name="NoData" />
+          )}
+          {isFetching && (
+            <div className="flex justify-center">
+              <BusyIndicator type="loading" show={isFetching} />
+            </div>
+          )}
           {boListVisibleFieldIds.length === 0 && (
             <h4 className="text-center">
               There are no visible fields in the table right now. Please select the fields you need in the table
               settings.
             </h4>
           )}
-          <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
-            {boListVisibleFieldIds.length > 0 &&
-              bizObjects.map((bizObject) => (
+          {boListVisibleFieldIds.length > 0 && (
+            <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
+              {bizObjects.map((bizObject) => (
                 <BizObjectCard key={bizObject.BoId} data={bizObject} loading={isFetching || isFetchingNextPage} />
               ))}
-          </Grid>
+            </Grid>
+          )}
         </FlexBox>
       )}
       <LoadMoreTrigger
-        hasMore={hasNextPage}
+        hasMore={viewMode === 'grid' && hasNextPage}
         isLoading={isFetchingNextPage}
         enabled={boListVisibleFieldIds.length > 0}
         onLoadMore={() => fetchNextPage()}
@@ -247,5 +263,3 @@ export function BoListView() {
     </DynamicPage>
   );
 }
-// TODO: Handle time zone display
-// TODO: Handle default orderby

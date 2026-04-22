@@ -13,14 +13,13 @@ import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { BusyIndicator } from '@/components/busy-indicator';
 import '@ui5/webcomponents-icons/business-objects-mobile.js';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
-import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { NotFoundIllustrated } from '@/components/not-found-illustrated';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
-import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { getError, pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
+import { useInvalidateBizObjectQuery } from '@/features/business-objects/hooks';
 import { displayDetailDate, displayDetailTime } from '@/libs/helpers/date-time';
 import { BizObjectAttachmentList } from '@/features/business-objects/components';
 import { type BoType, type BoStatus } from '@/features/business-objects/constants';
@@ -29,11 +28,14 @@ import { bizObjectDetailQueryOptions } from '@/features/business-objects/options
 import { updateBizObjectMutationOptions } from '@/features/business-objects/options/mutation';
 import { deleteBizObjectMutationOptions } from '@/features/business-objects/options/mutation';
 import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers/formatter';
+import { getError, pushApiErrorMessages, pushErrorMessages } from '@/libs/helpers/error-messages';
+import { ToolbarButton, type ToolbarButtonPropTypes } from '@ui5/webcomponents-react/ToolbarButton';
 
 export function BoDetailView() {
   const { id } = useParams();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const invalidateBo = useInvalidateBizObjectQuery();
+  const [linkedCount, setLinkedCount] = React.useState<number | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [editMode, setEditMode] = React.useState(false);
   const [editValues, setEditValues] = React.useState<BizFormValues>({
@@ -45,23 +47,24 @@ export function BoDetailView() {
   const {
     data: bizObject,
     error: bizObjectError,
-    refetch,
+    isLoading: isBizObjectLoading,
     isFetching: isBizObjectFetching,
-  } = useQuery(bizObjectDetailQueryOptions(id!, {}));
+  } = useQuery(bizObjectDetailQueryOptions(id!));
 
-  const refetchBizObject = function () {
-    queryClient.invalidateQueries({
-      queryKey: ['biz-objects', id],
-    });
-  };
+  const refetchBizObject: ToolbarButtonPropTypes['onClick'] = React.useCallback(
+    function () {
+      invalidateBo.invalidateBizObjectDetail(id!);
+      invalidateBo.invalidateBizObjectAttachmentLinks(id!);
+    },
+    [id, invalidateBo],
+  );
 
   const { mutate: deleteBizObject, isPending: isDeleting } = useMutation(
     deleteBizObjectMutationOptions({
       boId: id!,
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ['biz-objects'],
-        });
+        invalidateBo.invalidateBizObjectList();
+        invalidateBo.invalidateBizObjectDetail(id!);
         toast('Business object deleted successfully');
         navigate('/business-objects');
       },
@@ -72,7 +75,7 @@ export function BoDetailView() {
     updateBizObjectMutationOptions({
       boId: id!,
       onSuccess: () => {
-        refetch();
+        invalidateBo.invalidateBizObjectDetail(id!);
         toast('Business object updated successfully');
         setEditMode(false);
       },
@@ -135,10 +138,22 @@ export function BoDetailView() {
                   <ToolbarButton
                     design="Default"
                     text="Delete"
-                    onClick={() => setDeleteDialogOpen(true)}
-                    disabled={!bizObject?.__EntityControl.Deletable || isDeleting}
+                    onClick={() => {
+                      if (linkedCount && linkedCount > 0) {
+                        pushErrorMessages(['Cannot delete business object with linked attachments']);
+                        return;
+                      }
+                      setDeleteDialogOpen(true);
+                    }}
+                    disabled={!bizObject?.__EntityControl.Deletable || isDeleting || linkedCount === null}
                   />
-                  <ToolbarButton design="Default" icon="refresh" text="Refresh" onClick={() => refetchBizObject()} />
+                  <ToolbarButton
+                    design="Default"
+                    icon="refresh"
+                    text="Refresh"
+                    onClick={refetchBizObject}
+                    disabled={isBizObjectFetching || isUpdating || isDeleting}
+                  />
                 </Toolbar>
               ) : undefined
             }
@@ -154,15 +169,16 @@ export function BoDetailView() {
           />
         }
       >
-        {isBizObjectFetching && <BusyIndicator type="loading" />}
+        {isBizObjectLoading && <BusyIndicator type="loading" />}
         <ObjectPageSection
           aria-label="General Information"
           id="general"
           titleText="General Information"
           hideTitleText={true}
-          style={{ display: isBizObjectFetching ? 'none' : 'block' }}
+          style={{ display: isBizObjectLoading ? 'none' : 'block' }}
         >
-          <div className="md:grid md:grid-cols-3 gap-3">
+          <div className="md:grid md:grid-cols-3 gap-3 relative">
+            <BusyIndicator type="pending" show={isBizObjectFetching} />
             <div className="space-y-3">
               <Title level="H3">Basic Data</Title>
               {editMode ? (
@@ -223,9 +239,9 @@ export function BoDetailView() {
           aria-label="Attachments"
           id="attachments"
           titleText="Attachments"
-          style={{ display: isBizObjectFetching ? 'none' : 'block' }}
+          style={{ display: isBizObjectLoading ? 'none' : 'block' }}
         >
-          <BizObjectAttachmentList boId={id!} disabled={!bizObject} />
+          <BizObjectAttachmentList boId={id!} disabled={!bizObject} onCountChange={setLinkedCount} />
         </ObjectPageSection>
         {editMode && (
           <MutationBar
@@ -267,9 +283,6 @@ export function BoDetailView() {
         Are you sure you want to delete this business object? This action cannot be undone.
       </MessageBox>
       <BusyIndicator type="pending" show={isDeleting || isUpdating} />
-      {/* TODO: Handle time zone display */}
     </div>
   );
 }
-
-// TODO: Disable unlink when have linked attachments
