@@ -18,11 +18,11 @@ interface SearchHelpDialogProps {
   afterFilterStringBuild: (s: string) => void;
 }
 
-function createToken(defaultKey: SearchHelpToken['key']): SearchHelpToken {
+function createToken(defaultKey: SearchHelpToken['key'], text?: string): SearchHelpToken {
   return {
     id: crypto.randomUUID(),
     key: defaultKey,
-    text: '',
+    text: text ?? '',
     sign: 'positive',
   };
 }
@@ -114,6 +114,10 @@ export function SearchHelpDialog({ options = defaultOptions, field, label, ...pr
     afterFilterStringBuild(buildFilterString());
   }, [cleanTokens, afterFilterStringBuild, field, useApostrophe]);
 
+  const handleInputValue = function (value: string) {
+    setTokens((prev) => [...prev, createToken(options[0], value)]);
+  };
+
   return (
     <React.Fragment>
       <SearchHelpPreview
@@ -121,6 +125,7 @@ export function SearchHelpDialog({ options = defaultOptions, field, label, ...pr
         onTokensDelete={handleTokensDelete}
         icon={<Icon className="h-full" name="value-help" onClick={() => setOpen(true)} />}
         onValueHelpTrigger={() => setOpen(true)}
+        onInputValue={handleInputValue}
       />
       <Dialog
         headerText={`Conditions: ${label}`}
@@ -169,6 +174,7 @@ export function SearchHelpDialog({ options = defaultOptions, field, label, ...pr
             style={{ flex: 'none' }}
             tokens={cleanTokens}
             onTokensDelete={handleTokensDelete}
+            onInputValue={handleInputValue}
           />
         </FlexBox>
       </Dialog>
