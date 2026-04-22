@@ -88,6 +88,7 @@ const ALL_COLUMNS = [
 
 export function AttachmentListView() {
   const navigate = useNavigate();
+
   const viewMode = useAppStore((state) => state.viewMode);
   const setViewMode = useAppStore((state) => state.setViewMode);
   const selectedFieldIds = useViewStore((state) => state.attachmentListVisibleFieldIds);

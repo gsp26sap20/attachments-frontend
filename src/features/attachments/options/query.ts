@@ -1,10 +1,10 @@
-import { API } from '../constants';
+import { API, QUERY_KEYS } from '../constants';
 import { ODATA_SERVICE } from '@/app-constant';
 import { axiosInstance } from '@/libs/axios-instance';
+import type { AttachmentVersionsResponse } from '../types';
 import type { VersionDetail, AttachmentAuditsResponse } from '../types';
 import type { AttachmentListParams, AttachmentListResponse } from '../types';
 import type { AttachmentAuditsParams, AttachmentDetailParams } from '../types';
-import type { AttachmentVersionsResponse, VersionDetailParams } from '../types';
 import type { AttachmentCurrentVersion, AttachmentTitleResponse } from '../types';
 import type { AttachmentDetailResponse, AttachmentVersionsParams } from '../types';
 import type { AttachmentBizObjectsResponse, AttachmentBizObjectsParams } from '../types';
@@ -12,7 +12,7 @@ import { infiniteQueryOptions, keepPreviousData, queryOptions } from '@tanstack/
 
 export function attachmentsQueryOptions(params: AttachmentListParams) {
   return infiniteQueryOptions({
-    queryKey: ['attachments', params],
+    queryKey: QUERY_KEYS.attachmentListWithParams(params),
     initialPageParam: params.$skip,
     queryFn: ({ pageParam }) => {
       const res = axiosInstance.get<AttachmentListResponse>(`${ODATA_SERVICE.ATTACHMENT}${API.endpoint}`, {
@@ -44,7 +44,7 @@ export function attachmentsQueryOptions(params: AttachmentListParams) {
 
 export function attachmentDetailQueryOptions(id: string, params: AttachmentDetailParams) {
   return queryOptions({
-    queryKey: ['attachments', id, 'detail', params],
+    queryKey: QUERY_KEYS.attachmentDetailWithParams(id, params),
     queryFn: () => {
       const res = axiosInstance.get<AttachmentDetailResponse>(`${ODATA_SERVICE.ATTACHMENT}${API.endpoint}(${id})`, {
         params,
@@ -60,7 +60,7 @@ export function attachmentDetailQueryOptions(id: string, params: AttachmentDetai
 
 export function attachmentVersionsQueryOptions(fileId: string, params: AttachmentVersionsParams) {
   return infiniteQueryOptions({
-    queryKey: ['attachments', fileId, 'versions', params],
+    queryKey: QUERY_KEYS.attachmentVersionsWithParams(fileId, params),
     initialPageParam: params.$skip,
     queryFn: ({ pageParam }) => {
       const res = axiosInstance.get<AttachmentVersionsResponse>(
@@ -94,7 +94,7 @@ export function attachmentVersionsQueryOptions(fileId: string, params: Attachmen
 
 export function attachmentAuditsQueryOptions(fileId: string, params: AttachmentAuditsParams) {
   return infiniteQueryOptions({
-    queryKey: ['attachments', fileId, 'audit', params],
+    queryKey: QUERY_KEYS.attachmentAuditWithParams(fileId, params),
     initialPageParam: params.$skip,
     queryFn: ({ pageParam }) => {
       const res = axiosInstance.get<AttachmentAuditsResponse>(
@@ -126,15 +126,12 @@ export function attachmentAuditsQueryOptions(fileId: string, params: AttachmentA
   });
 }
 
-export function attachmentVersionDetailQueryOptions(fileId: string, versionNo: string, params: VersionDetailParams) {
+export function attachmentVersionDetailQueryOptions(fileId: string, versionNo: string) {
   return queryOptions({
-    queryKey: ['attachments', fileId, 'versions', versionNo, params],
+    queryKey: QUERY_KEYS.attachmentVersionDetail(fileId, versionNo),
     queryFn: () => {
       const res = axiosInstance.get<VersionDetail>(
         `${ODATA_SERVICE.ATTACHMENT}${API.versionDetailEndpoint(fileId, versionNo)}`,
-        {
-          params,
-        },
       );
       return res;
     },
@@ -147,7 +144,7 @@ export function attachmentVersionDetailQueryOptions(fileId: string, versionNo: s
 
 export function attachmentTitleQueryOptions(id: string) {
   return queryOptions({
-    queryKey: ['attachments', id, 'title'],
+    queryKey: QUERY_KEYS.attachmentTitle(id),
     queryFn: () => {
       const res = axiosInstance.get<AttachmentTitleResponse>(
         `${ODATA_SERVICE.ATTACHMENT}${API.attachmentTitleEndpoint(id)}`,
@@ -163,7 +160,7 @@ export function attachmentTitleQueryOptions(id: string) {
 
 export function attachmentCurrentVersionQueryOptions(id: string) {
   return queryOptions({
-    queryKey: ['attachments', id, 'current-version'],
+    queryKey: QUERY_KEYS.attachmentCurrentVersion(id),
     queryFn: () => {
       const res = axiosInstance.get<AttachmentCurrentVersion>(
         `${ODATA_SERVICE.ATTACHMENT}${API.attachmentCurrentVersionEndpoint(id)}`,
@@ -179,7 +176,7 @@ export function attachmentCurrentVersionQueryOptions(id: string) {
 
 export function attachmentBOsQueryOptions(fileId: string, params: AttachmentBizObjectsParams) {
   return infiniteQueryOptions({
-    queryKey: ['attachments', fileId, 'biz-objects', params],
+    queryKey: QUERY_KEYS.attachmentBoLinksWithParams(fileId, params),
     initialPageParam: params.$skip ?? 0,
     queryFn: ({ pageParam }) => {
       const res = axiosInstance.get<AttachmentBizObjectsResponse>(

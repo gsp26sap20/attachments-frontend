@@ -47,7 +47,7 @@ export function BoDetailView() {
     error: bizObjectError,
     refetch,
     isFetching: isBizObjectFetching,
-  } = useQuery(bizObjectDetailQueryOptions(id!, {}));
+  } = useQuery(bizObjectDetailQueryOptions(id!));
 
   const refetchBizObject = function () {
     queryClient.invalidateQueries({

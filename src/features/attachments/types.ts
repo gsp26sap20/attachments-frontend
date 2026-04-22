@@ -110,10 +110,6 @@ export type AttachmentAuditsParams = {
 
 export type VersionDetail = AttachmentVersionItem;
 
-export type VersionDetailParams = {
-  $select: string;
-};
-
 export type AttachmentTitleResponse = {
   value: string;
 };

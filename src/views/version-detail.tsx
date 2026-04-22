@@ -10,7 +10,6 @@ import { formatFileSize } from '@/libs/utils';
 import '@ui5/webcomponents-icons/document.js';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { Icon } from '@ui5/webcomponents-react/Icon';
-import { API } from '@/features/attachments/constants';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Label } from '@ui5/webcomponents-react/Label';
 import { Button } from '@ui5/webcomponents-react/Button';
@@ -40,11 +39,7 @@ export function VersionDetailView() {
     data: version,
     isFetching: isVersionFetching,
     error: dataError,
-  } = useQuery(
-    attachmentVersionDetailQueryOptions(id!, versionNo!, {
-      $select: API.versionDetailSelect,
-    }),
-  );
+  } = useQuery(attachmentVersionDetailQueryOptions(id!, versionNo!));
   const { data: title, isFetching: isTitleFetching, error: titleError } = useQuery(attachmentTitleQueryOptions(id!));
   const {
     data: currentVersion,

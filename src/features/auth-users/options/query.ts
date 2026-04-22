@@ -1,4 +1,4 @@
-import { API } from '../constants';
+import { API, QUERY_KEYS } from '../constants';
 import type { AxiosApiError } from '@/types/common';
 import { queryOptions } from '@tanstack/react-query';
 import { axiosInstance } from '@/libs/axios-instance';
@@ -8,7 +8,7 @@ import type { AuthUsersQueryParams, AuthUsersResponse, CurrentAuthUserResponse }
 
 export function authUsersQueryOptions(params: AuthUsersQueryParams) {
   return queryOptions<AuthUsersResponse, AxiosApiError>({
-    queryKey: ['auth-users', params],
+    queryKey: QUERY_KEYS.authUsersListWithParams(params),
     queryFn: () => {
       const res = axiosInstance.get<AuthUsersResponse>(`${ODATA_SERVICE.AUTH}${API.endpoint}`, {
         params,
@@ -23,7 +23,7 @@ export function authUsersQueryOptions(params: AuthUsersQueryParams) {
 
 export function currentAuthUserQueryOptions() {
   return queryOptions<CurrentAuthUserResponse, AxiosApiError>({
-    queryKey: ['auth-users', 'current-user'],
+    queryKey: QUERY_KEYS.currentAuthUser(),
     queryFn: () => {
       const res = axiosInstance.get<CurrentAuthUserResponse>(`${ODATA_SERVICE.AUTH}${API.currentUserEndpoint}`);
       return res;
@@ -35,7 +35,7 @@ export function currentAuthUserQueryOptions() {
 
 export function currentPublicUserProfileQueryOptions() {
   return queryOptions<CurrentPublicUserProfile, AxiosApiError>({
-    queryKey: ['auth-users', 'current-public-user-profile'],
+    queryKey: QUERY_KEYS.currentPublicAuthUser(),
     queryFn: async () => {
       const response = await axiosInstance.get<CurrentPublicUserProfileResponse>(ODATA_PUBLIC_SERVICE.USER, {
         params: {

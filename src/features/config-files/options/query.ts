@@ -1,4 +1,4 @@
-import { API } from '../constants';
+import { API, QUERY_KEYS } from '../constants';
 import { ODATA_SERVICE } from '@/app-constant';
 import { queryOptions } from '@tanstack/react-query';
 import { axiosInstance } from '@/libs/axios-instance';
@@ -6,7 +6,7 @@ import type { ConfigFileListParams, ConfigFileListResponse } from '../types';
 
 export function configFilesQueryOptions(params: ConfigFileListParams) {
   return queryOptions({
-    queryKey: ['config-files', params],
+    queryKey: QUERY_KEYS.configFileListWithParams(params),
     queryFn: () => {
       const res = axiosInstance.get<ConfigFileListResponse>(`${ODATA_SERVICE.CONFIG_FILE}${API.endpoint}`, {
         params,
