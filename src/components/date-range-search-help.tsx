@@ -48,6 +48,7 @@ export function DateRangeSearchHelp({ field, afterFilterStringBuild }: DateRange
       primaryCalendarType="Gregorian"
       valueState={valueState}
       showClearIcon
+      data-ui5-compact-size=""
       className="w-full h-6.5"
       valueStateMessage={message ? <Text>{message}</Text> : undefined}
     />
