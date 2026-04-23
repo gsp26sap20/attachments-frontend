@@ -70,6 +70,7 @@ export function AttachmentDetailView() {
       onSuccess: () => {
         invalidateAtt.invalidateAttachmentDetail(id!);
         invalidateAtt.invalidateAttachmentTitle(id!);
+        invalidateAtt.invalidateAttachmentAudit(id!);
         toast('Attachment updated successfully');
         setIsEditMode(false);
         setTitleError('');
