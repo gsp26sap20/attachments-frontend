@@ -2,8 +2,8 @@ function displayAuditAction(action?: string) {
   switch (action) {
     case 'CREATE':
       return 'Create';
-    case 'UPDATE_TITLE':
-      return 'Update Title';
+    case 'UPDATE':
+      return 'Update';
     case 'SET_CURRENT_VERSION':
       return 'Set Current Version';
     case 'DELETE':
